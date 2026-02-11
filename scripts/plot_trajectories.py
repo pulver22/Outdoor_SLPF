@@ -267,24 +267,24 @@ def main():
     
     trajectories = {
         'SPF LiDAR': {
-            'trajectory': data_dir / 'spf_lidar' / 'spf_lidar.tum',
-            'ground_truth': data_dir / 'spf_lidar' / 'gps_pose.tum'
+            'trajectory': results_dir / 'spf_lidar' / 'spf_lidar.tum',
+            'ground_truth': results_dir / 'spf_lidar' / 'gps_pose.tum'
         },
         'Noisy GPS': {
-            'trajectory': data_dir / 'ngps_only' / 'trajectory_pf.tum',
-            'ground_truth': data_dir / 'ngps_only' / 'gps_pose.tum'
+            'trajectory': results_dir / 'ngps_only' / 'trajectory_pf.tum',
+            'ground_truth': results_dir / 'ngps_only' / 'gps_pose.tum'
         },
         'AMCL+GPS': {
-            'trajectory': data_dir / 'amcl' / 'tum1' / 'amcl_pose.tum',
-            'ground_truth': data_dir / 'amcl' / 'tum1' / 'gps_pose.tum'
+            'trajectory': results_dir / 'amcl' / 'tum1' / 'amcl_pose.tum',
+            'ground_truth': results_dir / 'amcl' / 'tum1' / 'gps_pose.tum'
         },
         'RTABMap RGBD': {
-            'trajectory': data_dir / 'rtabmap' / 'rgbd' / 'tum1' / 'rtabmap_rgbd_filtered.tum',
-            'ground_truth': data_dir / 'rtabmap' / 'rgbd' / 'tum1' / 'gps_pose.tum'
+            'trajectory': results_dir / 'rtabmap' / 'rgbd' / 'tum1' / 'rtabmap_rgbd_filtered.tum',
+            'ground_truth': results_dir / 'rtabmap' / 'rgbd' / 'tum1' / 'gps_pose.tum'
         },
         'RTABMap RGB': {
-            'trajectory': data_dir / 'rtabmap' / 'rgb' / 'tum1' / 'rtabmap_rgb_filtered.tum',
-            'ground_truth': data_dir / 'rtabmap' / 'rgb' / 'tum1' / 'gps_pose.tum'
+            'trajectory': results_dir / 'rtabmap' / 'rgb' / 'tum1' / 'rtabmap_rgb_filtered.tum',
+            'ground_truth': results_dir / 'rtabmap' / 'rgb' / 'tum1' / 'gps_pose.tum'
         }
     }
 

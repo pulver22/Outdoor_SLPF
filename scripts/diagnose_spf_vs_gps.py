@@ -79,9 +79,9 @@ def main():
     results.mkdir(exist_ok=True)
 
     # files
-    gt_f = data / 'spf_lidar' / 'gps_pose.tum'
-    spf_f = data / 'spf_lidar' / 'spf_lidar.tum'
-    gps_f = data / 'ngps_only' / 'trajectory_pf.tum'
+    gt_f = results / 'spf_lidar' / 'gps_pose.tum'
+    spf_f = results / 'spf_lidar' / 'spf_lidar.tum'
+    gps_f = results / 'ngps_only' / 'trajectory_pf.tum'
 
     gt_ts, gt_pos, _ = read_tum_file(gt_f)
     spf_ts, spf_pos, spf_q = read_tum_file(spf_f)

@@ -50,6 +50,6 @@ def compute_stats(traj_path, gt_path):
 if __name__ == "__main__":
     from pathlib import Path
     base_dir = Path(__file__).parent.parent
-    traj_path = base_dir / "data/rtabmap/rgbd/tum1/rtabmap_rgbd_filtered.tum"
-    gt_path = base_dir / "data/rtabmap/rgbd/tum1/gps_pose.tum"
+    traj_path = base_dir / "results/rtabmap/rgbd/tum1/rtabmap_rgbd_filtered.tum"
+    gt_path = base_dir / "results/rtabmap/rgbd/tum1/gps_pose.tum"
     compute_stats(traj_path, gt_path)
