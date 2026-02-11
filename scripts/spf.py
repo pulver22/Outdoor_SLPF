@@ -4,6 +4,7 @@ import numpy as np
 import csv
 import math
 import argparse
+from pathlib import Path
 from ultralytics import YOLO
 from tqdm import tqdm
 import torch
@@ -17,10 +18,11 @@ from pyproj import Transformer
 
 
 # ---------- CONFIG ----------
+base_dir = Path(__file__).parent.parent
 FRAME_STRIDE = 5
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f"Using device: {device}")
-yolo = YOLO("./models/yolo.pt").to(device)
+yolo = YOLO(base_dir / "models/yolo.pt").to(device)
 CLASS_IDS = [2, 4]
 CLASS_NAMES = {2: 'poles', 4: 'trunks'}
 CLASS_WEIGHTS = {
@@ -38,10 +40,10 @@ INIT_HEADING = np.deg2rad(110)
 SENSOR_RANGE = 5.0
 HORIZONTAL_FOV = np.deg2rad(87)
 CAMERA_BASE_TF = 0.55
-geojson_path = "data/riseholme_poles_trunk.geojson"
+geojson_path = base_dir / "data/riseholme_poles_trunk.geojson"
 # Paths for folder-based processing
-DATA_PATH = "data/2025/ICRA2/"
-CSV_DATA_PATH = DATA_PATH + "data.csv"
+DATA_PATH = base_dir / "data/2025/ICRA2/"
+CSV_DATA_PATH = DATA_PATH / "data.csv"
 
 # Camera Intrinsics
 class Intrinsics:

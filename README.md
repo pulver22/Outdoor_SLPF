@@ -8,6 +8,23 @@ Submitted to ICRA 2026. <br>
 [Download dataset](https://lcas.lincoln.ac.uk/nextcloud/index.php/s/i8LtjsZ3pdjsYxs)
 ---
 
+## Project Structure
+
+- `data/`: Contains trajectory data, GeoJSON maps, and sensor logs.
+- `models/`: YOLO models and other pre-trained weights.
+- `scripts/`: Python scripts for analysis, processing, and plotting.
+- `results/`: Output folder for generated plots and evaluation metrics.
+
+## Usage
+
+To generate the trajectory comparison plot:
+```bash
+python scripts/plot_trajectories.py
+```
+Plots will be saved in the `results/` directory.
+
+---
+
 ## Citation
 
 ```

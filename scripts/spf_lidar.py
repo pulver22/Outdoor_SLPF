@@ -4,6 +4,7 @@ import numpy as np
 import csv
 import argparse
 import math
+from pathlib import Path
 from ultralytics import YOLO
 from tqdm import tqdm
 import torch
@@ -17,10 +18,11 @@ from pyproj import Transformer
 
 
 # ---------- CONFIG ----------
+base_dir = Path(__file__).parent.parent
 FRAME_STRIDE = 4
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f"Using device: {device}")
-yolo = YOLO("./models/yolo.pt").to(device)
+yolo = YOLO(base_dir / "models/yolo.pt").to(device)
 CLASS_IDS = [2, 4]
 CLASS_NAMES = {2: 'poles', 4: 'trunks'}
 CLASS_WEIGHTS = {
@@ -47,7 +49,7 @@ LIDAR_TO_CAMERA_DX = 0.0  # meters (forward)
 LIDAR_TO_CAMERA_DY = 0.0  # meters (left)
 EXPECTED_OBS_COUNT = 150.0
 
-geojson_path = "data/riseholme_poles_trunk.geojson"
+geojson_path = base_dir / "data/riseholme_poles_trunk.geojson"
 # Paths for folder-based processing
 DATA_PATH = "data/2025/ICRA2/"
 CSV_DATA_PATH = DATA_PATH + "data.csv"

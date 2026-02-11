@@ -214,3 +214,8 @@ old/*
 
 # Bash Scripts
 *.sh
+*.png
+*.jpg
+*.jpeg
+*.svg
+results/
