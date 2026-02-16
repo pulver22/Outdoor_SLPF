@@ -279,6 +279,10 @@ def main():
             'trajectory': results_dir / 'spf_lidar' / 'spf_lidar.tum',
             'ground_truth': results_dir / 'spf_lidar' / 'gps_pose.tum'
         },
+        'SPF LiDAR++': {
+            'trajectory': results_dir / 'spf_lidar++' / '0.5' / 'trajectory_0.5.tum',
+            'ground_truth': results_dir / 'spf_lidar++' / '0.5' / 'gps_pose.tum'
+        },
         'Noisy GPS': {
             # use the synthetic noisy GNSS (already in results) as the method trajectory
             'trajectory': results_dir / 'ngps_only' / 'noisy_gnss.tum',
@@ -303,11 +307,20 @@ def main():
     plot_data = []
     for label, paths in trajectories.items():
         print(f"Processing {label}...")
+        traj_path = Path(paths['trajectory'])
+        gt_path = Path(paths['ground_truth']) if paths.get('ground_truth') is not None else None
+
+        if not traj_path.exists():
+            print(f"  Warning: trajectory file not found, skipping: {traj_path}")
+            continue
+        if gt_path is not None and not gt_path.exists():
+            print(f"  Warning: ground-truth file not found, skipping: {gt_path}")
+            continue
 
         gt_ts = gt_pos = gt_q = None
         if paths.get('ground_truth') is not None:
-            gt_ts, gt_pos, gt_q = read_tum_file(str(paths['ground_truth']))
-        traj_ts, traj_pos, traj_q = read_tum_file(str(paths['trajectory']))
+            gt_ts, gt_pos, gt_q = read_tum_file(str(gt_path))
+        traj_ts, traj_pos, traj_q = read_tum_file(str(traj_path))
 
         if traj_pos is None:
             print(f"  Warning: Could not read trajectory for {label}")
@@ -350,19 +363,22 @@ def main():
 
     landmark_points = load_landmark_points(data_dir / 'riseholme_poles_trunk.geojson')
 
-    fig, axes = plt.subplots(2, 3, figsize=(22, 14))
-    axes = axes.flatten()
+    n_plots = len(plot_data)
+    n_cols = 3
+    n_rows = int(np.ceil(n_plots / n_cols))
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(22, 7 * n_rows))
+    axes = np.atleast_1d(axes).flatten()
 
     # Define explicit min/max values for row-wise colormaps
-    # Row 1 (indices 0, 1, 2): SPF LiDAR, Noisy GPS, AMCL
+    # Row 1 (indices 0..n_cols-1): SPF LiDAR variants + Noisy GPS
     vmin1, vmax1 = 0.0, 5.0
 
-    # Row 2 (indices 3, 4): RTABMap methods
+    # Remaining rows: broader error range for AMCL/RTABMap methods
     vmin2, vmax2 = 0.0, 40.0
 
     for idx, item in enumerate(plot_data):
         # Assign shared range based on row
-        if idx < 3:
+        if idx < n_cols:
             v_min, v_max = vmin1, vmax1
         else:
             v_min, v_max = vmin2, vmax2

@@ -9,13 +9,14 @@ results = base / 'results'
 # map method names between our CSV and evo files
 method_map = {
     'SPF LiDAR': 'SPF',
+    'SPF LiDAR++': 'SPFPP',
     'Noisy GPS': 'NoisyGPS',
     'AMCL': 'AMCL',
     'RTABMap RGBD': 'RTAB_RGBD',
     'RTABMap RGB': 'RTAB_RGB'
 }
 
-evo_files = {v: results / f'evo_{k.lower()}_raw.json' for k, v in [('spf','SPF'), ('ngps','NoisyGPS'), ('amcl','AMCL'), ('rtab_rgbd','RTAB_RGBD'), ('rtab_rgb','RTAB_RGB')]}
+evo_files = {v: results / f'evo_{k.lower()}_raw.json' for k, v in [('spf','SPF'), ('spfpp','SPFPP'), ('ngps','NoisyGPS'), ('amcl','AMCL'), ('rtab_rgbd','RTAB_RGBD'), ('rtab_rgb','RTAB_RGB')]}
 # fallback to previously-saved names if raw absent
 for k in list(evo_files.keys()):
     if not evo_files[k].exists():
@@ -59,13 +60,14 @@ for p in results.glob('evo_*json'):
 # keywords to match archives to methods
 keywords = {
     'SPF LiDAR': ['spf', 'spf_lidar'],
+    'SPF LiDAR++': ['spfpp', 'spf_lidar++', 'trajectory_0.5'],
     'Noisy GPS': ['ngps', 'noisy', 'noisy_gnss', 'noisy-gps'],
     'AMCL': ['amcl'],
     'RTABMap RGBD': ['rtabmap_rgbd', 'rgbd'],
     'RTABMap RGB': ['rtabmap_rgb', 'rgb']
 }
 
-method_list = ['SPF LiDAR', 'Noisy GPS', 'AMCL', 'RTABMap RGBD', 'RTABMap RGB']
+method_list = ['SPF LiDAR', 'SPF LiDAR++', 'Noisy GPS', 'AMCL', 'RTABMap RGBD', 'RTABMap RGB']
 
 for method in method_list:
     ate_rmse = None

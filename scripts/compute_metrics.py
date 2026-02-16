@@ -230,6 +230,10 @@ def main():
             'trajectory': results_dir / 'spf_lidar' / 'spf_lidar.tum',
             'ground_truth': results_dir / 'spf_lidar' / 'gps_pose.tum'
         },
+        'SPF LiDAR++': {
+            'trajectory': results_dir / 'spf_lidar++' / '0.5' / 'trajectory_0.5.tum',
+            'ground_truth': results_dir / 'spf_lidar++' / '0.5' / 'gps_pose.tum'
+        },
         'Noisy GPS': {
             # treat the synthetic noisy GNSS (already in results) as the method trajectory
             'trajectory': results_dir / 'ngps_only' / 'noisy_gnss.tum',
@@ -258,13 +262,23 @@ def main():
     rows = load_rows_from_geojson(data_dir / 'riseholme_poles_trunk.geojson')
     for label, paths in trajectories.items():
         print(f"Processing {label}...")
+        traj_path = Path(paths['trajectory'])
+        gt_path = Path(paths['ground_truth']) if paths.get('ground_truth') is not None else None
+
+        if not traj_path.exists():
+            print(f"  Skipping, trajectory file not found: {traj_path}")
+            continue
+        if gt_path is not None and not gt_path.exists():
+            print(f"  Skipping, ground truth file not found: {gt_path}")
+            continue
+
         # handle lidar-only methods with no ground truth specified
         if paths.get('ground_truth') is None:
             gt_ts = gt_pos = gt_q = None
         else:
-            gt_ts, gt_pos, gt_q = read_tum_file(str(paths['ground_truth']))
+            gt_ts, gt_pos, gt_q = read_tum_file(str(gt_path))
 
-        traj_ts, traj_pos, traj_q = read_tum_file(str(paths['trajectory']))
+        traj_ts, traj_pos, traj_q = read_tum_file(str(traj_path))
         if traj_pos is None:
             print("  Skipping, could not read trajectory file.")
             continue
