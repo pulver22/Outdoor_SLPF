@@ -243,8 +243,6 @@ results/evo_aggregated_metrics.pdf
 results/iros_ablation/20260217_085102_ablation_smoke/
 results/iros_aligned/
 results/iros_rh1/archive/
-results/iros_rh1_robustness/20260225_150632_run1_robustness_cpu/
-results/iros_rh1_robustness/20260225_150715_run1_robustness_cpu/
 results/iros_riseholme2/
 results/iros_semantic_class_ablation/
 results/noisy_gps/
