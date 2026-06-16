@@ -139,6 +139,7 @@ celerybeat.pid
 .env
 .envrc
 .venv
+.venv*/
 env/
 venv/
 ENV/
@@ -216,6 +217,7 @@ output/*
 old/*
 .tmp_home/
 .tmp_mpl/
+.tmp_ultralytics/
 reviews_ICRA/
 evaluation_setup.tex
 methodology.tex
@@ -243,6 +245,7 @@ results/evo_aggregated_metrics.pdf
 results/iros_ablation/20260217_085102_ablation_smoke/
 results/iros_aligned/
 results/iros_rh1/archive/
+results/iros_rh2_topological/
 results/iros_riseholme2/
 results/iros_semantic_class_ablation/
 results/noisy_gps/

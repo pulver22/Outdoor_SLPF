@@ -1,0 +1,6674 @@
+{
+  "metadata": {
+    "source_format": "tmap2",
+    "source_tmap2": "data/topological/riseholme.tmap2.yaml",
+    "metric_map": "riseholme",
+    "name": "riseholme",
+    "pointset": "riseholme",
+    "num_tmap_nodes": 99,
+    "num_tmap_edges": 106,
+    "outer_lanes": [
+      {
+        "prefix": "OuterLaneLeft",
+        "node_count": 11,
+        "connected_to_top": "WayPoint1",
+        "connected_to_bottom": "WayPoint2"
+      },
+      {
+        "prefix": "OuterLaneRight",
+        "node_count": 11,
+        "connected_to_top": "WayPoint17",
+        "connected_to_bottom": "WayPoint18"
+      }
+    ],
+    "detected_lane_count": 9,
+    "added_outer_lanes": true,
+    "spacing_m": 0.5,
+    "num_nodes": 736,
+    "num_edges": 745
+  },
+  "nodes": [
+    {
+      "name": "OuterLaneLeft_00",
+      "x": -13.899999999999999,
+      "y": 9.23,
+      "neighbors": [
+        "OuterLaneLeft_00_OuterLaneLeft_01_0001",
+        "OuterLaneLeft_00_WayPoint1_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_00_OuterLaneLeft_01_0001",
+      "x": -13.856666666666666,
+      "y": 8.783333333333333,
+      "neighbors": [
+        "OuterLaneLeft_00",
+        "OuterLaneLeft_00_OuterLaneLeft_01_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_00_OuterLaneLeft_01_0002",
+      "x": -13.813333333333333,
+      "y": 8.336666666666666,
+      "neighbors": [
+        "OuterLaneLeft_00_OuterLaneLeft_01_0001",
+        "OuterLaneLeft_00_OuterLaneLeft_01_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_00_OuterLaneLeft_01_0003",
+      "x": -13.77,
+      "y": 7.89,
+      "neighbors": [
+        "OuterLaneLeft_00_OuterLaneLeft_01_0002",
+        "OuterLaneLeft_00_OuterLaneLeft_01_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_00_OuterLaneLeft_01_0004",
+      "x": -13.726666666666665,
+      "y": 7.443333333333333,
+      "neighbors": [
+        "OuterLaneLeft_00_OuterLaneLeft_01_0003",
+        "OuterLaneLeft_00_OuterLaneLeft_01_0005"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_00_OuterLaneLeft_01_0005",
+      "x": -13.683333333333332,
+      "y": 6.996666666666666,
+      "neighbors": [
+        "OuterLaneLeft_00_OuterLaneLeft_01_0004",
+        "OuterLaneLeft_01"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_00_WayPoint1_0001",
+      "x": -13.408,
+      "y": 9.296000000000001,
+      "neighbors": [
+        "OuterLaneLeft_00",
+        "OuterLaneLeft_00_WayPoint1_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_00_WayPoint1_0002",
+      "x": -12.915999999999999,
+      "y": 9.362,
+      "neighbors": [
+        "OuterLaneLeft_00_WayPoint1_0001",
+        "OuterLaneLeft_00_WayPoint1_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_00_WayPoint1_0003",
+      "x": -12.424,
+      "y": 9.428,
+      "neighbors": [
+        "OuterLaneLeft_00_WayPoint1_0002",
+        "OuterLaneLeft_00_WayPoint1_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_00_WayPoint1_0004",
+      "x": -11.931999999999999,
+      "y": 9.494,
+      "neighbors": [
+        "OuterLaneLeft_00_WayPoint1_0003",
+        "WayPoint1"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_01",
+      "x": -13.639999999999999,
+      "y": 6.549999999999999,
+      "neighbors": [
+        "OuterLaneLeft_00_OuterLaneLeft_01_0005",
+        "OuterLaneLeft_01_OuterLaneLeft_02_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_01_OuterLaneLeft_02_0001",
+      "x": -13.557999999999998,
+      "y": 6.149999999999999,
+      "neighbors": [
+        "OuterLaneLeft_01",
+        "OuterLaneLeft_01_OuterLaneLeft_02_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_01_OuterLaneLeft_02_0002",
+      "x": -13.475999999999999,
+      "y": 5.749999999999999,
+      "neighbors": [
+        "OuterLaneLeft_01_OuterLaneLeft_02_0001",
+        "OuterLaneLeft_01_OuterLaneLeft_02_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_01_OuterLaneLeft_02_0003",
+      "x": -13.393999999999998,
+      "y": 5.349999999999999,
+      "neighbors": [
+        "OuterLaneLeft_01_OuterLaneLeft_02_0002",
+        "OuterLaneLeft_01_OuterLaneLeft_02_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_01_OuterLaneLeft_02_0004",
+      "x": -13.312,
+      "y": 4.949999999999999,
+      "neighbors": [
+        "OuterLaneLeft_01_OuterLaneLeft_02_0003",
+        "OuterLaneLeft_02"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_02",
+      "x": -13.229999999999999,
+      "y": 4.549999999999999,
+      "neighbors": [
+        "OuterLaneLeft_01_OuterLaneLeft_02_0004",
+        "OuterLaneLeft_02_OuterLaneLeft_03_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_02_OuterLaneLeft_03_0001",
+      "x": -13.163999999999998,
+      "y": 4.127999999999999,
+      "neighbors": [
+        "OuterLaneLeft_02",
+        "OuterLaneLeft_02_OuterLaneLeft_03_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_02_OuterLaneLeft_03_0002",
+      "x": -13.097999999999999,
+      "y": 3.705999999999999,
+      "neighbors": [
+        "OuterLaneLeft_02_OuterLaneLeft_03_0001",
+        "OuterLaneLeft_02_OuterLaneLeft_03_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_02_OuterLaneLeft_03_0003",
+      "x": -13.031999999999998,
+      "y": 3.2839999999999994,
+      "neighbors": [
+        "OuterLaneLeft_02_OuterLaneLeft_03_0002",
+        "OuterLaneLeft_02_OuterLaneLeft_03_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_02_OuterLaneLeft_03_0004",
+      "x": -12.966,
+      "y": 2.861999999999999,
+      "neighbors": [
+        "OuterLaneLeft_02_OuterLaneLeft_03_0003",
+        "OuterLaneLeft_03"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_03",
+      "x": -12.899999999999999,
+      "y": 2.4399999999999995,
+      "neighbors": [
+        "OuterLaneLeft_02_OuterLaneLeft_03_0004",
+        "OuterLaneLeft_03_OuterLaneLeft_04_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_03_OuterLaneLeft_04_0001",
+      "x": -12.847999999999999,
+      "y": 2.018,
+      "neighbors": [
+        "OuterLaneLeft_03",
+        "OuterLaneLeft_03_OuterLaneLeft_04_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_03_OuterLaneLeft_04_0002",
+      "x": -12.796,
+      "y": 1.5959999999999996,
+      "neighbors": [
+        "OuterLaneLeft_03_OuterLaneLeft_04_0001",
+        "OuterLaneLeft_03_OuterLaneLeft_04_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_03_OuterLaneLeft_04_0003",
+      "x": -12.744,
+      "y": 1.174,
+      "neighbors": [
+        "OuterLaneLeft_03_OuterLaneLeft_04_0002",
+        "OuterLaneLeft_03_OuterLaneLeft_04_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_03_OuterLaneLeft_04_0004",
+      "x": -12.692,
+      "y": 0.7519999999999998,
+      "neighbors": [
+        "OuterLaneLeft_03_OuterLaneLeft_04_0003",
+        "OuterLaneLeft_04"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_04",
+      "x": -12.64,
+      "y": 0.33000000000000007,
+      "neighbors": [
+        "OuterLaneLeft_03_OuterLaneLeft_04_0004",
+        "OuterLaneLeft_04_OuterLaneLeft_05_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_04_OuterLaneLeft_05_0001",
+      "x": -12.572000000000001,
+      "y": -0.06999999999999995,
+      "neighbors": [
+        "OuterLaneLeft_04",
+        "OuterLaneLeft_04_OuterLaneLeft_05_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_04_OuterLaneLeft_05_0002",
+      "x": -12.504000000000001,
+      "y": -0.47,
+      "neighbors": [
+        "OuterLaneLeft_04_OuterLaneLeft_05_0001",
+        "OuterLaneLeft_04_OuterLaneLeft_05_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_04_OuterLaneLeft_05_0003",
+      "x": -12.436,
+      "y": -0.8699999999999999,
+      "neighbors": [
+        "OuterLaneLeft_04_OuterLaneLeft_05_0002",
+        "OuterLaneLeft_04_OuterLaneLeft_05_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_04_OuterLaneLeft_05_0004",
+      "x": -12.368,
+      "y": -1.27,
+      "neighbors": [
+        "OuterLaneLeft_04_OuterLaneLeft_05_0003",
+        "OuterLaneLeft_05"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_05",
+      "x": -12.3,
+      "y": -1.6700000000000002,
+      "neighbors": [
+        "OuterLaneLeft_04_OuterLaneLeft_05_0004",
+        "OuterLaneLeft_05_OuterLaneLeft_06_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_05_OuterLaneLeft_06_0001",
+      "x": -12.262,
+      "y": -2.09,
+      "neighbors": [
+        "OuterLaneLeft_05",
+        "OuterLaneLeft_05_OuterLaneLeft_06_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_05_OuterLaneLeft_06_0002",
+      "x": -12.224,
+      "y": -2.51,
+      "neighbors": [
+        "OuterLaneLeft_05_OuterLaneLeft_06_0001",
+        "OuterLaneLeft_05_OuterLaneLeft_06_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_05_OuterLaneLeft_06_0003",
+      "x": -12.186,
+      "y": -2.9299999999999997,
+      "neighbors": [
+        "OuterLaneLeft_05_OuterLaneLeft_06_0002",
+        "OuterLaneLeft_05_OuterLaneLeft_06_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_05_OuterLaneLeft_06_0004",
+      "x": -12.148,
+      "y": -3.3499999999999996,
+      "neighbors": [
+        "OuterLaneLeft_05_OuterLaneLeft_06_0003",
+        "OuterLaneLeft_06"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_06",
+      "x": -12.11,
+      "y": -3.77,
+      "neighbors": [
+        "OuterLaneLeft_05_OuterLaneLeft_06_0004",
+        "OuterLaneLeft_06_OuterLaneLeft_07_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_06_OuterLaneLeft_07_0001",
+      "x": -12.03,
+      "y": -4.192,
+      "neighbors": [
+        "OuterLaneLeft_06",
+        "OuterLaneLeft_06_OuterLaneLeft_07_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_06_OuterLaneLeft_07_0002",
+      "x": -11.95,
+      "y": -4.614,
+      "neighbors": [
+        "OuterLaneLeft_06_OuterLaneLeft_07_0001",
+        "OuterLaneLeft_06_OuterLaneLeft_07_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_06_OuterLaneLeft_07_0003",
+      "x": -11.870000000000001,
+      "y": -5.036,
+      "neighbors": [
+        "OuterLaneLeft_06_OuterLaneLeft_07_0002",
+        "OuterLaneLeft_06_OuterLaneLeft_07_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_06_OuterLaneLeft_07_0004",
+      "x": -11.790000000000001,
+      "y": -5.458,
+      "neighbors": [
+        "OuterLaneLeft_06_OuterLaneLeft_07_0003",
+        "OuterLaneLeft_07"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_07",
+      "x": -11.71,
+      "y": -5.88,
+      "neighbors": [
+        "OuterLaneLeft_06_OuterLaneLeft_07_0004",
+        "OuterLaneLeft_07_OuterLaneLeft_08_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_07_OuterLaneLeft_08_0001",
+      "x": -11.670000000000002,
+      "y": -6.302,
+      "neighbors": [
+        "OuterLaneLeft_07",
+        "OuterLaneLeft_07_OuterLaneLeft_08_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_07_OuterLaneLeft_08_0002",
+      "x": -11.63,
+      "y": -6.724,
+      "neighbors": [
+        "OuterLaneLeft_07_OuterLaneLeft_08_0001",
+        "OuterLaneLeft_07_OuterLaneLeft_08_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_07_OuterLaneLeft_08_0003",
+      "x": -11.590000000000002,
+      "y": -7.146,
+      "neighbors": [
+        "OuterLaneLeft_07_OuterLaneLeft_08_0002",
+        "OuterLaneLeft_07_OuterLaneLeft_08_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_07_OuterLaneLeft_08_0004",
+      "x": -11.55,
+      "y": -7.5680000000000005,
+      "neighbors": [
+        "OuterLaneLeft_07_OuterLaneLeft_08_0003",
+        "OuterLaneLeft_08"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_08",
+      "x": -11.510000000000002,
+      "y": -7.99,
+      "neighbors": [
+        "OuterLaneLeft_07_OuterLaneLeft_08_0004",
+        "OuterLaneLeft_08_OuterLaneLeft_09_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_08_OuterLaneLeft_09_0001",
+      "x": -11.430000000000001,
+      "y": -8.39,
+      "neighbors": [
+        "OuterLaneLeft_08",
+        "OuterLaneLeft_08_OuterLaneLeft_09_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_08_OuterLaneLeft_09_0002",
+      "x": -11.350000000000001,
+      "y": -8.790000000000001,
+      "neighbors": [
+        "OuterLaneLeft_08_OuterLaneLeft_09_0001",
+        "OuterLaneLeft_08_OuterLaneLeft_09_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_08_OuterLaneLeft_09_0003",
+      "x": -11.27,
+      "y": -9.19,
+      "neighbors": [
+        "OuterLaneLeft_08_OuterLaneLeft_09_0002",
+        "OuterLaneLeft_08_OuterLaneLeft_09_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_08_OuterLaneLeft_09_0004",
+      "x": -11.19,
+      "y": -9.59,
+      "neighbors": [
+        "OuterLaneLeft_08_OuterLaneLeft_09_0003",
+        "OuterLaneLeft_09"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_09",
+      "x": -11.11,
+      "y": -9.99,
+      "neighbors": [
+        "OuterLaneLeft_08_OuterLaneLeft_09_0004",
+        "OuterLaneLeft_09_OuterLaneLeft_10_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_09_OuterLaneLeft_10_0001",
+      "x": -11.043333333333333,
+      "y": -10.436666666666667,
+      "neighbors": [
+        "OuterLaneLeft_09",
+        "OuterLaneLeft_09_OuterLaneLeft_10_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_09_OuterLaneLeft_10_0002",
+      "x": -10.976666666666667,
+      "y": -10.883333333333333,
+      "neighbors": [
+        "OuterLaneLeft_09_OuterLaneLeft_10_0001",
+        "OuterLaneLeft_09_OuterLaneLeft_10_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_09_OuterLaneLeft_10_0003",
+      "x": -10.91,
+      "y": -11.33,
+      "neighbors": [
+        "OuterLaneLeft_09_OuterLaneLeft_10_0002",
+        "OuterLaneLeft_09_OuterLaneLeft_10_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_09_OuterLaneLeft_10_0004",
+      "x": -10.843333333333334,
+      "y": -11.776666666666667,
+      "neighbors": [
+        "OuterLaneLeft_09_OuterLaneLeft_10_0003",
+        "OuterLaneLeft_09_OuterLaneLeft_10_0005"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_09_OuterLaneLeft_10_0005",
+      "x": -10.776666666666667,
+      "y": -12.223333333333333,
+      "neighbors": [
+        "OuterLaneLeft_09_OuterLaneLeft_10_0004",
+        "OuterLaneLeft_10"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_10",
+      "x": -10.71,
+      "y": -12.67,
+      "neighbors": [
+        "OuterLaneLeft_09_OuterLaneLeft_10_0005",
+        "OuterLaneLeft_10_WayPoint2_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_10_WayPoint2_0001",
+      "x": -10.218,
+      "y": -12.602,
+      "neighbors": [
+        "OuterLaneLeft_10",
+        "OuterLaneLeft_10_WayPoint2_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_10_WayPoint2_0002",
+      "x": -9.726,
+      "y": -12.534,
+      "neighbors": [
+        "OuterLaneLeft_10_WayPoint2_0001",
+        "OuterLaneLeft_10_WayPoint2_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_10_WayPoint2_0003",
+      "x": -9.234,
+      "y": -12.466,
+      "neighbors": [
+        "OuterLaneLeft_10_WayPoint2_0002",
+        "OuterLaneLeft_10_WayPoint2_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneLeft_10_WayPoint2_0004",
+      "x": -8.742,
+      "y": -12.398,
+      "neighbors": [
+        "OuterLaneLeft_10_WayPoint2_0003",
+        "WayPoint2"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_00",
+      "x": 10.830000000000002,
+      "y": 12.67,
+      "neighbors": [
+        "OuterLaneRight_00_OuterLaneRight_01_0001",
+        "OuterLaneRight_00_WayPoint17_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_00_OuterLaneRight_01_0001",
+      "x": 10.896666666666668,
+      "y": 12.225,
+      "neighbors": [
+        "OuterLaneRight_00",
+        "OuterLaneRight_00_OuterLaneRight_01_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_00_OuterLaneRight_01_0002",
+      "x": 10.963333333333335,
+      "y": 11.78,
+      "neighbors": [
+        "OuterLaneRight_00_OuterLaneRight_01_0001",
+        "OuterLaneRight_00_OuterLaneRight_01_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_00_OuterLaneRight_01_0003",
+      "x": 11.030000000000001,
+      "y": 11.335,
+      "neighbors": [
+        "OuterLaneRight_00_OuterLaneRight_01_0002",
+        "OuterLaneRight_00_OuterLaneRight_01_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_00_OuterLaneRight_01_0004",
+      "x": 11.096666666666666,
+      "y": 10.89,
+      "neighbors": [
+        "OuterLaneRight_00_OuterLaneRight_01_0003",
+        "OuterLaneRight_00_OuterLaneRight_01_0005"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_00_OuterLaneRight_01_0005",
+      "x": 11.163333333333332,
+      "y": 10.445,
+      "neighbors": [
+        "OuterLaneRight_00_OuterLaneRight_01_0004",
+        "OuterLaneRight_01"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_00_WayPoint17_0001",
+      "x": 10.408333333333335,
+      "y": 12.615,
+      "neighbors": [
+        "OuterLaneRight_00",
+        "OuterLaneRight_00_WayPoint17_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_00_WayPoint17_0002",
+      "x": 9.986666666666668,
+      "y": 12.56,
+      "neighbors": [
+        "OuterLaneRight_00_WayPoint17_0001",
+        "OuterLaneRight_00_WayPoint17_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_00_WayPoint17_0003",
+      "x": 9.565000000000001,
+      "y": 12.504999999999999,
+      "neighbors": [
+        "OuterLaneRight_00_WayPoint17_0002",
+        "OuterLaneRight_00_WayPoint17_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_00_WayPoint17_0004",
+      "x": 9.143333333333334,
+      "y": 12.45,
+      "neighbors": [
+        "OuterLaneRight_00_WayPoint17_0003",
+        "OuterLaneRight_00_WayPoint17_0005"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_00_WayPoint17_0005",
+      "x": 8.721666666666668,
+      "y": 12.395,
+      "neighbors": [
+        "OuterLaneRight_00_WayPoint17_0004",
+        "WayPoint17"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_01",
+      "x": 11.229999999999999,
+      "y": 10.0,
+      "neighbors": [
+        "OuterLaneRight_00_OuterLaneRight_01_0005",
+        "OuterLaneRight_01_OuterLaneRight_02_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_01_OuterLaneRight_02_0001",
+      "x": 11.2775,
+      "y": 9.5275,
+      "neighbors": [
+        "OuterLaneRight_01",
+        "OuterLaneRight_01_OuterLaneRight_02_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_01_OuterLaneRight_02_0002",
+      "x": 11.325,
+      "y": 9.055,
+      "neighbors": [
+        "OuterLaneRight_01_OuterLaneRight_02_0001",
+        "OuterLaneRight_01_OuterLaneRight_02_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_01_OuterLaneRight_02_0003",
+      "x": 11.3725,
+      "y": 8.5825,
+      "neighbors": [
+        "OuterLaneRight_01_OuterLaneRight_02_0002",
+        "OuterLaneRight_02"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_02",
+      "x": 11.420000000000002,
+      "y": 8.11,
+      "neighbors": [
+        "OuterLaneRight_01_OuterLaneRight_02_0003",
+        "OuterLaneRight_02_OuterLaneRight_03_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_02_OuterLaneRight_03_0001",
+      "x": 11.502000000000002,
+      "y": 7.6659999999999995,
+      "neighbors": [
+        "OuterLaneRight_02",
+        "OuterLaneRight_02_OuterLaneRight_03_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_02_OuterLaneRight_03_0002",
+      "x": 11.584000000000001,
+      "y": 7.2219999999999995,
+      "neighbors": [
+        "OuterLaneRight_02_OuterLaneRight_03_0001",
+        "OuterLaneRight_02_OuterLaneRight_03_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_02_OuterLaneRight_03_0003",
+      "x": 11.666000000000002,
+      "y": 6.777999999999999,
+      "neighbors": [
+        "OuterLaneRight_02_OuterLaneRight_03_0002",
+        "OuterLaneRight_02_OuterLaneRight_03_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_02_OuterLaneRight_03_0004",
+      "x": 11.748000000000001,
+      "y": 6.333999999999999,
+      "neighbors": [
+        "OuterLaneRight_02_OuterLaneRight_03_0003",
+        "OuterLaneRight_03"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_03",
+      "x": 11.830000000000002,
+      "y": 5.889999999999999,
+      "neighbors": [
+        "OuterLaneRight_02_OuterLaneRight_03_0004",
+        "OuterLaneRight_03_OuterLaneRight_04_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_03_OuterLaneRight_04_0001",
+      "x": 11.868000000000002,
+      "y": 5.467999999999999,
+      "neighbors": [
+        "OuterLaneRight_03",
+        "OuterLaneRight_03_OuterLaneRight_04_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_03_OuterLaneRight_04_0002",
+      "x": 11.906000000000002,
+      "y": 5.045999999999999,
+      "neighbors": [
+        "OuterLaneRight_03_OuterLaneRight_04_0001",
+        "OuterLaneRight_03_OuterLaneRight_04_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_03_OuterLaneRight_04_0003",
+      "x": 11.944,
+      "y": 4.624,
+      "neighbors": [
+        "OuterLaneRight_03_OuterLaneRight_04_0002",
+        "OuterLaneRight_03_OuterLaneRight_04_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_03_OuterLaneRight_04_0004",
+      "x": 11.982000000000001,
+      "y": 4.202,
+      "neighbors": [
+        "OuterLaneRight_03_OuterLaneRight_04_0003",
+        "OuterLaneRight_04"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_04",
+      "x": 12.020000000000001,
+      "y": 3.7800000000000002,
+      "neighbors": [
+        "OuterLaneRight_03_OuterLaneRight_04_0004",
+        "OuterLaneRight_04_OuterLaneRight_05_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_04_OuterLaneRight_05_0001",
+      "x": 12.086000000000002,
+      "y": 3.38,
+      "neighbors": [
+        "OuterLaneRight_04",
+        "OuterLaneRight_04_OuterLaneRight_05_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_04_OuterLaneRight_05_0002",
+      "x": 12.152000000000001,
+      "y": 2.98,
+      "neighbors": [
+        "OuterLaneRight_04_OuterLaneRight_05_0001",
+        "OuterLaneRight_04_OuterLaneRight_05_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_04_OuterLaneRight_05_0003",
+      "x": 12.218000000000002,
+      "y": 2.58,
+      "neighbors": [
+        "OuterLaneRight_04_OuterLaneRight_05_0002",
+        "OuterLaneRight_04_OuterLaneRight_05_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_04_OuterLaneRight_05_0004",
+      "x": 12.284,
+      "y": 2.1799999999999997,
+      "neighbors": [
+        "OuterLaneRight_04_OuterLaneRight_05_0003",
+        "OuterLaneRight_05"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_05",
+      "x": 12.350000000000001,
+      "y": 1.7799999999999998,
+      "neighbors": [
+        "OuterLaneRight_04_OuterLaneRight_05_0004",
+        "OuterLaneRight_05_OuterLaneRight_06_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_05_OuterLaneRight_06_0001",
+      "x": 12.432000000000002,
+      "y": 1.3579999999999999,
+      "neighbors": [
+        "OuterLaneRight_05",
+        "OuterLaneRight_05_OuterLaneRight_06_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_05_OuterLaneRight_06_0002",
+      "x": 12.514000000000001,
+      "y": 0.9359999999999998,
+      "neighbors": [
+        "OuterLaneRight_05_OuterLaneRight_06_0001",
+        "OuterLaneRight_05_OuterLaneRight_06_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_05_OuterLaneRight_06_0003",
+      "x": 12.596000000000002,
+      "y": 0.514,
+      "neighbors": [
+        "OuterLaneRight_05_OuterLaneRight_06_0002",
+        "OuterLaneRight_05_OuterLaneRight_06_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_05_OuterLaneRight_06_0004",
+      "x": 12.678,
+      "y": 0.09199999999999986,
+      "neighbors": [
+        "OuterLaneRight_05_OuterLaneRight_06_0003",
+        "OuterLaneRight_06"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_06",
+      "x": 12.760000000000002,
+      "y": -0.33000000000000007,
+      "neighbors": [
+        "OuterLaneRight_05_OuterLaneRight_06_0004",
+        "OuterLaneRight_06_OuterLaneRight_07_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_06_OuterLaneRight_07_0001",
+      "x": 12.798000000000002,
+      "y": -0.7500000000000001,
+      "neighbors": [
+        "OuterLaneRight_06",
+        "OuterLaneRight_06_OuterLaneRight_07_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_06_OuterLaneRight_07_0002",
+      "x": 12.836000000000002,
+      "y": -1.1700000000000002,
+      "neighbors": [
+        "OuterLaneRight_06_OuterLaneRight_07_0001",
+        "OuterLaneRight_06_OuterLaneRight_07_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_06_OuterLaneRight_07_0003",
+      "x": 12.874,
+      "y": -1.59,
+      "neighbors": [
+        "OuterLaneRight_06_OuterLaneRight_07_0002",
+        "OuterLaneRight_06_OuterLaneRight_07_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_06_OuterLaneRight_07_0004",
+      "x": 12.912,
+      "y": -2.0100000000000002,
+      "neighbors": [
+        "OuterLaneRight_06_OuterLaneRight_07_0003",
+        "OuterLaneRight_07"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_07",
+      "x": 12.950000000000001,
+      "y": -2.43,
+      "neighbors": [
+        "OuterLaneRight_06_OuterLaneRight_07_0004",
+        "OuterLaneRight_07_OuterLaneRight_08_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_07_OuterLaneRight_08_0001",
+      "x": 13.028,
+      "y": -2.874,
+      "neighbors": [
+        "OuterLaneRight_07",
+        "OuterLaneRight_07_OuterLaneRight_08_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_07_OuterLaneRight_08_0002",
+      "x": 13.106,
+      "y": -3.318,
+      "neighbors": [
+        "OuterLaneRight_07_OuterLaneRight_08_0001",
+        "OuterLaneRight_07_OuterLaneRight_08_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_07_OuterLaneRight_08_0003",
+      "x": 13.184000000000001,
+      "y": -3.7619999999999996,
+      "neighbors": [
+        "OuterLaneRight_07_OuterLaneRight_08_0002",
+        "OuterLaneRight_07_OuterLaneRight_08_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_07_OuterLaneRight_08_0004",
+      "x": 13.262,
+      "y": -4.2059999999999995,
+      "neighbors": [
+        "OuterLaneRight_07_OuterLaneRight_08_0003",
+        "OuterLaneRight_08"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_08",
+      "x": 13.34,
+      "y": -4.6499999999999995,
+      "neighbors": [
+        "OuterLaneRight_07_OuterLaneRight_08_0004",
+        "OuterLaneRight_08_OuterLaneRight_09_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_08_OuterLaneRight_09_0001",
+      "x": 13.3925,
+      "y": -5.1225,
+      "neighbors": [
+        "OuterLaneRight_08",
+        "OuterLaneRight_08_OuterLaneRight_09_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_08_OuterLaneRight_09_0002",
+      "x": 13.445,
+      "y": -5.595,
+      "neighbors": [
+        "OuterLaneRight_08_OuterLaneRight_09_0001",
+        "OuterLaneRight_08_OuterLaneRight_09_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_08_OuterLaneRight_09_0003",
+      "x": 13.497499999999999,
+      "y": -6.0675,
+      "neighbors": [
+        "OuterLaneRight_08_OuterLaneRight_09_0002",
+        "OuterLaneRight_09"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_09",
+      "x": 13.549999999999999,
+      "y": -6.54,
+      "neighbors": [
+        "OuterLaneRight_08_OuterLaneRight_09_0003",
+        "OuterLaneRight_09_OuterLaneRight_10_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_09_OuterLaneRight_10_0001",
+      "x": 13.616666666666665,
+      "y": -6.986666666666666,
+      "neighbors": [
+        "OuterLaneRight_09",
+        "OuterLaneRight_09_OuterLaneRight_10_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_09_OuterLaneRight_10_0002",
+      "x": 13.683333333333334,
+      "y": -7.433333333333334,
+      "neighbors": [
+        "OuterLaneRight_09_OuterLaneRight_10_0001",
+        "OuterLaneRight_09_OuterLaneRight_10_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_09_OuterLaneRight_10_0003",
+      "x": 13.75,
+      "y": -7.880000000000001,
+      "neighbors": [
+        "OuterLaneRight_09_OuterLaneRight_10_0002",
+        "OuterLaneRight_09_OuterLaneRight_10_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_09_OuterLaneRight_10_0004",
+      "x": 13.816666666666666,
+      "y": -8.326666666666668,
+      "neighbors": [
+        "OuterLaneRight_09_OuterLaneRight_10_0003",
+        "OuterLaneRight_09_OuterLaneRight_10_0005"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_09_OuterLaneRight_10_0005",
+      "x": 13.883333333333335,
+      "y": -8.773333333333333,
+      "neighbors": [
+        "OuterLaneRight_09_OuterLaneRight_10_0004",
+        "OuterLaneRight_10"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_10",
+      "x": 13.950000000000001,
+      "y": -9.22,
+      "neighbors": [
+        "OuterLaneRight_09_OuterLaneRight_10_0005",
+        "OuterLaneRight_10_WayPoint18_0001"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_10_WayPoint18_0001",
+      "x": 13.458,
+      "y": -9.286000000000001,
+      "neighbors": [
+        "OuterLaneRight_10",
+        "OuterLaneRight_10_WayPoint18_0002"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_10_WayPoint18_0002",
+      "x": 12.966000000000001,
+      "y": -9.352,
+      "neighbors": [
+        "OuterLaneRight_10_WayPoint18_0001",
+        "OuterLaneRight_10_WayPoint18_0003"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_10_WayPoint18_0003",
+      "x": 12.474,
+      "y": -9.418000000000001,
+      "neighbors": [
+        "OuterLaneRight_10_WayPoint18_0002",
+        "OuterLaneRight_10_WayPoint18_0004"
+      ]
+    },
+    {
+      "name": "OuterLaneRight_10_WayPoint18_0004",
+      "x": 11.982,
+      "y": -9.484,
+      "neighbors": [
+        "OuterLaneRight_10_WayPoint18_0003",
+        "WayPoint18"
+      ]
+    },
+    {
+      "name": "WayPoint1",
+      "x": -11.44,
+      "y": 9.56,
+      "neighbors": [
+        "OuterLaneLeft_00_WayPoint1_0004",
+        "WayPoint1_WayPoint19_0001",
+        "WayPoint1_WayPoint5_0001"
+      ]
+    },
+    {
+      "name": "WayPoint10",
+      "x": 1.59,
+      "y": -10.99,
+      "neighbors": [
+        "WayPoint10_WayPoint14_0001",
+        "WayPoint10_WayPoint63_0001",
+        "WayPoint10_WayPoint6_0001"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint14_0001",
+      "x": 2.081,
+      "y": -10.913,
+      "neighbors": [
+        "WayPoint10",
+        "WayPoint10_WayPoint14_0002"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint14_0002",
+      "x": 2.572,
+      "y": -10.836,
+      "neighbors": [
+        "WayPoint10_WayPoint14_0001",
+        "WayPoint10_WayPoint14_0003"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint14_0003",
+      "x": 3.063,
+      "y": -10.759,
+      "neighbors": [
+        "WayPoint10_WayPoint14_0002",
+        "WayPoint10_WayPoint14_0004"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint14_0004",
+      "x": 3.5540000000000003,
+      "y": -10.682,
+      "neighbors": [
+        "WayPoint10_WayPoint14_0003",
+        "WayPoint10_WayPoint14_0005"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint14_0005",
+      "x": 4.045,
+      "y": -10.605,
+      "neighbors": [
+        "WayPoint10_WayPoint14_0004",
+        "WayPoint10_WayPoint14_0006"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint14_0006",
+      "x": 4.5360000000000005,
+      "y": -10.528,
+      "neighbors": [
+        "WayPoint10_WayPoint14_0005",
+        "WayPoint10_WayPoint14_0007"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint14_0007",
+      "x": 5.027,
+      "y": -10.451,
+      "neighbors": [
+        "WayPoint10_WayPoint14_0006",
+        "WayPoint10_WayPoint14_0008"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint14_0008",
+      "x": 5.518000000000001,
+      "y": -10.374,
+      "neighbors": [
+        "WayPoint10_WayPoint14_0007",
+        "WayPoint10_WayPoint14_0009"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint14_0009",
+      "x": 6.009,
+      "y": -10.297,
+      "neighbors": [
+        "WayPoint10_WayPoint14_0008",
+        "WayPoint14"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint63_0001",
+      "x": 1.5333333333333334,
+      "y": -10.546666666666667,
+      "neighbors": [
+        "WayPoint10",
+        "WayPoint10_WayPoint63_0002"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint63_0002",
+      "x": 1.4766666666666668,
+      "y": -10.103333333333333,
+      "neighbors": [
+        "WayPoint10_WayPoint63_0001",
+        "WayPoint10_WayPoint63_0003"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint63_0003",
+      "x": 1.42,
+      "y": -9.66,
+      "neighbors": [
+        "WayPoint10_WayPoint63_0002",
+        "WayPoint10_WayPoint63_0004"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint63_0004",
+      "x": 1.3633333333333333,
+      "y": -9.216666666666667,
+      "neighbors": [
+        "WayPoint10_WayPoint63_0003",
+        "WayPoint10_WayPoint63_0005"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint63_0005",
+      "x": 1.3066666666666666,
+      "y": -8.773333333333333,
+      "neighbors": [
+        "WayPoint10_WayPoint63_0004",
+        "WayPoint63"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint6_0001",
+      "x": 1.098,
+      "y": -11.057,
+      "neighbors": [
+        "WayPoint10",
+        "WayPoint10_WayPoint6_0002"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint6_0002",
+      "x": 0.6060000000000001,
+      "y": -11.124,
+      "neighbors": [
+        "WayPoint10_WayPoint6_0001",
+        "WayPoint10_WayPoint6_0003"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint6_0003",
+      "x": 0.1140000000000001,
+      "y": -11.191,
+      "neighbors": [
+        "WayPoint10_WayPoint6_0002",
+        "WayPoint10_WayPoint6_0004"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint6_0004",
+      "x": -0.3779999999999999,
+      "y": -11.258000000000001,
+      "neighbors": [
+        "WayPoint10_WayPoint6_0003",
+        "WayPoint10_WayPoint6_0005"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint6_0005",
+      "x": -0.8699999999999999,
+      "y": -11.325,
+      "neighbors": [
+        "WayPoint10_WayPoint6_0004",
+        "WayPoint10_WayPoint6_0006"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint6_0006",
+      "x": -1.3619999999999999,
+      "y": -11.392,
+      "neighbors": [
+        "WayPoint10_WayPoint6_0005",
+        "WayPoint10_WayPoint6_0007"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint6_0007",
+      "x": -1.8539999999999999,
+      "y": -11.459,
+      "neighbors": [
+        "WayPoint10_WayPoint6_0006",
+        "WayPoint10_WayPoint6_0008"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint6_0008",
+      "x": -2.346,
+      "y": -11.526,
+      "neighbors": [
+        "WayPoint10_WayPoint6_0007",
+        "WayPoint10_WayPoint6_0009"
+      ]
+    },
+    {
+      "name": "WayPoint10_WayPoint6_0009",
+      "x": -2.838,
+      "y": -11.593,
+      "neighbors": [
+        "WayPoint10_WayPoint6_0008",
+        "WayPoint6"
+      ]
+    },
+    {
+      "name": "WayPoint11",
+      "x": 0.86,
+      "y": 11.34,
+      "neighbors": [
+        "WayPoint11_WayPoint15_0001",
+        "WayPoint11_WayPoint64_0001",
+        "WayPoint11_WayPoint7_0001"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint15_0001",
+      "x": 1.351,
+      "y": 11.407,
+      "neighbors": [
+        "WayPoint11",
+        "WayPoint11_WayPoint15_0002"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint15_0002",
+      "x": 1.8419999999999999,
+      "y": 11.474,
+      "neighbors": [
+        "WayPoint11_WayPoint15_0001",
+        "WayPoint11_WayPoint15_0003"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint15_0003",
+      "x": 2.3329999999999997,
+      "y": 11.541,
+      "neighbors": [
+        "WayPoint11_WayPoint15_0002",
+        "WayPoint11_WayPoint15_0004"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint15_0004",
+      "x": 2.824,
+      "y": 11.608,
+      "neighbors": [
+        "WayPoint11_WayPoint15_0003",
+        "WayPoint11_WayPoint15_0005"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint15_0005",
+      "x": 3.3149999999999995,
+      "y": 11.675,
+      "neighbors": [
+        "WayPoint11_WayPoint15_0004",
+        "WayPoint11_WayPoint15_0006"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint15_0006",
+      "x": 3.805999999999999,
+      "y": 11.741999999999999,
+      "neighbors": [
+        "WayPoint11_WayPoint15_0005",
+        "WayPoint11_WayPoint15_0007"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint15_0007",
+      "x": 4.297,
+      "y": 11.809,
+      "neighbors": [
+        "WayPoint11_WayPoint15_0006",
+        "WayPoint11_WayPoint15_0008"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint15_0008",
+      "x": 4.787999999999999,
+      "y": 11.876,
+      "neighbors": [
+        "WayPoint11_WayPoint15_0007",
+        "WayPoint11_WayPoint15_0009"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint15_0009",
+      "x": 5.279,
+      "y": 11.943,
+      "neighbors": [
+        "WayPoint11_WayPoint15_0008",
+        "WayPoint15"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint64_0001",
+      "x": 0.915,
+      "y": 10.895,
+      "neighbors": [
+        "WayPoint11",
+        "WayPoint11_WayPoint64_0002"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint64_0002",
+      "x": 0.97,
+      "y": 10.45,
+      "neighbors": [
+        "WayPoint11_WayPoint64_0001",
+        "WayPoint11_WayPoint64_0003"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint64_0003",
+      "x": 1.025,
+      "y": 10.004999999999999,
+      "neighbors": [
+        "WayPoint11_WayPoint64_0002",
+        "WayPoint11_WayPoint64_0004"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint64_0004",
+      "x": 1.08,
+      "y": 9.56,
+      "neighbors": [
+        "WayPoint11_WayPoint64_0003",
+        "WayPoint11_WayPoint64_0005"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint64_0005",
+      "x": 1.135,
+      "y": 9.115,
+      "neighbors": [
+        "WayPoint11_WayPoint64_0004",
+        "WayPoint64"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint7_0001",
+      "x": 0.368,
+      "y": 11.262,
+      "neighbors": [
+        "WayPoint11",
+        "WayPoint11_WayPoint7_0002"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint7_0002",
+      "x": -0.124,
+      "y": 11.184,
+      "neighbors": [
+        "WayPoint11_WayPoint7_0001",
+        "WayPoint11_WayPoint7_0003"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint7_0003",
+      "x": -0.616,
+      "y": 11.106,
+      "neighbors": [
+        "WayPoint11_WayPoint7_0002",
+        "WayPoint11_WayPoint7_0004"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint7_0004",
+      "x": -1.108,
+      "y": 11.028,
+      "neighbors": [
+        "WayPoint11_WayPoint7_0003",
+        "WayPoint11_WayPoint7_0005"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint7_0005",
+      "x": -1.6,
+      "y": 10.95,
+      "neighbors": [
+        "WayPoint11_WayPoint7_0004",
+        "WayPoint11_WayPoint7_0006"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint7_0006",
+      "x": -2.092,
+      "y": 10.872,
+      "neighbors": [
+        "WayPoint11_WayPoint7_0005",
+        "WayPoint11_WayPoint7_0007"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint7_0007",
+      "x": -2.584,
+      "y": 10.794,
+      "neighbors": [
+        "WayPoint11_WayPoint7_0006",
+        "WayPoint11_WayPoint7_0008"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint7_0008",
+      "x": -3.076,
+      "y": 10.716000000000001,
+      "neighbors": [
+        "WayPoint11_WayPoint7_0007",
+        "WayPoint11_WayPoint7_0009"
+      ]
+    },
+    {
+      "name": "WayPoint11_WayPoint7_0009",
+      "x": -3.568,
+      "y": 10.638,
+      "neighbors": [
+        "WayPoint11_WayPoint7_0008",
+        "WayPoint7"
+      ]
+    },
+    {
+      "name": "WayPoint12",
+      "x": 4.05,
+      "y": -10.55,
+      "neighbors": [
+        "WayPoint12_WayPoint16_0001",
+        "WayPoint12_WayPoint72_0001",
+        "WayPoint12_WayPoint8_0001"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint16_0001",
+      "x": 4.502727272727273,
+      "y": -10.48909090909091,
+      "neighbors": [
+        "WayPoint12",
+        "WayPoint12_WayPoint16_0002"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint16_0002",
+      "x": 4.955454545454545,
+      "y": -10.42818181818182,
+      "neighbors": [
+        "WayPoint12_WayPoint16_0001",
+        "WayPoint12_WayPoint16_0003"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint16_0003",
+      "x": 5.408181818181818,
+      "y": -10.367272727272727,
+      "neighbors": [
+        "WayPoint12_WayPoint16_0002",
+        "WayPoint12_WayPoint16_0004"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint16_0004",
+      "x": 5.86090909090909,
+      "y": -10.306363636363637,
+      "neighbors": [
+        "WayPoint12_WayPoint16_0003",
+        "WayPoint12_WayPoint16_0005"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint16_0005",
+      "x": 6.313636363636363,
+      "y": -10.245454545454546,
+      "neighbors": [
+        "WayPoint12_WayPoint16_0004",
+        "WayPoint12_WayPoint16_0006"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint16_0006",
+      "x": 6.766363636363636,
+      "y": -10.184545454545455,
+      "neighbors": [
+        "WayPoint12_WayPoint16_0005",
+        "WayPoint12_WayPoint16_0007"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint16_0007",
+      "x": 7.219090909090909,
+      "y": -10.123636363636365,
+      "neighbors": [
+        "WayPoint12_WayPoint16_0006",
+        "WayPoint12_WayPoint16_0008"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint16_0008",
+      "x": 7.671818181818182,
+      "y": -10.062727272727274,
+      "neighbors": [
+        "WayPoint12_WayPoint16_0007",
+        "WayPoint12_WayPoint16_0009"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint16_0009",
+      "x": 8.124545454545455,
+      "y": -10.001818181818182,
+      "neighbors": [
+        "WayPoint12_WayPoint16_0008",
+        "WayPoint12_WayPoint16_0010"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint16_0010",
+      "x": 8.577272727272726,
+      "y": -9.940909090909091,
+      "neighbors": [
+        "WayPoint12_WayPoint16_0009",
+        "WayPoint16"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint72_0001",
+      "x": 3.9833333333333334,
+      "y": -10.105,
+      "neighbors": [
+        "WayPoint12",
+        "WayPoint12_WayPoint72_0002"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint72_0002",
+      "x": 3.9166666666666665,
+      "y": -9.66,
+      "neighbors": [
+        "WayPoint12_WayPoint72_0001",
+        "WayPoint12_WayPoint72_0003"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint72_0003",
+      "x": 3.8499999999999996,
+      "y": -9.215,
+      "neighbors": [
+        "WayPoint12_WayPoint72_0002",
+        "WayPoint12_WayPoint72_0004"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint72_0004",
+      "x": 3.783333333333333,
+      "y": -8.77,
+      "neighbors": [
+        "WayPoint12_WayPoint72_0003",
+        "WayPoint12_WayPoint72_0005"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint72_0005",
+      "x": 3.716666666666667,
+      "y": -8.325,
+      "neighbors": [
+        "WayPoint12_WayPoint72_0004",
+        "WayPoint72"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint8_0001",
+      "x": 3.558,
+      "y": -10.628,
+      "neighbors": [
+        "WayPoint12",
+        "WayPoint12_WayPoint8_0002"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint8_0002",
+      "x": 3.066,
+      "y": -10.706000000000001,
+      "neighbors": [
+        "WayPoint12_WayPoint8_0001",
+        "WayPoint12_WayPoint8_0003"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint8_0003",
+      "x": 2.574,
+      "y": -10.784,
+      "neighbors": [
+        "WayPoint12_WayPoint8_0002",
+        "WayPoint12_WayPoint8_0004"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint8_0004",
+      "x": 2.082,
+      "y": -10.862,
+      "neighbors": [
+        "WayPoint12_WayPoint8_0003",
+        "WayPoint12_WayPoint8_0005"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint8_0005",
+      "x": 1.5899999999999999,
+      "y": -10.940000000000001,
+      "neighbors": [
+        "WayPoint12_WayPoint8_0004",
+        "WayPoint12_WayPoint8_0006"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint8_0006",
+      "x": 1.0979999999999999,
+      "y": -11.018,
+      "neighbors": [
+        "WayPoint12_WayPoint8_0005",
+        "WayPoint12_WayPoint8_0007"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint8_0007",
+      "x": 0.6059999999999999,
+      "y": -11.096,
+      "neighbors": [
+        "WayPoint12_WayPoint8_0006",
+        "WayPoint12_WayPoint8_0008"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint8_0008",
+      "x": 0.11399999999999988,
+      "y": -11.174,
+      "neighbors": [
+        "WayPoint12_WayPoint8_0007",
+        "WayPoint12_WayPoint8_0009"
+      ]
+    },
+    {
+      "name": "WayPoint12_WayPoint8_0009",
+      "x": -0.3780000000000001,
+      "y": -11.252,
+      "neighbors": [
+        "WayPoint12_WayPoint8_0008",
+        "WayPoint8"
+      ]
+    },
+    {
+      "name": "WayPoint13",
+      "x": 3.31,
+      "y": 11.67,
+      "neighbors": [
+        "WayPoint13_WayPoint17_0001",
+        "WayPoint13_WayPoint73_0001",
+        "WayPoint13_WayPoint9_0001"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint17_0001",
+      "x": 3.7636363636363637,
+      "y": 11.73090909090909,
+      "neighbors": [
+        "WayPoint13",
+        "WayPoint13_WayPoint17_0002"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint17_0002",
+      "x": 4.217272727272728,
+      "y": 11.791818181818181,
+      "neighbors": [
+        "WayPoint13_WayPoint17_0001",
+        "WayPoint13_WayPoint17_0003"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint17_0003",
+      "x": 4.670909090909091,
+      "y": 11.852727272727273,
+      "neighbors": [
+        "WayPoint13_WayPoint17_0002",
+        "WayPoint13_WayPoint17_0004"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint17_0004",
+      "x": 5.124545454545455,
+      "y": 11.913636363636364,
+      "neighbors": [
+        "WayPoint13_WayPoint17_0003",
+        "WayPoint13_WayPoint17_0005"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint17_0005",
+      "x": 5.578181818181818,
+      "y": 11.974545454545455,
+      "neighbors": [
+        "WayPoint13_WayPoint17_0004",
+        "WayPoint13_WayPoint17_0006"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint17_0006",
+      "x": 6.031818181818181,
+      "y": 12.035454545454545,
+      "neighbors": [
+        "WayPoint13_WayPoint17_0005",
+        "WayPoint13_WayPoint17_0007"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint17_0007",
+      "x": 6.485454545454546,
+      "y": 12.096363636363636,
+      "neighbors": [
+        "WayPoint13_WayPoint17_0006",
+        "WayPoint13_WayPoint17_0008"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint17_0008",
+      "x": 6.939090909090909,
+      "y": 12.157272727272726,
+      "neighbors": [
+        "WayPoint13_WayPoint17_0007",
+        "WayPoint13_WayPoint17_0009"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint17_0009",
+      "x": 7.392727272727273,
+      "y": 12.218181818181819,
+      "neighbors": [
+        "WayPoint13_WayPoint17_0008",
+        "WayPoint13_WayPoint17_0010"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint17_0010",
+      "x": 7.846363636363636,
+      "y": 12.27909090909091,
+      "neighbors": [
+        "WayPoint13_WayPoint17_0009",
+        "WayPoint17"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint73_0001",
+      "x": 3.376666666666667,
+      "y": 11.226666666666667,
+      "neighbors": [
+        "WayPoint13",
+        "WayPoint13_WayPoint73_0002"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint73_0002",
+      "x": 3.4433333333333334,
+      "y": 10.783333333333333,
+      "neighbors": [
+        "WayPoint13_WayPoint73_0001",
+        "WayPoint13_WayPoint73_0003"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint73_0003",
+      "x": 3.51,
+      "y": 10.34,
+      "neighbors": [
+        "WayPoint13_WayPoint73_0002",
+        "WayPoint13_WayPoint73_0004"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint73_0004",
+      "x": 3.5766666666666667,
+      "y": 9.896666666666667,
+      "neighbors": [
+        "WayPoint13_WayPoint73_0003",
+        "WayPoint13_WayPoint73_0005"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint73_0005",
+      "x": 3.6433333333333335,
+      "y": 9.453333333333333,
+      "neighbors": [
+        "WayPoint13_WayPoint73_0004",
+        "WayPoint73"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint9_0001",
+      "x": 2.819,
+      "y": 11.592,
+      "neighbors": [
+        "WayPoint13",
+        "WayPoint13_WayPoint9_0002"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint9_0002",
+      "x": 2.328,
+      "y": 11.514,
+      "neighbors": [
+        "WayPoint13_WayPoint9_0001",
+        "WayPoint13_WayPoint9_0003"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint9_0003",
+      "x": 1.837,
+      "y": 11.436,
+      "neighbors": [
+        "WayPoint13_WayPoint9_0002",
+        "WayPoint13_WayPoint9_0004"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint9_0004",
+      "x": 1.3459999999999999,
+      "y": 11.358,
+      "neighbors": [
+        "WayPoint13_WayPoint9_0003",
+        "WayPoint13_WayPoint9_0005"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint9_0005",
+      "x": 0.855,
+      "y": 11.280000000000001,
+      "neighbors": [
+        "WayPoint13_WayPoint9_0004",
+        "WayPoint13_WayPoint9_0006"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint9_0006",
+      "x": 0.3639999999999999,
+      "y": 11.202,
+      "neighbors": [
+        "WayPoint13_WayPoint9_0005",
+        "WayPoint13_WayPoint9_0007"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint9_0007",
+      "x": -0.12699999999999978,
+      "y": 11.124,
+      "neighbors": [
+        "WayPoint13_WayPoint9_0006",
+        "WayPoint13_WayPoint9_0008"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint9_0008",
+      "x": -0.6180000000000003,
+      "y": 11.046000000000001,
+      "neighbors": [
+        "WayPoint13_WayPoint9_0007",
+        "WayPoint13_WayPoint9_0009"
+      ]
+    },
+    {
+      "name": "WayPoint13_WayPoint9_0009",
+      "x": -1.1090000000000004,
+      "y": 10.968,
+      "neighbors": [
+        "WayPoint13_WayPoint9_0008",
+        "WayPoint9"
+      ]
+    },
+    {
+      "name": "WayPoint14",
+      "x": 6.5,
+      "y": -10.22,
+      "neighbors": [
+        "WayPoint10_WayPoint14_0009",
+        "WayPoint14_WayPoint18_0001",
+        "WayPoint14_WayPoint81_0001"
+      ]
+    },
+    {
+      "name": "WayPoint14_WayPoint18_0001",
+      "x": 6.953636363636364,
+      "y": -10.15909090909091,
+      "neighbors": [
+        "WayPoint14",
+        "WayPoint14_WayPoint18_0002"
+      ]
+    },
+    {
+      "name": "WayPoint14_WayPoint18_0002",
+      "x": 7.407272727272727,
+      "y": -10.09818181818182,
+      "neighbors": [
+        "WayPoint14_WayPoint18_0001",
+        "WayPoint14_WayPoint18_0003"
+      ]
+    },
+    {
+      "name": "WayPoint14_WayPoint18_0003",
+      "x": 7.860909090909091,
+      "y": -10.037272727272727,
+      "neighbors": [
+        "WayPoint14_WayPoint18_0002",
+        "WayPoint14_WayPoint18_0004"
+      ]
+    },
+    {
+      "name": "WayPoint14_WayPoint18_0004",
+      "x": 8.314545454545454,
+      "y": -9.976363636363637,
+      "neighbors": [
+        "WayPoint14_WayPoint18_0003",
+        "WayPoint14_WayPoint18_0005"
+      ]
+    },
+    {
+      "name": "WayPoint14_WayPoint18_0005",
+      "x": 8.768181818181818,
+      "y": -9.915454545454546,
+      "neighbors": [
+        "WayPoint14_WayPoint18_0004",
+        "WayPoint14_WayPoint18_0006"
+      ]
+    },
+    {
+      "name": "WayPoint14_WayPoint18_0006",
+      "x": 9.221818181818183,
+      "y": -9.854545454545455,
+      "neighbors": [
+        "WayPoint14_WayPoint18_0005",
+        "WayPoint14_WayPoint18_0007"
+      ]
+    },
+    {
+      "name": "WayPoint14_WayPoint18_0007",
+      "x": 9.675454545454546,
+      "y": -9.793636363636365,
+      "neighbors": [
+        "WayPoint14_WayPoint18_0006",
+        "WayPoint14_WayPoint18_0008"
+      ]
+    },
+    {
+      "name": "WayPoint14_WayPoint18_0008",
+      "x": 10.129090909090909,
+      "y": -9.732727272727274,
+      "neighbors": [
+        "WayPoint14_WayPoint18_0007",
+        "WayPoint14_WayPoint18_0009"
+      ]
+    },
+    {
+      "name": "WayPoint14_WayPoint18_0009",
+      "x": 10.582727272727272,
+      "y": -9.671818181818182,
+      "neighbors": [
+        "WayPoint14_WayPoint18_0008",
+        "WayPoint14_WayPoint18_0010"
+      ]
+    },
+    {
+      "name": "WayPoint14_WayPoint18_0010",
+      "x": 11.036363636363635,
+      "y": -9.610909090909091,
+      "neighbors": [
+        "WayPoint14_WayPoint18_0009",
+        "WayPoint18"
+      ]
+    },
+    {
+      "name": "WayPoint14_WayPoint81_0001",
+      "x": 6.4350000000000005,
+      "y": -9.775,
+      "neighbors": [
+        "WayPoint14",
+        "WayPoint14_WayPoint81_0002"
+      ]
+    },
+    {
+      "name": "WayPoint14_WayPoint81_0002",
+      "x": 6.37,
+      "y": -9.33,
+      "neighbors": [
+        "WayPoint14_WayPoint81_0001",
+        "WayPoint14_WayPoint81_0003"
+      ]
+    },
+    {
+      "name": "WayPoint14_WayPoint81_0003",
+      "x": 6.305,
+      "y": -8.885,
+      "neighbors": [
+        "WayPoint14_WayPoint81_0002",
+        "WayPoint14_WayPoint81_0004"
+      ]
+    },
+    {
+      "name": "WayPoint14_WayPoint81_0004",
+      "x": 6.24,
+      "y": -8.44,
+      "neighbors": [
+        "WayPoint14_WayPoint81_0003",
+        "WayPoint14_WayPoint81_0005"
+      ]
+    },
+    {
+      "name": "WayPoint14_WayPoint81_0005",
+      "x": 6.175000000000001,
+      "y": -7.994999999999999,
+      "neighbors": [
+        "WayPoint14_WayPoint81_0004",
+        "WayPoint81"
+      ]
+    },
+    {
+      "name": "WayPoint15",
+      "x": 5.77,
+      "y": 12.01,
+      "neighbors": [
+        "WayPoint11_WayPoint15_0009",
+        "WayPoint15_WayPoint17_0001",
+        "WayPoint15_WayPoint82_0001"
+      ]
+    },
+    {
+      "name": "WayPoint15_WayPoint17_0001",
+      "x": 6.191666666666666,
+      "y": 12.065,
+      "neighbors": [
+        "WayPoint15",
+        "WayPoint15_WayPoint17_0002"
+      ]
+    },
+    {
+      "name": "WayPoint15_WayPoint17_0002",
+      "x": 6.613333333333333,
+      "y": 12.12,
+      "neighbors": [
+        "WayPoint15_WayPoint17_0001",
+        "WayPoint15_WayPoint17_0003"
+      ]
+    },
+    {
+      "name": "WayPoint15_WayPoint17_0003",
+      "x": 7.035,
+      "y": 12.175,
+      "neighbors": [
+        "WayPoint15_WayPoint17_0002",
+        "WayPoint15_WayPoint17_0004"
+      ]
+    },
+    {
+      "name": "WayPoint15_WayPoint17_0004",
+      "x": 7.456666666666667,
+      "y": 12.23,
+      "neighbors": [
+        "WayPoint15_WayPoint17_0003",
+        "WayPoint15_WayPoint17_0005"
+      ]
+    },
+    {
+      "name": "WayPoint15_WayPoint17_0005",
+      "x": 7.878333333333334,
+      "y": 12.285,
+      "neighbors": [
+        "WayPoint15_WayPoint17_0004",
+        "WayPoint17"
+      ]
+    },
+    {
+      "name": "WayPoint15_WayPoint82_0001",
+      "x": 5.836666666666666,
+      "y": 11.565,
+      "neighbors": [
+        "WayPoint15",
+        "WayPoint15_WayPoint82_0002"
+      ]
+    },
+    {
+      "name": "WayPoint15_WayPoint82_0002",
+      "x": 5.903333333333333,
+      "y": 11.12,
+      "neighbors": [
+        "WayPoint15_WayPoint82_0001",
+        "WayPoint15_WayPoint82_0003"
+      ]
+    },
+    {
+      "name": "WayPoint15_WayPoint82_0003",
+      "x": 5.97,
+      "y": 10.675,
+      "neighbors": [
+        "WayPoint15_WayPoint82_0002",
+        "WayPoint15_WayPoint82_0004"
+      ]
+    },
+    {
+      "name": "WayPoint15_WayPoint82_0004",
+      "x": 6.036666666666666,
+      "y": 10.23,
+      "neighbors": [
+        "WayPoint15_WayPoint82_0003",
+        "WayPoint15_WayPoint82_0005"
+      ]
+    },
+    {
+      "name": "WayPoint15_WayPoint82_0005",
+      "x": 6.1033333333333335,
+      "y": 9.785,
+      "neighbors": [
+        "WayPoint15_WayPoint82_0004",
+        "WayPoint82"
+      ]
+    },
+    {
+      "name": "WayPoint16",
+      "x": 9.03,
+      "y": -9.88,
+      "neighbors": [
+        "WayPoint12_WayPoint16_0010",
+        "WayPoint16_WayPoint18_0001",
+        "WayPoint16_WayPoint90_0001"
+      ]
+    },
+    {
+      "name": "WayPoint16_WayPoint18_0001",
+      "x": 9.522,
+      "y": -9.814,
+      "neighbors": [
+        "WayPoint16",
+        "WayPoint16_WayPoint18_0002"
+      ]
+    },
+    {
+      "name": "WayPoint16_WayPoint18_0002",
+      "x": 10.014,
+      "y": -9.748000000000001,
+      "neighbors": [
+        "WayPoint16_WayPoint18_0001",
+        "WayPoint16_WayPoint18_0003"
+      ]
+    },
+    {
+      "name": "WayPoint16_WayPoint18_0003",
+      "x": 10.506,
+      "y": -9.682,
+      "neighbors": [
+        "WayPoint16_WayPoint18_0002",
+        "WayPoint16_WayPoint18_0004"
+      ]
+    },
+    {
+      "name": "WayPoint16_WayPoint18_0004",
+      "x": 10.998000000000001,
+      "y": -9.616000000000001,
+      "neighbors": [
+        "WayPoint16_WayPoint18_0003",
+        "WayPoint18"
+      ]
+    },
+    {
+      "name": "WayPoint16_WayPoint90_0001",
+      "x": 8.963333333333333,
+      "y": -9.436666666666667,
+      "neighbors": [
+        "WayPoint16",
+        "WayPoint16_WayPoint90_0002"
+      ]
+    },
+    {
+      "name": "WayPoint16_WayPoint90_0002",
+      "x": 8.896666666666667,
+      "y": -8.993333333333334,
+      "neighbors": [
+        "WayPoint16_WayPoint90_0001",
+        "WayPoint16_WayPoint90_0003"
+      ]
+    },
+    {
+      "name": "WayPoint16_WayPoint90_0003",
+      "x": 8.83,
+      "y": -8.55,
+      "neighbors": [
+        "WayPoint16_WayPoint90_0002",
+        "WayPoint16_WayPoint90_0004"
+      ]
+    },
+    {
+      "name": "WayPoint16_WayPoint90_0004",
+      "x": 8.763333333333334,
+      "y": -8.106666666666667,
+      "neighbors": [
+        "WayPoint16_WayPoint90_0003",
+        "WayPoint16_WayPoint90_0005"
+      ]
+    },
+    {
+      "name": "WayPoint16_WayPoint90_0005",
+      "x": 8.696666666666667,
+      "y": -7.663333333333333,
+      "neighbors": [
+        "WayPoint16_WayPoint90_0004",
+        "WayPoint90"
+      ]
+    },
+    {
+      "name": "WayPoint17",
+      "x": 8.3,
+      "y": 12.34,
+      "neighbors": [
+        "OuterLaneRight_00_WayPoint17_0005",
+        "WayPoint13_WayPoint17_0010",
+        "WayPoint15_WayPoint17_0005",
+        "WayPoint17_WayPoint91_0001"
+      ]
+    },
+    {
+      "name": "WayPoint17_WayPoint91_0001",
+      "x": 8.366666666666667,
+      "y": 11.895,
+      "neighbors": [
+        "WayPoint17",
+        "WayPoint17_WayPoint91_0002"
+      ]
+    },
+    {
+      "name": "WayPoint17_WayPoint91_0002",
+      "x": 8.433333333333334,
+      "y": 11.45,
+      "neighbors": [
+        "WayPoint17_WayPoint91_0001",
+        "WayPoint17_WayPoint91_0003"
+      ]
+    },
+    {
+      "name": "WayPoint17_WayPoint91_0003",
+      "x": 8.5,
+      "y": 11.004999999999999,
+      "neighbors": [
+        "WayPoint17_WayPoint91_0002",
+        "WayPoint17_WayPoint91_0004"
+      ]
+    },
+    {
+      "name": "WayPoint17_WayPoint91_0004",
+      "x": 8.566666666666666,
+      "y": 10.56,
+      "neighbors": [
+        "WayPoint17_WayPoint91_0003",
+        "WayPoint17_WayPoint91_0005"
+      ]
+    },
+    {
+      "name": "WayPoint17_WayPoint91_0005",
+      "x": 8.633333333333333,
+      "y": 10.115,
+      "neighbors": [
+        "WayPoint17_WayPoint91_0004",
+        "WayPoint91"
+      ]
+    },
+    {
+      "name": "WayPoint18",
+      "x": 11.49,
+      "y": -9.55,
+      "neighbors": [
+        "OuterLaneRight_10_WayPoint18_0004",
+        "WayPoint14_WayPoint18_0010",
+        "WayPoint16_WayPoint18_0004",
+        "WayPoint18_WayPoint99_0001"
+      ]
+    },
+    {
+      "name": "WayPoint18_WayPoint99_0001",
+      "x": 11.423333333333334,
+      "y": -9.105,
+      "neighbors": [
+        "WayPoint18",
+        "WayPoint18_WayPoint99_0002"
+      ]
+    },
+    {
+      "name": "WayPoint18_WayPoint99_0002",
+      "x": 11.356666666666667,
+      "y": -8.66,
+      "neighbors": [
+        "WayPoint18_WayPoint99_0001",
+        "WayPoint18_WayPoint99_0003"
+      ]
+    },
+    {
+      "name": "WayPoint18_WayPoint99_0003",
+      "x": 11.29,
+      "y": -8.215,
+      "neighbors": [
+        "WayPoint18_WayPoint99_0002",
+        "WayPoint18_WayPoint99_0004"
+      ]
+    },
+    {
+      "name": "WayPoint18_WayPoint99_0004",
+      "x": 11.223333333333333,
+      "y": -7.7700000000000005,
+      "neighbors": [
+        "WayPoint18_WayPoint99_0003",
+        "WayPoint18_WayPoint99_0005"
+      ]
+    },
+    {
+      "name": "WayPoint18_WayPoint99_0005",
+      "x": 11.156666666666666,
+      "y": -7.324999999999999,
+      "neighbors": [
+        "WayPoint18_WayPoint99_0004",
+        "WayPoint99"
+      ]
+    },
+    {
+      "name": "WayPoint19",
+      "x": -11.11,
+      "y": 6.89,
+      "neighbors": [
+        "WayPoint19_WayPoint20_0001",
+        "WayPoint1_WayPoint19_0005"
+      ]
+    },
+    {
+      "name": "WayPoint19_WayPoint20_0001",
+      "x": -11.042,
+      "y": 6.489999999999999,
+      "neighbors": [
+        "WayPoint19",
+        "WayPoint19_WayPoint20_0002"
+      ]
+    },
+    {
+      "name": "WayPoint19_WayPoint20_0002",
+      "x": -10.974,
+      "y": 6.09,
+      "neighbors": [
+        "WayPoint19_WayPoint20_0001",
+        "WayPoint19_WayPoint20_0003"
+      ]
+    },
+    {
+      "name": "WayPoint19_WayPoint20_0003",
+      "x": -10.905999999999999,
+      "y": 5.6899999999999995,
+      "neighbors": [
+        "WayPoint19_WayPoint20_0002",
+        "WayPoint19_WayPoint20_0004"
+      ]
+    },
+    {
+      "name": "WayPoint19_WayPoint20_0004",
+      "x": -10.838,
+      "y": 5.289999999999999,
+      "neighbors": [
+        "WayPoint19_WayPoint20_0003",
+        "WayPoint20"
+      ]
+    },
+    {
+      "name": "WayPoint1_WayPoint19_0001",
+      "x": -11.385,
+      "y": 9.115,
+      "neighbors": [
+        "WayPoint1",
+        "WayPoint1_WayPoint19_0002"
+      ]
+    },
+    {
+      "name": "WayPoint1_WayPoint19_0002",
+      "x": -11.33,
+      "y": 8.67,
+      "neighbors": [
+        "WayPoint1_WayPoint19_0001",
+        "WayPoint1_WayPoint19_0003"
+      ]
+    },
+    {
+      "name": "WayPoint1_WayPoint19_0003",
+      "x": -11.274999999999999,
+      "y": 8.225,
+      "neighbors": [
+        "WayPoint1_WayPoint19_0002",
+        "WayPoint1_WayPoint19_0004"
+      ]
+    },
+    {
+      "name": "WayPoint1_WayPoint19_0004",
+      "x": -11.219999999999999,
+      "y": 7.78,
+      "neighbors": [
+        "WayPoint1_WayPoint19_0003",
+        "WayPoint1_WayPoint19_0005"
+      ]
+    },
+    {
+      "name": "WayPoint1_WayPoint19_0005",
+      "x": -11.165,
+      "y": 7.334999999999999,
+      "neighbors": [
+        "WayPoint19",
+        "WayPoint1_WayPoint19_0004"
+      ]
+    },
+    {
+      "name": "WayPoint1_WayPoint5_0001",
+      "x": -10.948,
+      "y": 9.627,
+      "neighbors": [
+        "WayPoint1",
+        "WayPoint1_WayPoint5_0002"
+      ]
+    },
+    {
+      "name": "WayPoint1_WayPoint5_0002",
+      "x": -10.456,
+      "y": 9.694,
+      "neighbors": [
+        "WayPoint1_WayPoint5_0001",
+        "WayPoint1_WayPoint5_0003"
+      ]
+    },
+    {
+      "name": "WayPoint1_WayPoint5_0003",
+      "x": -9.963999999999999,
+      "y": 9.761000000000001,
+      "neighbors": [
+        "WayPoint1_WayPoint5_0002",
+        "WayPoint1_WayPoint5_0004"
+      ]
+    },
+    {
+      "name": "WayPoint1_WayPoint5_0004",
+      "x": -9.472,
+      "y": 9.828000000000001,
+      "neighbors": [
+        "WayPoint1_WayPoint5_0003",
+        "WayPoint1_WayPoint5_0005"
+      ]
+    },
+    {
+      "name": "WayPoint1_WayPoint5_0005",
+      "x": -8.98,
+      "y": 9.895,
+      "neighbors": [
+        "WayPoint1_WayPoint5_0004",
+        "WayPoint1_WayPoint5_0006"
+      ]
+    },
+    {
+      "name": "WayPoint1_WayPoint5_0006",
+      "x": -8.488,
+      "y": 9.962,
+      "neighbors": [
+        "WayPoint1_WayPoint5_0005",
+        "WayPoint1_WayPoint5_0007"
+      ]
+    },
+    {
+      "name": "WayPoint1_WayPoint5_0007",
+      "x": -7.9959999999999996,
+      "y": 10.029,
+      "neighbors": [
+        "WayPoint1_WayPoint5_0006",
+        "WayPoint1_WayPoint5_0008"
+      ]
+    },
+    {
+      "name": "WayPoint1_WayPoint5_0008",
+      "x": -7.504,
+      "y": 10.096,
+      "neighbors": [
+        "WayPoint1_WayPoint5_0007",
+        "WayPoint1_WayPoint5_0009"
+      ]
+    },
+    {
+      "name": "WayPoint1_WayPoint5_0009",
+      "x": -7.012,
+      "y": 10.163,
+      "neighbors": [
+        "WayPoint1_WayPoint5_0008",
+        "WayPoint5"
+      ]
+    },
+    {
+      "name": "WayPoint2",
+      "x": -8.25,
+      "y": -12.33,
+      "neighbors": [
+        "OuterLaneLeft_10_WayPoint2_0004",
+        "WayPoint2_WayPoint27_0001",
+        "WayPoint2_WayPoint6_0001"
+      ]
+    },
+    {
+      "name": "WayPoint20",
+      "x": -10.77,
+      "y": 4.89,
+      "neighbors": [
+        "WayPoint19_WayPoint20_0004",
+        "WayPoint20_WayPoint21_0001"
+      ]
+    },
+    {
+      "name": "WayPoint20_WayPoint21_0001",
+      "x": -10.703999999999999,
+      "y": 4.468,
+      "neighbors": [
+        "WayPoint20",
+        "WayPoint20_WayPoint21_0002"
+      ]
+    },
+    {
+      "name": "WayPoint20_WayPoint21_0002",
+      "x": -10.638,
+      "y": 4.045999999999999,
+      "neighbors": [
+        "WayPoint20_WayPoint21_0001",
+        "WayPoint20_WayPoint21_0003"
+      ]
+    },
+    {
+      "name": "WayPoint20_WayPoint21_0003",
+      "x": -10.572,
+      "y": 3.6239999999999997,
+      "neighbors": [
+        "WayPoint20_WayPoint21_0002",
+        "WayPoint20_WayPoint21_0004"
+      ]
+    },
+    {
+      "name": "WayPoint20_WayPoint21_0004",
+      "x": -10.506,
+      "y": 3.202,
+      "neighbors": [
+        "WayPoint20_WayPoint21_0003",
+        "WayPoint21"
+      ]
+    },
+    {
+      "name": "WayPoint21",
+      "x": -10.44,
+      "y": 2.78,
+      "neighbors": [
+        "WayPoint20_WayPoint21_0004",
+        "WayPoint21_WayPoint22_0001"
+      ]
+    },
+    {
+      "name": "WayPoint21_WayPoint22_0001",
+      "x": -10.388,
+      "y": 2.3579999999999997,
+      "neighbors": [
+        "WayPoint21",
+        "WayPoint21_WayPoint22_0002"
+      ]
+    },
+    {
+      "name": "WayPoint21_WayPoint22_0002",
+      "x": -10.336,
+      "y": 1.936,
+      "neighbors": [
+        "WayPoint21_WayPoint22_0001",
+        "WayPoint21_WayPoint22_0003"
+      ]
+    },
+    {
+      "name": "WayPoint21_WayPoint22_0003",
+      "x": -10.283999999999999,
+      "y": 1.514,
+      "neighbors": [
+        "WayPoint21_WayPoint22_0002",
+        "WayPoint21_WayPoint22_0004"
+      ]
+    },
+    {
+      "name": "WayPoint21_WayPoint22_0004",
+      "x": -10.232,
+      "y": 1.0919999999999999,
+      "neighbors": [
+        "WayPoint21_WayPoint22_0003",
+        "WayPoint22"
+      ]
+    },
+    {
+      "name": "WayPoint22",
+      "x": -10.18,
+      "y": 0.67,
+      "neighbors": [
+        "WayPoint21_WayPoint22_0004",
+        "WayPoint22_WayPoint23_0001"
+      ]
+    },
+    {
+      "name": "WayPoint22_WayPoint23_0001",
+      "x": -10.112,
+      "y": 0.27,
+      "neighbors": [
+        "WayPoint22",
+        "WayPoint22_WayPoint23_0002"
+      ]
+    },
+    {
+      "name": "WayPoint22_WayPoint23_0002",
+      "x": -10.044,
+      "y": -0.13,
+      "neighbors": [
+        "WayPoint22_WayPoint23_0001",
+        "WayPoint22_WayPoint23_0003"
+      ]
+    },
+    {
+      "name": "WayPoint22_WayPoint23_0003",
+      "x": -9.975999999999999,
+      "y": -0.5299999999999999,
+      "neighbors": [
+        "WayPoint22_WayPoint23_0002",
+        "WayPoint22_WayPoint23_0004"
+      ]
+    },
+    {
+      "name": "WayPoint22_WayPoint23_0004",
+      "x": -9.908,
+      "y": -0.93,
+      "neighbors": [
+        "WayPoint22_WayPoint23_0003",
+        "WayPoint23"
+      ]
+    },
+    {
+      "name": "WayPoint23",
+      "x": -9.84,
+      "y": -1.33,
+      "neighbors": [
+        "WayPoint22_WayPoint23_0004",
+        "WayPoint23_WayPoint24_0001"
+      ]
+    },
+    {
+      "name": "WayPoint23_WayPoint24_0001",
+      "x": -9.788,
+      "y": -1.752,
+      "neighbors": [
+        "WayPoint23",
+        "WayPoint23_WayPoint24_0002"
+      ]
+    },
+    {
+      "name": "WayPoint23_WayPoint24_0002",
+      "x": -9.736,
+      "y": -2.174,
+      "neighbors": [
+        "WayPoint23_WayPoint24_0001",
+        "WayPoint23_WayPoint24_0003"
+      ]
+    },
+    {
+      "name": "WayPoint23_WayPoint24_0003",
+      "x": -9.684,
+      "y": -2.596,
+      "neighbors": [
+        "WayPoint23_WayPoint24_0002",
+        "WayPoint23_WayPoint24_0004"
+      ]
+    },
+    {
+      "name": "WayPoint23_WayPoint24_0004",
+      "x": -9.632,
+      "y": -3.018,
+      "neighbors": [
+        "WayPoint23_WayPoint24_0003",
+        "WayPoint24"
+      ]
+    },
+    {
+      "name": "WayPoint24",
+      "x": -9.58,
+      "y": -3.44,
+      "neighbors": [
+        "WayPoint23_WayPoint24_0004",
+        "WayPoint24_WayPoint25_0001"
+      ]
+    },
+    {
+      "name": "WayPoint24_WayPoint25_0001",
+      "x": -9.514,
+      "y": -3.862,
+      "neighbors": [
+        "WayPoint24",
+        "WayPoint24_WayPoint25_0002"
+      ]
+    },
+    {
+      "name": "WayPoint24_WayPoint25_0002",
+      "x": -9.448,
+      "y": -4.284,
+      "neighbors": [
+        "WayPoint24_WayPoint25_0001",
+        "WayPoint24_WayPoint25_0003"
+      ]
+    },
+    {
+      "name": "WayPoint24_WayPoint25_0003",
+      "x": -9.382,
+      "y": -4.7059999999999995,
+      "neighbors": [
+        "WayPoint24_WayPoint25_0002",
+        "WayPoint24_WayPoint25_0004"
+      ]
+    },
+    {
+      "name": "WayPoint24_WayPoint25_0004",
+      "x": -9.316,
+      "y": -5.128,
+      "neighbors": [
+        "WayPoint24_WayPoint25_0003",
+        "WayPoint25"
+      ]
+    },
+    {
+      "name": "WayPoint25",
+      "x": -9.25,
+      "y": -5.55,
+      "neighbors": [
+        "WayPoint24_WayPoint25_0004",
+        "WayPoint25_WayPoint26_0001"
+      ]
+    },
+    {
+      "name": "WayPoint25_WayPoint26_0001",
+      "x": -9.196,
+      "y": -5.9719999999999995,
+      "neighbors": [
+        "WayPoint25",
+        "WayPoint25_WayPoint26_0002"
+      ]
+    },
+    {
+      "name": "WayPoint25_WayPoint26_0002",
+      "x": -9.142,
+      "y": -6.394,
+      "neighbors": [
+        "WayPoint25_WayPoint26_0001",
+        "WayPoint25_WayPoint26_0003"
+      ]
+    },
+    {
+      "name": "WayPoint25_WayPoint26_0003",
+      "x": -9.088000000000001,
+      "y": -6.816,
+      "neighbors": [
+        "WayPoint25_WayPoint26_0002",
+        "WayPoint25_WayPoint26_0004"
+      ]
+    },
+    {
+      "name": "WayPoint25_WayPoint26_0004",
+      "x": -9.034,
+      "y": -7.238,
+      "neighbors": [
+        "WayPoint25_WayPoint26_0003",
+        "WayPoint26"
+      ]
+    },
+    {
+      "name": "WayPoint26",
+      "x": -8.98,
+      "y": -7.66,
+      "neighbors": [
+        "WayPoint25_WayPoint26_0004",
+        "WayPoint26_WayPoint27_0001"
+      ]
+    },
+    {
+      "name": "WayPoint26_WayPoint27_0001",
+      "x": -8.914,
+      "y": -8.06,
+      "neighbors": [
+        "WayPoint26",
+        "WayPoint26_WayPoint27_0002"
+      ]
+    },
+    {
+      "name": "WayPoint26_WayPoint27_0002",
+      "x": -8.848,
+      "y": -8.46,
+      "neighbors": [
+        "WayPoint26_WayPoint27_0001",
+        "WayPoint26_WayPoint27_0003"
+      ]
+    },
+    {
+      "name": "WayPoint26_WayPoint27_0003",
+      "x": -8.782,
+      "y": -8.86,
+      "neighbors": [
+        "WayPoint26_WayPoint27_0002",
+        "WayPoint26_WayPoint27_0004"
+      ]
+    },
+    {
+      "name": "WayPoint26_WayPoint27_0004",
+      "x": -8.716000000000001,
+      "y": -9.26,
+      "neighbors": [
+        "WayPoint26_WayPoint27_0003",
+        "WayPoint27"
+      ]
+    },
+    {
+      "name": "WayPoint27",
+      "x": -8.65,
+      "y": -9.66,
+      "neighbors": [
+        "WayPoint26_WayPoint27_0004",
+        "WayPoint2_WayPoint27_0005"
+      ]
+    },
+    {
+      "name": "WayPoint28",
+      "x": -8.58,
+      "y": 7.23,
+      "neighbors": [
+        "WayPoint28_WayPoint29_0001",
+        "WayPoint28_WayPoint3_0001"
+      ]
+    },
+    {
+      "name": "WayPoint28_WayPoint29_0001",
+      "x": -8.526,
+      "y": 6.83,
+      "neighbors": [
+        "WayPoint28",
+        "WayPoint28_WayPoint29_0002"
+      ]
+    },
+    {
+      "name": "WayPoint28_WayPoint29_0002",
+      "x": -8.472,
+      "y": 6.430000000000001,
+      "neighbors": [
+        "WayPoint28_WayPoint29_0001",
+        "WayPoint28_WayPoint29_0003"
+      ]
+    },
+    {
+      "name": "WayPoint28_WayPoint29_0003",
+      "x": -8.418000000000001,
+      "y": 6.03,
+      "neighbors": [
+        "WayPoint28_WayPoint29_0002",
+        "WayPoint28_WayPoint29_0004"
+      ]
+    },
+    {
+      "name": "WayPoint28_WayPoint29_0004",
+      "x": -8.364,
+      "y": 5.630000000000001,
+      "neighbors": [
+        "WayPoint28_WayPoint29_0003",
+        "WayPoint29"
+      ]
+    },
+    {
+      "name": "WayPoint28_WayPoint3_0001",
+      "x": -8.646666666666667,
+      "y": 7.673333333333334,
+      "neighbors": [
+        "WayPoint28",
+        "WayPoint28_WayPoint3_0002"
+      ]
+    },
+    {
+      "name": "WayPoint28_WayPoint3_0002",
+      "x": -8.713333333333333,
+      "y": 8.116666666666667,
+      "neighbors": [
+        "WayPoint28_WayPoint3_0001",
+        "WayPoint28_WayPoint3_0003"
+      ]
+    },
+    {
+      "name": "WayPoint28_WayPoint3_0003",
+      "x": -8.780000000000001,
+      "y": 8.56,
+      "neighbors": [
+        "WayPoint28_WayPoint3_0002",
+        "WayPoint28_WayPoint3_0004"
+      ]
+    },
+    {
+      "name": "WayPoint28_WayPoint3_0004",
+      "x": -8.846666666666668,
+      "y": 9.003333333333334,
+      "neighbors": [
+        "WayPoint28_WayPoint3_0003",
+        "WayPoint28_WayPoint3_0005"
+      ]
+    },
+    {
+      "name": "WayPoint28_WayPoint3_0005",
+      "x": -8.913333333333334,
+      "y": 9.446666666666667,
+      "neighbors": [
+        "WayPoint28_WayPoint3_0004",
+        "WayPoint3"
+      ]
+    },
+    {
+      "name": "WayPoint29",
+      "x": -8.31,
+      "y": 5.23,
+      "neighbors": [
+        "WayPoint28_WayPoint29_0004",
+        "WayPoint29_WayPoint30_0001"
+      ]
+    },
+    {
+      "name": "WayPoint29_WayPoint30_0001",
+      "x": -8.244,
+      "y": 4.808000000000001,
+      "neighbors": [
+        "WayPoint29",
+        "WayPoint29_WayPoint30_0002"
+      ]
+    },
+    {
+      "name": "WayPoint29_WayPoint30_0002",
+      "x": -8.178,
+      "y": 4.386,
+      "neighbors": [
+        "WayPoint29_WayPoint30_0001",
+        "WayPoint29_WayPoint30_0003"
+      ]
+    },
+    {
+      "name": "WayPoint29_WayPoint30_0003",
+      "x": -8.112,
+      "y": 3.9640000000000004,
+      "neighbors": [
+        "WayPoint29_WayPoint30_0002",
+        "WayPoint29_WayPoint30_0004"
+      ]
+    },
+    {
+      "name": "WayPoint29_WayPoint30_0004",
+      "x": -8.046000000000001,
+      "y": 3.542,
+      "neighbors": [
+        "WayPoint29_WayPoint30_0003",
+        "WayPoint30"
+      ]
+    },
+    {
+      "name": "WayPoint2_WayPoint27_0001",
+      "x": -8.316666666666666,
+      "y": -11.885,
+      "neighbors": [
+        "WayPoint2",
+        "WayPoint2_WayPoint27_0002"
+      ]
+    },
+    {
+      "name": "WayPoint2_WayPoint27_0002",
+      "x": -8.383333333333333,
+      "y": -11.44,
+      "neighbors": [
+        "WayPoint2_WayPoint27_0001",
+        "WayPoint2_WayPoint27_0003"
+      ]
+    },
+    {
+      "name": "WayPoint2_WayPoint27_0003",
+      "x": -8.45,
+      "y": -10.995000000000001,
+      "neighbors": [
+        "WayPoint2_WayPoint27_0002",
+        "WayPoint2_WayPoint27_0004"
+      ]
+    },
+    {
+      "name": "WayPoint2_WayPoint27_0004",
+      "x": -8.516666666666667,
+      "y": -10.55,
+      "neighbors": [
+        "WayPoint2_WayPoint27_0003",
+        "WayPoint2_WayPoint27_0005"
+      ]
+    },
+    {
+      "name": "WayPoint2_WayPoint27_0005",
+      "x": -8.583333333333334,
+      "y": -10.105,
+      "neighbors": [
+        "WayPoint27",
+        "WayPoint2_WayPoint27_0004"
+      ]
+    },
+    {
+      "name": "WayPoint2_WayPoint6_0001",
+      "x": -7.758,
+      "y": -12.263,
+      "neighbors": [
+        "WayPoint2",
+        "WayPoint2_WayPoint6_0002"
+      ]
+    },
+    {
+      "name": "WayPoint2_WayPoint6_0002",
+      "x": -7.266,
+      "y": -12.196,
+      "neighbors": [
+        "WayPoint2_WayPoint6_0001",
+        "WayPoint2_WayPoint6_0003"
+      ]
+    },
+    {
+      "name": "WayPoint2_WayPoint6_0003",
+      "x": -6.774,
+      "y": -12.129,
+      "neighbors": [
+        "WayPoint2_WayPoint6_0002",
+        "WayPoint2_WayPoint6_0004"
+      ]
+    },
+    {
+      "name": "WayPoint2_WayPoint6_0004",
+      "x": -6.282,
+      "y": -12.062,
+      "neighbors": [
+        "WayPoint2_WayPoint6_0003",
+        "WayPoint2_WayPoint6_0005"
+      ]
+    },
+    {
+      "name": "WayPoint2_WayPoint6_0005",
+      "x": -5.79,
+      "y": -11.995000000000001,
+      "neighbors": [
+        "WayPoint2_WayPoint6_0004",
+        "WayPoint2_WayPoint6_0006"
+      ]
+    },
+    {
+      "name": "WayPoint2_WayPoint6_0006",
+      "x": -5.298,
+      "y": -11.928,
+      "neighbors": [
+        "WayPoint2_WayPoint6_0005",
+        "WayPoint2_WayPoint6_0007"
+      ]
+    },
+    {
+      "name": "WayPoint2_WayPoint6_0007",
+      "x": -4.806,
+      "y": -11.861,
+      "neighbors": [
+        "WayPoint2_WayPoint6_0006",
+        "WayPoint2_WayPoint6_0008"
+      ]
+    },
+    {
+      "name": "WayPoint2_WayPoint6_0008",
+      "x": -4.314,
+      "y": -11.794,
+      "neighbors": [
+        "WayPoint2_WayPoint6_0007",
+        "WayPoint2_WayPoint6_0009"
+      ]
+    },
+    {
+      "name": "WayPoint2_WayPoint6_0009",
+      "x": -3.822,
+      "y": -11.727,
+      "neighbors": [
+        "WayPoint2_WayPoint6_0008",
+        "WayPoint6"
+      ]
+    },
+    {
+      "name": "WayPoint3",
+      "x": -8.98,
+      "y": 9.89,
+      "neighbors": [
+        "WayPoint28_WayPoint3_0005",
+        "WayPoint3_WayPoint7_0001"
+      ]
+    },
+    {
+      "name": "WayPoint30",
+      "x": -7.98,
+      "y": 3.12,
+      "neighbors": [
+        "WayPoint29_WayPoint30_0004",
+        "WayPoint30_WayPoint31_0001"
+      ]
+    },
+    {
+      "name": "WayPoint30_WayPoint31_0001",
+      "x": -7.928,
+      "y": 2.698,
+      "neighbors": [
+        "WayPoint30",
+        "WayPoint30_WayPoint31_0002"
+      ]
+    },
+    {
+      "name": "WayPoint30_WayPoint31_0002",
+      "x": -7.876,
+      "y": 2.276,
+      "neighbors": [
+        "WayPoint30_WayPoint31_0001",
+        "WayPoint30_WayPoint31_0003"
+      ]
+    },
+    {
+      "name": "WayPoint30_WayPoint31_0003",
+      "x": -7.824,
+      "y": 1.8539999999999999,
+      "neighbors": [
+        "WayPoint30_WayPoint31_0002",
+        "WayPoint30_WayPoint31_0004"
+      ]
+    },
+    {
+      "name": "WayPoint30_WayPoint31_0004",
+      "x": -7.772,
+      "y": 1.4319999999999997,
+      "neighbors": [
+        "WayPoint30_WayPoint31_0003",
+        "WayPoint31"
+      ]
+    },
+    {
+      "name": "WayPoint31",
+      "x": -7.72,
+      "y": 1.01,
+      "neighbors": [
+        "WayPoint30_WayPoint31_0004",
+        "WayPoint31_WayPoint32_0001"
+      ]
+    },
+    {
+      "name": "WayPoint31_WayPoint32_0001",
+      "x": -7.652,
+      "y": 0.61,
+      "neighbors": [
+        "WayPoint31",
+        "WayPoint31_WayPoint32_0002"
+      ]
+    },
+    {
+      "name": "WayPoint31_WayPoint32_0002",
+      "x": -7.584,
+      "y": 0.20999999999999996,
+      "neighbors": [
+        "WayPoint31_WayPoint32_0001",
+        "WayPoint31_WayPoint32_0003"
+      ]
+    },
+    {
+      "name": "WayPoint31_WayPoint32_0003",
+      "x": -7.516,
+      "y": -0.18999999999999995,
+      "neighbors": [
+        "WayPoint31_WayPoint32_0002",
+        "WayPoint31_WayPoint32_0004"
+      ]
+    },
+    {
+      "name": "WayPoint31_WayPoint32_0004",
+      "x": -7.4479999999999995,
+      "y": -0.5900000000000001,
+      "neighbors": [
+        "WayPoint31_WayPoint32_0003",
+        "WayPoint32"
+      ]
+    },
+    {
+      "name": "WayPoint32",
+      "x": -7.38,
+      "y": -0.99,
+      "neighbors": [
+        "WayPoint31_WayPoint32_0004",
+        "WayPoint32_WayPoint33_0001"
+      ]
+    },
+    {
+      "name": "WayPoint32_WayPoint33_0001",
+      "x": -7.314,
+      "y": -1.4140000000000001,
+      "neighbors": [
+        "WayPoint32",
+        "WayPoint32_WayPoint33_0002"
+      ]
+    },
+    {
+      "name": "WayPoint32_WayPoint33_0002",
+      "x": -7.248,
+      "y": -1.838,
+      "neighbors": [
+        "WayPoint32_WayPoint33_0001",
+        "WayPoint32_WayPoint33_0003"
+      ]
+    },
+    {
+      "name": "WayPoint32_WayPoint33_0003",
+      "x": -7.1819999999999995,
+      "y": -2.262,
+      "neighbors": [
+        "WayPoint32_WayPoint33_0002",
+        "WayPoint32_WayPoint33_0004"
+      ]
+    },
+    {
+      "name": "WayPoint32_WayPoint33_0004",
+      "x": -7.116,
+      "y": -2.686,
+      "neighbors": [
+        "WayPoint32_WayPoint33_0003",
+        "WayPoint33"
+      ]
+    },
+    {
+      "name": "WayPoint33",
+      "x": -7.05,
+      "y": -3.11,
+      "neighbors": [
+        "WayPoint32_WayPoint33_0004",
+        "WayPoint33_WayPoint34_0001"
+      ]
+    },
+    {
+      "name": "WayPoint33_WayPoint34_0001",
+      "x": -6.998,
+      "y": -3.532,
+      "neighbors": [
+        "WayPoint33",
+        "WayPoint33_WayPoint34_0002"
+      ]
+    },
+    {
+      "name": "WayPoint33_WayPoint34_0002",
+      "x": -6.946,
+      "y": -3.9539999999999997,
+      "neighbors": [
+        "WayPoint33_WayPoint34_0001",
+        "WayPoint33_WayPoint34_0003"
+      ]
+    },
+    {
+      "name": "WayPoint33_WayPoint34_0003",
+      "x": -6.894,
+      "y": -4.3759999999999994,
+      "neighbors": [
+        "WayPoint33_WayPoint34_0002",
+        "WayPoint33_WayPoint34_0004"
+      ]
+    },
+    {
+      "name": "WayPoint33_WayPoint34_0004",
+      "x": -6.842,
+      "y": -4.798,
+      "neighbors": [
+        "WayPoint33_WayPoint34_0003",
+        "WayPoint34"
+      ]
+    },
+    {
+      "name": "WayPoint34",
+      "x": -6.79,
+      "y": -5.22,
+      "neighbors": [
+        "WayPoint33_WayPoint34_0004",
+        "WayPoint34_WayPoint35_0001"
+      ]
+    },
+    {
+      "name": "WayPoint34_WayPoint35_0001",
+      "x": -6.722,
+      "y": -5.6419999999999995,
+      "neighbors": [
+        "WayPoint34",
+        "WayPoint34_WayPoint35_0002"
+      ]
+    },
+    {
+      "name": "WayPoint34_WayPoint35_0002",
+      "x": -6.654,
+      "y": -6.064,
+      "neighbors": [
+        "WayPoint34_WayPoint35_0001",
+        "WayPoint34_WayPoint35_0003"
+      ]
+    },
+    {
+      "name": "WayPoint34_WayPoint35_0003",
+      "x": -6.586,
+      "y": -6.486,
+      "neighbors": [
+        "WayPoint34_WayPoint35_0002",
+        "WayPoint34_WayPoint35_0004"
+      ]
+    },
+    {
+      "name": "WayPoint34_WayPoint35_0004",
+      "x": -6.518,
+      "y": -6.908,
+      "neighbors": [
+        "WayPoint34_WayPoint35_0003",
+        "WayPoint35"
+      ]
+    },
+    {
+      "name": "WayPoint35",
+      "x": -6.45,
+      "y": -7.33,
+      "neighbors": [
+        "WayPoint34_WayPoint35_0004",
+        "WayPoint35_WayPoint36_0001"
+      ]
+    },
+    {
+      "name": "WayPoint35_WayPoint36_0001",
+      "x": -6.398000000000001,
+      "y": -7.73,
+      "neighbors": [
+        "WayPoint35",
+        "WayPoint35_WayPoint36_0002"
+      ]
+    },
+    {
+      "name": "WayPoint35_WayPoint36_0002",
+      "x": -6.346,
+      "y": -8.13,
+      "neighbors": [
+        "WayPoint35_WayPoint36_0001",
+        "WayPoint35_WayPoint36_0003"
+      ]
+    },
+    {
+      "name": "WayPoint35_WayPoint36_0003",
+      "x": -6.2940000000000005,
+      "y": -8.53,
+      "neighbors": [
+        "WayPoint35_WayPoint36_0002",
+        "WayPoint35_WayPoint36_0004"
+      ]
+    },
+    {
+      "name": "WayPoint35_WayPoint36_0004",
+      "x": -6.242,
+      "y": -8.93,
+      "neighbors": [
+        "WayPoint35_WayPoint36_0003",
+        "WayPoint36"
+      ]
+    },
+    {
+      "name": "WayPoint36",
+      "x": -6.19,
+      "y": -9.33,
+      "neighbors": [
+        "WayPoint35_WayPoint36_0004",
+        "WayPoint36_WayPoint4_0001"
+      ]
+    },
+    {
+      "name": "WayPoint36_WayPoint4_0001",
+      "x": -6.123333333333334,
+      "y": -9.773333333333333,
+      "neighbors": [
+        "WayPoint36",
+        "WayPoint36_WayPoint4_0002"
+      ]
+    },
+    {
+      "name": "WayPoint36_WayPoint4_0002",
+      "x": -6.056666666666667,
+      "y": -10.216666666666667,
+      "neighbors": [
+        "WayPoint36_WayPoint4_0001",
+        "WayPoint36_WayPoint4_0003"
+      ]
+    },
+    {
+      "name": "WayPoint36_WayPoint4_0003",
+      "x": -5.99,
+      "y": -10.66,
+      "neighbors": [
+        "WayPoint36_WayPoint4_0002",
+        "WayPoint36_WayPoint4_0004"
+      ]
+    },
+    {
+      "name": "WayPoint36_WayPoint4_0004",
+      "x": -5.923333333333334,
+      "y": -11.103333333333333,
+      "neighbors": [
+        "WayPoint36_WayPoint4_0003",
+        "WayPoint36_WayPoint4_0005"
+      ]
+    },
+    {
+      "name": "WayPoint36_WayPoint4_0005",
+      "x": -5.8566666666666665,
+      "y": -11.546666666666667,
+      "neighbors": [
+        "WayPoint36_WayPoint4_0004",
+        "WayPoint4"
+      ]
+    },
+    {
+      "name": "WayPoint37",
+      "x": -6.12,
+      "y": 7.56,
+      "neighbors": [
+        "WayPoint37_WayPoint38_0001",
+        "WayPoint37_WayPoint5_0001"
+      ]
+    },
+    {
+      "name": "WayPoint37_WayPoint38_0001",
+      "x": -6.0680000000000005,
+      "y": 7.159999999999999,
+      "neighbors": [
+        "WayPoint37",
+        "WayPoint37_WayPoint38_0002"
+      ]
+    },
+    {
+      "name": "WayPoint37_WayPoint38_0002",
+      "x": -6.016,
+      "y": 6.76,
+      "neighbors": [
+        "WayPoint37_WayPoint38_0001",
+        "WayPoint37_WayPoint38_0003"
+      ]
+    },
+    {
+      "name": "WayPoint37_WayPoint38_0003",
+      "x": -5.964,
+      "y": 6.359999999999999,
+      "neighbors": [
+        "WayPoint37_WayPoint38_0002",
+        "WayPoint37_WayPoint38_0004"
+      ]
+    },
+    {
+      "name": "WayPoint37_WayPoint38_0004",
+      "x": -5.912,
+      "y": 5.959999999999999,
+      "neighbors": [
+        "WayPoint37_WayPoint38_0003",
+        "WayPoint38"
+      ]
+    },
+    {
+      "name": "WayPoint37_WayPoint5_0001",
+      "x": -6.1866666666666665,
+      "y": 8.004999999999999,
+      "neighbors": [
+        "WayPoint37",
+        "WayPoint37_WayPoint5_0002"
+      ]
+    },
+    {
+      "name": "WayPoint37_WayPoint5_0002",
+      "x": -6.253333333333333,
+      "y": 8.45,
+      "neighbors": [
+        "WayPoint37_WayPoint5_0001",
+        "WayPoint37_WayPoint5_0003"
+      ]
+    },
+    {
+      "name": "WayPoint37_WayPoint5_0003",
+      "x": -6.32,
+      "y": 8.895,
+      "neighbors": [
+        "WayPoint37_WayPoint5_0002",
+        "WayPoint37_WayPoint5_0004"
+      ]
+    },
+    {
+      "name": "WayPoint37_WayPoint5_0004",
+      "x": -6.386666666666667,
+      "y": 9.34,
+      "neighbors": [
+        "WayPoint37_WayPoint5_0003",
+        "WayPoint37_WayPoint5_0005"
+      ]
+    },
+    {
+      "name": "WayPoint37_WayPoint5_0005",
+      "x": -6.453333333333333,
+      "y": 9.785,
+      "neighbors": [
+        "WayPoint37_WayPoint5_0004",
+        "WayPoint5"
+      ]
+    },
+    {
+      "name": "WayPoint38",
+      "x": -5.86,
+      "y": 5.56,
+      "neighbors": [
+        "WayPoint37_WayPoint38_0004",
+        "WayPoint38_WayPoint39_0001"
+      ]
+    },
+    {
+      "name": "WayPoint38_WayPoint39_0001",
+      "x": -5.792,
+      "y": 5.138,
+      "neighbors": [
+        "WayPoint38",
+        "WayPoint38_WayPoint39_0002"
+      ]
+    },
+    {
+      "name": "WayPoint38_WayPoint39_0002",
+      "x": -5.724,
+      "y": 4.715999999999999,
+      "neighbors": [
+        "WayPoint38_WayPoint39_0001",
+        "WayPoint38_WayPoint39_0003"
+      ]
+    },
+    {
+      "name": "WayPoint38_WayPoint39_0003",
+      "x": -5.656,
+      "y": 4.2940000000000005,
+      "neighbors": [
+        "WayPoint38_WayPoint39_0002",
+        "WayPoint38_WayPoint39_0004"
+      ]
+    },
+    {
+      "name": "WayPoint38_WayPoint39_0004",
+      "x": -5.588,
+      "y": 3.872,
+      "neighbors": [
+        "WayPoint38_WayPoint39_0003",
+        "WayPoint39"
+      ]
+    },
+    {
+      "name": "WayPoint39",
+      "x": -5.52,
+      "y": 3.45,
+      "neighbors": [
+        "WayPoint38_WayPoint39_0004",
+        "WayPoint39_WayPoint40_0001"
+      ]
+    },
+    {
+      "name": "WayPoint39_WayPoint40_0001",
+      "x": -5.468,
+      "y": 3.028,
+      "neighbors": [
+        "WayPoint39",
+        "WayPoint39_WayPoint40_0002"
+      ]
+    },
+    {
+      "name": "WayPoint39_WayPoint40_0002",
+      "x": -5.4159999999999995,
+      "y": 2.606,
+      "neighbors": [
+        "WayPoint39_WayPoint40_0001",
+        "WayPoint39_WayPoint40_0003"
+      ]
+    },
+    {
+      "name": "WayPoint39_WayPoint40_0003",
+      "x": -5.364,
+      "y": 2.184,
+      "neighbors": [
+        "WayPoint39_WayPoint40_0002",
+        "WayPoint39_WayPoint40_0004"
+      ]
+    },
+    {
+      "name": "WayPoint39_WayPoint40_0004",
+      "x": -5.311999999999999,
+      "y": 1.7619999999999998,
+      "neighbors": [
+        "WayPoint39_WayPoint40_0003",
+        "WayPoint40"
+      ]
+    },
+    {
+      "name": "WayPoint3_WayPoint7_0001",
+      "x": -8.488,
+      "y": 9.957,
+      "neighbors": [
+        "WayPoint3",
+        "WayPoint3_WayPoint7_0002"
+      ]
+    },
+    {
+      "name": "WayPoint3_WayPoint7_0002",
+      "x": -7.996,
+      "y": 10.024000000000001,
+      "neighbors": [
+        "WayPoint3_WayPoint7_0001",
+        "WayPoint3_WayPoint7_0003"
+      ]
+    },
+    {
+      "name": "WayPoint3_WayPoint7_0003",
+      "x": -7.5040000000000004,
+      "y": 10.091000000000001,
+      "neighbors": [
+        "WayPoint3_WayPoint7_0002",
+        "WayPoint3_WayPoint7_0004"
+      ]
+    },
+    {
+      "name": "WayPoint3_WayPoint7_0004",
+      "x": -7.0120000000000005,
+      "y": 10.158000000000001,
+      "neighbors": [
+        "WayPoint3_WayPoint7_0003",
+        "WayPoint3_WayPoint7_0005"
+      ]
+    },
+    {
+      "name": "WayPoint3_WayPoint7_0005",
+      "x": -6.52,
+      "y": 10.225000000000001,
+      "neighbors": [
+        "WayPoint3_WayPoint7_0004",
+        "WayPoint3_WayPoint7_0006"
+      ]
+    },
+    {
+      "name": "WayPoint3_WayPoint7_0006",
+      "x": -6.0280000000000005,
+      "y": 10.292,
+      "neighbors": [
+        "WayPoint3_WayPoint7_0005",
+        "WayPoint3_WayPoint7_0007"
+      ]
+    },
+    {
+      "name": "WayPoint3_WayPoint7_0007",
+      "x": -5.536,
+      "y": 10.359,
+      "neighbors": [
+        "WayPoint3_WayPoint7_0006",
+        "WayPoint3_WayPoint7_0008"
+      ]
+    },
+    {
+      "name": "WayPoint3_WayPoint7_0008",
+      "x": -5.044,
+      "y": 10.426,
+      "neighbors": [
+        "WayPoint3_WayPoint7_0007",
+        "WayPoint3_WayPoint7_0009"
+      ]
+    },
+    {
+      "name": "WayPoint3_WayPoint7_0009",
+      "x": -4.552,
+      "y": 10.493,
+      "neighbors": [
+        "WayPoint3_WayPoint7_0008",
+        "WayPoint7"
+      ]
+    },
+    {
+      "name": "WayPoint4",
+      "x": -5.79,
+      "y": -11.99,
+      "neighbors": [
+        "WayPoint36_WayPoint4_0005",
+        "WayPoint4_WayPoint8_0001"
+      ]
+    },
+    {
+      "name": "WayPoint40",
+      "x": -5.26,
+      "y": 1.34,
+      "neighbors": [
+        "WayPoint39_WayPoint40_0004",
+        "WayPoint40_WayPoint41_0001"
+      ]
+    },
+    {
+      "name": "WayPoint40_WayPoint41_0001",
+      "x": -5.194,
+      "y": 0.9400000000000001,
+      "neighbors": [
+        "WayPoint40",
+        "WayPoint40_WayPoint41_0002"
+      ]
+    },
+    {
+      "name": "WayPoint40_WayPoint41_0002",
+      "x": -5.128,
+      "y": 0.54,
+      "neighbors": [
+        "WayPoint40_WayPoint41_0001",
+        "WayPoint40_WayPoint41_0003"
+      ]
+    },
+    {
+      "name": "WayPoint40_WayPoint41_0003",
+      "x": -5.061999999999999,
+      "y": 0.14000000000000012,
+      "neighbors": [
+        "WayPoint40_WayPoint41_0002",
+        "WayPoint40_WayPoint41_0004"
+      ]
+    },
+    {
+      "name": "WayPoint40_WayPoint41_0004",
+      "x": -4.9959999999999996,
+      "y": -0.26,
+      "neighbors": [
+        "WayPoint40_WayPoint41_0003",
+        "WayPoint41"
+      ]
+    },
+    {
+      "name": "WayPoint41",
+      "x": -4.93,
+      "y": -0.66,
+      "neighbors": [
+        "WayPoint40_WayPoint41_0004",
+        "WayPoint41_WayPoint42_0001"
+      ]
+    },
+    {
+      "name": "WayPoint41_WayPoint42_0001",
+      "x": -4.862,
+      "y": -1.082,
+      "neighbors": [
+        "WayPoint41",
+        "WayPoint41_WayPoint42_0002"
+      ]
+    },
+    {
+      "name": "WayPoint41_WayPoint42_0002",
+      "x": -4.794,
+      "y": -1.504,
+      "neighbors": [
+        "WayPoint41_WayPoint42_0001",
+        "WayPoint41_WayPoint42_0003"
+      ]
+    },
+    {
+      "name": "WayPoint41_WayPoint42_0003",
+      "x": -4.726,
+      "y": -1.9259999999999997,
+      "neighbors": [
+        "WayPoint41_WayPoint42_0002",
+        "WayPoint41_WayPoint42_0004"
+      ]
+    },
+    {
+      "name": "WayPoint41_WayPoint42_0004",
+      "x": -4.6579999999999995,
+      "y": -2.348,
+      "neighbors": [
+        "WayPoint41_WayPoint42_0003",
+        "WayPoint42"
+      ]
+    },
+    {
+      "name": "WayPoint42",
+      "x": -4.59,
+      "y": -2.77,
+      "neighbors": [
+        "WayPoint41_WayPoint42_0004",
+        "WayPoint42_WayPoint43_0001"
+      ]
+    },
+    {
+      "name": "WayPoint42_WayPoint43_0001",
+      "x": -4.538,
+      "y": -3.192,
+      "neighbors": [
+        "WayPoint42",
+        "WayPoint42_WayPoint43_0002"
+      ]
+    },
+    {
+      "name": "WayPoint42_WayPoint43_0002",
+      "x": -4.486,
+      "y": -3.614,
+      "neighbors": [
+        "WayPoint42_WayPoint43_0001",
+        "WayPoint42_WayPoint43_0003"
+      ]
+    },
+    {
+      "name": "WayPoint42_WayPoint43_0003",
+      "x": -4.434,
+      "y": -4.036,
+      "neighbors": [
+        "WayPoint42_WayPoint43_0002",
+        "WayPoint42_WayPoint43_0004"
+      ]
+    },
+    {
+      "name": "WayPoint42_WayPoint43_0004",
+      "x": -4.382,
+      "y": -4.458,
+      "neighbors": [
+        "WayPoint42_WayPoint43_0003",
+        "WayPoint43"
+      ]
+    },
+    {
+      "name": "WayPoint43",
+      "x": -4.33,
+      "y": -4.88,
+      "neighbors": [
+        "WayPoint42_WayPoint43_0004",
+        "WayPoint43_WayPoint44_0001"
+      ]
+    },
+    {
+      "name": "WayPoint43_WayPoint44_0001",
+      "x": -4.264,
+      "y": -5.302,
+      "neighbors": [
+        "WayPoint43",
+        "WayPoint43_WayPoint44_0002"
+      ]
+    },
+    {
+      "name": "WayPoint43_WayPoint44_0002",
+      "x": -4.198,
+      "y": -5.724,
+      "neighbors": [
+        "WayPoint43_WayPoint44_0001",
+        "WayPoint43_WayPoint44_0003"
+      ]
+    },
+    {
+      "name": "WayPoint43_WayPoint44_0003",
+      "x": -4.132,
+      "y": -6.146,
+      "neighbors": [
+        "WayPoint43_WayPoint44_0002",
+        "WayPoint43_WayPoint44_0004"
+      ]
+    },
+    {
+      "name": "WayPoint43_WayPoint44_0004",
+      "x": -4.066,
+      "y": -6.5680000000000005,
+      "neighbors": [
+        "WayPoint43_WayPoint44_0003",
+        "WayPoint44"
+      ]
+    },
+    {
+      "name": "WayPoint44",
+      "x": -4.0,
+      "y": -6.99,
+      "neighbors": [
+        "WayPoint43_WayPoint44_0004",
+        "WayPoint44_WayPoint45_0001"
+      ]
+    },
+    {
+      "name": "WayPoint44_WayPoint45_0001",
+      "x": -3.946,
+      "y": -7.390000000000001,
+      "neighbors": [
+        "WayPoint44",
+        "WayPoint44_WayPoint45_0002"
+      ]
+    },
+    {
+      "name": "WayPoint44_WayPoint45_0002",
+      "x": -3.892,
+      "y": -7.79,
+      "neighbors": [
+        "WayPoint44_WayPoint45_0001",
+        "WayPoint44_WayPoint45_0003"
+      ]
+    },
+    {
+      "name": "WayPoint44_WayPoint45_0003",
+      "x": -3.838,
+      "y": -8.19,
+      "neighbors": [
+        "WayPoint44_WayPoint45_0002",
+        "WayPoint44_WayPoint45_0004"
+      ]
+    },
+    {
+      "name": "WayPoint44_WayPoint45_0004",
+      "x": -3.784,
+      "y": -8.59,
+      "neighbors": [
+        "WayPoint44_WayPoint45_0003",
+        "WayPoint45"
+      ]
+    },
+    {
+      "name": "WayPoint45",
+      "x": -3.73,
+      "y": -8.99,
+      "neighbors": [
+        "WayPoint44_WayPoint45_0004",
+        "WayPoint45_WayPoint6_0001"
+      ]
+    },
+    {
+      "name": "WayPoint45_WayPoint6_0001",
+      "x": -3.663333333333333,
+      "y": -9.435,
+      "neighbors": [
+        "WayPoint45",
+        "WayPoint45_WayPoint6_0002"
+      ]
+    },
+    {
+      "name": "WayPoint45_WayPoint6_0002",
+      "x": -3.5966666666666667,
+      "y": -9.88,
+      "neighbors": [
+        "WayPoint45_WayPoint6_0001",
+        "WayPoint45_WayPoint6_0003"
+      ]
+    },
+    {
+      "name": "WayPoint45_WayPoint6_0003",
+      "x": -3.5300000000000002,
+      "y": -10.325,
+      "neighbors": [
+        "WayPoint45_WayPoint6_0002",
+        "WayPoint45_WayPoint6_0004"
+      ]
+    },
+    {
+      "name": "WayPoint45_WayPoint6_0004",
+      "x": -3.4633333333333334,
+      "y": -10.77,
+      "neighbors": [
+        "WayPoint45_WayPoint6_0003",
+        "WayPoint45_WayPoint6_0005"
+      ]
+    },
+    {
+      "name": "WayPoint45_WayPoint6_0005",
+      "x": -3.3966666666666665,
+      "y": -11.215,
+      "neighbors": [
+        "WayPoint45_WayPoint6_0004",
+        "WayPoint6"
+      ]
+    },
+    {
+      "name": "WayPoint46",
+      "x": -3.66,
+      "y": 7.89,
+      "neighbors": [
+        "WayPoint46_WayPoint47_0001",
+        "WayPoint46_WayPoint7_0001"
+      ]
+    },
+    {
+      "name": "WayPoint46_WayPoint47_0001",
+      "x": -3.608,
+      "y": 7.489999999999999,
+      "neighbors": [
+        "WayPoint46",
+        "WayPoint46_WayPoint47_0002"
+      ]
+    },
+    {
+      "name": "WayPoint46_WayPoint47_0002",
+      "x": -3.556,
+      "y": 7.09,
+      "neighbors": [
+        "WayPoint46_WayPoint47_0001",
+        "WayPoint46_WayPoint47_0003"
+      ]
+    },
+    {
+      "name": "WayPoint46_WayPoint47_0003",
+      "x": -3.504,
+      "y": 6.6899999999999995,
+      "neighbors": [
+        "WayPoint46_WayPoint47_0002",
+        "WayPoint46_WayPoint47_0004"
+      ]
+    },
+    {
+      "name": "WayPoint46_WayPoint47_0004",
+      "x": -3.452,
+      "y": 6.289999999999999,
+      "neighbors": [
+        "WayPoint46_WayPoint47_0003",
+        "WayPoint47"
+      ]
+    },
+    {
+      "name": "WayPoint46_WayPoint7_0001",
+      "x": -3.7266666666666666,
+      "y": 8.334999999999999,
+      "neighbors": [
+        "WayPoint46",
+        "WayPoint46_WayPoint7_0002"
+      ]
+    },
+    {
+      "name": "WayPoint46_WayPoint7_0002",
+      "x": -3.7933333333333334,
+      "y": 8.78,
+      "neighbors": [
+        "WayPoint46_WayPoint7_0001",
+        "WayPoint46_WayPoint7_0003"
+      ]
+    },
+    {
+      "name": "WayPoint46_WayPoint7_0003",
+      "x": -3.86,
+      "y": 9.225,
+      "neighbors": [
+        "WayPoint46_WayPoint7_0002",
+        "WayPoint46_WayPoint7_0004"
+      ]
+    },
+    {
+      "name": "WayPoint46_WayPoint7_0004",
+      "x": -3.9266666666666663,
+      "y": 9.67,
+      "neighbors": [
+        "WayPoint46_WayPoint7_0003",
+        "WayPoint46_WayPoint7_0005"
+      ]
+    },
+    {
+      "name": "WayPoint46_WayPoint7_0005",
+      "x": -3.993333333333333,
+      "y": 10.115,
+      "neighbors": [
+        "WayPoint46_WayPoint7_0004",
+        "WayPoint7"
+      ]
+    },
+    {
+      "name": "WayPoint47",
+      "x": -3.4,
+      "y": 5.89,
+      "neighbors": [
+        "WayPoint46_WayPoint47_0004",
+        "WayPoint47_WayPoint48_0001"
+      ]
+    },
+    {
+      "name": "WayPoint47_WayPoint48_0001",
+      "x": -3.332,
+      "y": 5.468,
+      "neighbors": [
+        "WayPoint47",
+        "WayPoint47_WayPoint48_0002"
+      ]
+    },
+    {
+      "name": "WayPoint47_WayPoint48_0002",
+      "x": -3.264,
+      "y": 5.045999999999999,
+      "neighbors": [
+        "WayPoint47_WayPoint48_0001",
+        "WayPoint47_WayPoint48_0003"
+      ]
+    },
+    {
+      "name": "WayPoint47_WayPoint48_0003",
+      "x": -3.196,
+      "y": 4.624,
+      "neighbors": [
+        "WayPoint47_WayPoint48_0002",
+        "WayPoint47_WayPoint48_0004"
+      ]
+    },
+    {
+      "name": "WayPoint47_WayPoint48_0004",
+      "x": -3.128,
+      "y": 4.202,
+      "neighbors": [
+        "WayPoint47_WayPoint48_0003",
+        "WayPoint48"
+      ]
+    },
+    {
+      "name": "WayPoint48",
+      "x": -3.06,
+      "y": 3.78,
+      "neighbors": [
+        "WayPoint47_WayPoint48_0004",
+        "WayPoint48_WayPoint49_0001"
+      ]
+    },
+    {
+      "name": "WayPoint48_WayPoint49_0001",
+      "x": -3.008,
+      "y": 3.3579999999999997,
+      "neighbors": [
+        "WayPoint48",
+        "WayPoint48_WayPoint49_0002"
+      ]
+    },
+    {
+      "name": "WayPoint48_WayPoint49_0002",
+      "x": -2.956,
+      "y": 2.936,
+      "neighbors": [
+        "WayPoint48_WayPoint49_0001",
+        "WayPoint48_WayPoint49_0003"
+      ]
+    },
+    {
+      "name": "WayPoint48_WayPoint49_0003",
+      "x": -2.904,
+      "y": 2.5140000000000002,
+      "neighbors": [
+        "WayPoint48_WayPoint49_0002",
+        "WayPoint48_WayPoint49_0004"
+      ]
+    },
+    {
+      "name": "WayPoint48_WayPoint49_0004",
+      "x": -2.852,
+      "y": 2.0919999999999996,
+      "neighbors": [
+        "WayPoint48_WayPoint49_0003",
+        "WayPoint49"
+      ]
+    },
+    {
+      "name": "WayPoint49",
+      "x": -2.8,
+      "y": 1.67,
+      "neighbors": [
+        "WayPoint48_WayPoint49_0004",
+        "WayPoint49_WayPoint50_0001"
+      ]
+    },
+    {
+      "name": "WayPoint49_WayPoint50_0001",
+      "x": -2.734,
+      "y": 1.27,
+      "neighbors": [
+        "WayPoint49",
+        "WayPoint49_WayPoint50_0002"
+      ]
+    },
+    {
+      "name": "WayPoint49_WayPoint50_0002",
+      "x": -2.668,
+      "y": 0.8699999999999999,
+      "neighbors": [
+        "WayPoint49_WayPoint50_0001",
+        "WayPoint49_WayPoint50_0003"
+      ]
+    },
+    {
+      "name": "WayPoint49_WayPoint50_0003",
+      "x": -2.602,
+      "y": 0.47,
+      "neighbors": [
+        "WayPoint49_WayPoint50_0002",
+        "WayPoint49_WayPoint50_0004"
+      ]
+    },
+    {
+      "name": "WayPoint49_WayPoint50_0004",
+      "x": -2.536,
+      "y": 0.06999999999999984,
+      "neighbors": [
+        "WayPoint49_WayPoint50_0003",
+        "WayPoint50"
+      ]
+    },
+    {
+      "name": "WayPoint4_WayPoint8_0001",
+      "x": -5.298,
+      "y": -11.924,
+      "neighbors": [
+        "WayPoint4",
+        "WayPoint4_WayPoint8_0002"
+      ]
+    },
+    {
+      "name": "WayPoint4_WayPoint8_0002",
+      "x": -4.806,
+      "y": -11.858,
+      "neighbors": [
+        "WayPoint4_WayPoint8_0001",
+        "WayPoint4_WayPoint8_0003"
+      ]
+    },
+    {
+      "name": "WayPoint4_WayPoint8_0003",
+      "x": -4.314,
+      "y": -11.792,
+      "neighbors": [
+        "WayPoint4_WayPoint8_0002",
+        "WayPoint4_WayPoint8_0004"
+      ]
+    },
+    {
+      "name": "WayPoint4_WayPoint8_0004",
+      "x": -3.822,
+      "y": -11.726,
+      "neighbors": [
+        "WayPoint4_WayPoint8_0003",
+        "WayPoint4_WayPoint8_0005"
+      ]
+    },
+    {
+      "name": "WayPoint4_WayPoint8_0005",
+      "x": -3.33,
+      "y": -11.66,
+      "neighbors": [
+        "WayPoint4_WayPoint8_0004",
+        "WayPoint4_WayPoint8_0006"
+      ]
+    },
+    {
+      "name": "WayPoint4_WayPoint8_0006",
+      "x": -2.838,
+      "y": -11.594,
+      "neighbors": [
+        "WayPoint4_WayPoint8_0005",
+        "WayPoint4_WayPoint8_0007"
+      ]
+    },
+    {
+      "name": "WayPoint4_WayPoint8_0007",
+      "x": -2.346,
+      "y": -11.528,
+      "neighbors": [
+        "WayPoint4_WayPoint8_0006",
+        "WayPoint4_WayPoint8_0008"
+      ]
+    },
+    {
+      "name": "WayPoint4_WayPoint8_0008",
+      "x": -1.854,
+      "y": -11.462,
+      "neighbors": [
+        "WayPoint4_WayPoint8_0007",
+        "WayPoint4_WayPoint8_0009"
+      ]
+    },
+    {
+      "name": "WayPoint4_WayPoint8_0009",
+      "x": -1.362,
+      "y": -11.396,
+      "neighbors": [
+        "WayPoint4_WayPoint8_0008",
+        "WayPoint8"
+      ]
+    },
+    {
+      "name": "WayPoint5",
+      "x": -6.52,
+      "y": 10.23,
+      "neighbors": [
+        "WayPoint1_WayPoint5_0009",
+        "WayPoint37_WayPoint5_0005",
+        "WayPoint5_WayPoint9_0001"
+      ]
+    },
+    {
+      "name": "WayPoint50",
+      "x": -2.47,
+      "y": -0.33,
+      "neighbors": [
+        "WayPoint49_WayPoint50_0004",
+        "WayPoint50_WayPoint51_0001"
+      ]
+    },
+    {
+      "name": "WayPoint50_WayPoint51_0001",
+      "x": -2.402,
+      "y": -0.752,
+      "neighbors": [
+        "WayPoint50",
+        "WayPoint50_WayPoint51_0002"
+      ]
+    },
+    {
+      "name": "WayPoint50_WayPoint51_0002",
+      "x": -2.334,
+      "y": -1.174,
+      "neighbors": [
+        "WayPoint50_WayPoint51_0001",
+        "WayPoint50_WayPoint51_0003"
+      ]
+    },
+    {
+      "name": "WayPoint50_WayPoint51_0003",
+      "x": -2.266,
+      "y": -1.5959999999999999,
+      "neighbors": [
+        "WayPoint50_WayPoint51_0002",
+        "WayPoint50_WayPoint51_0004"
+      ]
+    },
+    {
+      "name": "WayPoint50_WayPoint51_0004",
+      "x": -2.198,
+      "y": -2.018,
+      "neighbors": [
+        "WayPoint50_WayPoint51_0003",
+        "WayPoint51"
+      ]
+    },
+    {
+      "name": "WayPoint51",
+      "x": -2.13,
+      "y": -2.44,
+      "neighbors": [
+        "WayPoint50_WayPoint51_0004",
+        "WayPoint51_WayPoint52_0001"
+      ]
+    },
+    {
+      "name": "WayPoint51_WayPoint52_0001",
+      "x": -2.078,
+      "y": -2.862,
+      "neighbors": [
+        "WayPoint51",
+        "WayPoint51_WayPoint52_0002"
+      ]
+    },
+    {
+      "name": "WayPoint51_WayPoint52_0002",
+      "x": -2.026,
+      "y": -3.284,
+      "neighbors": [
+        "WayPoint51_WayPoint52_0001",
+        "WayPoint51_WayPoint52_0003"
+      ]
+    },
+    {
+      "name": "WayPoint51_WayPoint52_0003",
+      "x": -1.974,
+      "y": -3.7059999999999995,
+      "neighbors": [
+        "WayPoint51_WayPoint52_0002",
+        "WayPoint51_WayPoint52_0004"
+      ]
+    },
+    {
+      "name": "WayPoint51_WayPoint52_0004",
+      "x": -1.9220000000000002,
+      "y": -4.128,
+      "neighbors": [
+        "WayPoint51_WayPoint52_0003",
+        "WayPoint52"
+      ]
+    },
+    {
+      "name": "WayPoint52",
+      "x": -1.87,
+      "y": -4.55,
+      "neighbors": [
+        "WayPoint51_WayPoint52_0004",
+        "WayPoint52_WayPoint53_0001"
+      ]
+    },
+    {
+      "name": "WayPoint52_WayPoint53_0001",
+      "x": -1.804,
+      "y": -4.9719999999999995,
+      "neighbors": [
+        "WayPoint52",
+        "WayPoint52_WayPoint53_0002"
+      ]
+    },
+    {
+      "name": "WayPoint52_WayPoint53_0002",
+      "x": -1.738,
+      "y": -5.394,
+      "neighbors": [
+        "WayPoint52_WayPoint53_0001",
+        "WayPoint52_WayPoint53_0003"
+      ]
+    },
+    {
+      "name": "WayPoint52_WayPoint53_0003",
+      "x": -1.6720000000000002,
+      "y": -5.816,
+      "neighbors": [
+        "WayPoint52_WayPoint53_0002",
+        "WayPoint52_WayPoint53_0004"
+      ]
+    },
+    {
+      "name": "WayPoint52_WayPoint53_0004",
+      "x": -1.606,
+      "y": -6.238,
+      "neighbors": [
+        "WayPoint52_WayPoint53_0003",
+        "WayPoint53"
+      ]
+    },
+    {
+      "name": "WayPoint53",
+      "x": -1.54,
+      "y": -6.66,
+      "neighbors": [
+        "WayPoint52_WayPoint53_0004",
+        "WayPoint53_WayPoint54_0001"
+      ]
+    },
+    {
+      "name": "WayPoint53_WayPoint54_0001",
+      "x": -1.486,
+      "y": -7.0600000000000005,
+      "neighbors": [
+        "WayPoint53",
+        "WayPoint53_WayPoint54_0002"
+      ]
+    },
+    {
+      "name": "WayPoint53_WayPoint54_0002",
+      "x": -1.432,
+      "y": -7.46,
+      "neighbors": [
+        "WayPoint53_WayPoint54_0001",
+        "WayPoint53_WayPoint54_0003"
+      ]
+    },
+    {
+      "name": "WayPoint53_WayPoint54_0003",
+      "x": -1.3780000000000001,
+      "y": -7.86,
+      "neighbors": [
+        "WayPoint53_WayPoint54_0002",
+        "WayPoint53_WayPoint54_0004"
+      ]
+    },
+    {
+      "name": "WayPoint53_WayPoint54_0004",
+      "x": -1.324,
+      "y": -8.26,
+      "neighbors": [
+        "WayPoint53_WayPoint54_0003",
+        "WayPoint54"
+      ]
+    },
+    {
+      "name": "WayPoint54",
+      "x": -1.27,
+      "y": -8.66,
+      "neighbors": [
+        "WayPoint53_WayPoint54_0004",
+        "WayPoint54_WayPoint8_0001"
+      ]
+    },
+    {
+      "name": "WayPoint54_WayPoint8_0001",
+      "x": -1.2033333333333334,
+      "y": -9.105,
+      "neighbors": [
+        "WayPoint54",
+        "WayPoint54_WayPoint8_0002"
+      ]
+    },
+    {
+      "name": "WayPoint54_WayPoint8_0002",
+      "x": -1.1366666666666667,
+      "y": -9.55,
+      "neighbors": [
+        "WayPoint54_WayPoint8_0001",
+        "WayPoint54_WayPoint8_0003"
+      ]
+    },
+    {
+      "name": "WayPoint54_WayPoint8_0003",
+      "x": -1.07,
+      "y": -9.995000000000001,
+      "neighbors": [
+        "WayPoint54_WayPoint8_0002",
+        "WayPoint54_WayPoint8_0004"
+      ]
+    },
+    {
+      "name": "WayPoint54_WayPoint8_0004",
+      "x": -1.0033333333333334,
+      "y": -10.44,
+      "neighbors": [
+        "WayPoint54_WayPoint8_0003",
+        "WayPoint54_WayPoint8_0005"
+      ]
+    },
+    {
+      "name": "WayPoint54_WayPoint8_0005",
+      "x": -0.9366666666666666,
+      "y": -10.885,
+      "neighbors": [
+        "WayPoint54_WayPoint8_0004",
+        "WayPoint8"
+      ]
+    },
+    {
+      "name": "WayPoint55",
+      "x": -1.2,
+      "y": 8.23,
+      "neighbors": [
+        "WayPoint55_WayPoint56_0001",
+        "WayPoint55_WayPoint9_0001"
+      ]
+    },
+    {
+      "name": "WayPoint55_WayPoint56_0001",
+      "x": -1.148,
+      "y": 7.83,
+      "neighbors": [
+        "WayPoint55",
+        "WayPoint55_WayPoint56_0002"
+      ]
+    },
+    {
+      "name": "WayPoint55_WayPoint56_0002",
+      "x": -1.0959999999999999,
+      "y": 7.430000000000001,
+      "neighbors": [
+        "WayPoint55_WayPoint56_0001",
+        "WayPoint55_WayPoint56_0003"
+      ]
+    },
+    {
+      "name": "WayPoint55_WayPoint56_0003",
+      "x": -1.044,
+      "y": 7.03,
+      "neighbors": [
+        "WayPoint55_WayPoint56_0002",
+        "WayPoint55_WayPoint56_0004"
+      ]
+    },
+    {
+      "name": "WayPoint55_WayPoint56_0004",
+      "x": -0.992,
+      "y": 6.630000000000001,
+      "neighbors": [
+        "WayPoint55_WayPoint56_0003",
+        "WayPoint56"
+      ]
+    },
+    {
+      "name": "WayPoint55_WayPoint9_0001",
+      "x": -1.2666666666666666,
+      "y": 8.673333333333334,
+      "neighbors": [
+        "WayPoint55",
+        "WayPoint55_WayPoint9_0002"
+      ]
+    },
+    {
+      "name": "WayPoint55_WayPoint9_0002",
+      "x": -1.3333333333333333,
+      "y": 9.116666666666667,
+      "neighbors": [
+        "WayPoint55_WayPoint9_0001",
+        "WayPoint55_WayPoint9_0003"
+      ]
+    },
+    {
+      "name": "WayPoint55_WayPoint9_0003",
+      "x": -1.4,
+      "y": 9.56,
+      "neighbors": [
+        "WayPoint55_WayPoint9_0002",
+        "WayPoint55_WayPoint9_0004"
+      ]
+    },
+    {
+      "name": "WayPoint55_WayPoint9_0004",
+      "x": -1.4666666666666668,
+      "y": 10.003333333333334,
+      "neighbors": [
+        "WayPoint55_WayPoint9_0003",
+        "WayPoint55_WayPoint9_0005"
+      ]
+    },
+    {
+      "name": "WayPoint55_WayPoint9_0005",
+      "x": -1.5333333333333334,
+      "y": 10.446666666666667,
+      "neighbors": [
+        "WayPoint55_WayPoint9_0004",
+        "WayPoint9"
+      ]
+    },
+    {
+      "name": "WayPoint56",
+      "x": -0.94,
+      "y": 6.23,
+      "neighbors": [
+        "WayPoint55_WayPoint56_0004",
+        "WayPoint56_WayPoint57_0001"
+      ]
+    },
+    {
+      "name": "WayPoint56_WayPoint57_0001",
+      "x": -0.874,
+      "y": 5.808000000000001,
+      "neighbors": [
+        "WayPoint56",
+        "WayPoint56_WayPoint57_0002"
+      ]
+    },
+    {
+      "name": "WayPoint56_WayPoint57_0002",
+      "x": -0.8079999999999999,
+      "y": 5.386,
+      "neighbors": [
+        "WayPoint56_WayPoint57_0001",
+        "WayPoint56_WayPoint57_0003"
+      ]
+    },
+    {
+      "name": "WayPoint56_WayPoint57_0003",
+      "x": -0.742,
+      "y": 4.964,
+      "neighbors": [
+        "WayPoint56_WayPoint57_0002",
+        "WayPoint56_WayPoint57_0004"
+      ]
+    },
+    {
+      "name": "WayPoint56_WayPoint57_0004",
+      "x": -0.6759999999999999,
+      "y": 4.542,
+      "neighbors": [
+        "WayPoint56_WayPoint57_0003",
+        "WayPoint57"
+      ]
+    },
+    {
+      "name": "WayPoint57",
+      "x": -0.61,
+      "y": 4.12,
+      "neighbors": [
+        "WayPoint56_WayPoint57_0004",
+        "WayPoint57_WayPoint58_0001"
+      ]
+    },
+    {
+      "name": "WayPoint57_WayPoint58_0001",
+      "x": -0.556,
+      "y": 3.698,
+      "neighbors": [
+        "WayPoint57",
+        "WayPoint57_WayPoint58_0002"
+      ]
+    },
+    {
+      "name": "WayPoint57_WayPoint58_0002",
+      "x": -0.502,
+      "y": 3.276,
+      "neighbors": [
+        "WayPoint57_WayPoint58_0001",
+        "WayPoint57_WayPoint58_0003"
+      ]
+    },
+    {
+      "name": "WayPoint57_WayPoint58_0003",
+      "x": -0.448,
+      "y": 2.854,
+      "neighbors": [
+        "WayPoint57_WayPoint58_0002",
+        "WayPoint57_WayPoint58_0004"
+      ]
+    },
+    {
+      "name": "WayPoint57_WayPoint58_0004",
+      "x": -0.394,
+      "y": 2.4319999999999995,
+      "neighbors": [
+        "WayPoint57_WayPoint58_0003",
+        "WayPoint58"
+      ]
+    },
+    {
+      "name": "WayPoint58",
+      "x": -0.34,
+      "y": 2.01,
+      "neighbors": [
+        "WayPoint57_WayPoint58_0004",
+        "WayPoint58_WayPoint59_0001"
+      ]
+    },
+    {
+      "name": "WayPoint58_WayPoint59_0001",
+      "x": -0.274,
+      "y": 1.6099999999999999,
+      "neighbors": [
+        "WayPoint58",
+        "WayPoint58_WayPoint59_0002"
+      ]
+    },
+    {
+      "name": "WayPoint58_WayPoint59_0002",
+      "x": -0.20800000000000002,
+      "y": 1.21,
+      "neighbors": [
+        "WayPoint58_WayPoint59_0001",
+        "WayPoint58_WayPoint59_0003"
+      ]
+    },
+    {
+      "name": "WayPoint58_WayPoint59_0003",
+      "x": -0.14200000000000002,
+      "y": 0.81,
+      "neighbors": [
+        "WayPoint58_WayPoint59_0002",
+        "WayPoint58_WayPoint59_0004"
+      ]
+    },
+    {
+      "name": "WayPoint58_WayPoint59_0004",
+      "x": -0.07600000000000001,
+      "y": 0.4099999999999999,
+      "neighbors": [
+        "WayPoint58_WayPoint59_0003",
+        "WayPoint59"
+      ]
+    },
+    {
+      "name": "WayPoint59",
+      "x": -0.01,
+      "y": 0.01,
+      "neighbors": [
+        "WayPoint58_WayPoint59_0004",
+        "WayPoint59_WayPoint60_0001"
+      ]
+    },
+    {
+      "name": "WayPoint59_WayPoint60_0001",
+      "x": 0.056,
+      "y": -0.4139999999999999,
+      "neighbors": [
+        "WayPoint59",
+        "WayPoint59_WayPoint60_0002"
+      ]
+    },
+    {
+      "name": "WayPoint59_WayPoint60_0002",
+      "x": 0.12200000000000001,
+      "y": -0.8379999999999999,
+      "neighbors": [
+        "WayPoint59_WayPoint60_0001",
+        "WayPoint59_WayPoint60_0003"
+      ]
+    },
+    {
+      "name": "WayPoint59_WayPoint60_0003",
+      "x": 0.188,
+      "y": -1.2619999999999998,
+      "neighbors": [
+        "WayPoint59_WayPoint60_0002",
+        "WayPoint59_WayPoint60_0004"
+      ]
+    },
+    {
+      "name": "WayPoint59_WayPoint60_0004",
+      "x": 0.254,
+      "y": -1.6859999999999997,
+      "neighbors": [
+        "WayPoint59_WayPoint60_0003",
+        "WayPoint60"
+      ]
+    },
+    {
+      "name": "WayPoint5_WayPoint9_0001",
+      "x": -6.028,
+      "y": 10.296000000000001,
+      "neighbors": [
+        "WayPoint5",
+        "WayPoint5_WayPoint9_0002"
+      ]
+    },
+    {
+      "name": "WayPoint5_WayPoint9_0002",
+      "x": -5.536,
+      "y": 10.362,
+      "neighbors": [
+        "WayPoint5_WayPoint9_0001",
+        "WayPoint5_WayPoint9_0003"
+      ]
+    },
+    {
+      "name": "WayPoint5_WayPoint9_0003",
+      "x": -5.044,
+      "y": 10.428,
+      "neighbors": [
+        "WayPoint5_WayPoint9_0002",
+        "WayPoint5_WayPoint9_0004"
+      ]
+    },
+    {
+      "name": "WayPoint5_WayPoint9_0004",
+      "x": -4.552,
+      "y": 10.494,
+      "neighbors": [
+        "WayPoint5_WayPoint9_0003",
+        "WayPoint5_WayPoint9_0005"
+      ]
+    },
+    {
+      "name": "WayPoint5_WayPoint9_0005",
+      "x": -4.06,
+      "y": 10.56,
+      "neighbors": [
+        "WayPoint5_WayPoint9_0004",
+        "WayPoint5_WayPoint9_0006"
+      ]
+    },
+    {
+      "name": "WayPoint5_WayPoint9_0006",
+      "x": -3.5679999999999996,
+      "y": 10.626000000000001,
+      "neighbors": [
+        "WayPoint5_WayPoint9_0005",
+        "WayPoint5_WayPoint9_0007"
+      ]
+    },
+    {
+      "name": "WayPoint5_WayPoint9_0007",
+      "x": -3.0759999999999996,
+      "y": 10.692,
+      "neighbors": [
+        "WayPoint5_WayPoint9_0006",
+        "WayPoint5_WayPoint9_0008"
+      ]
+    },
+    {
+      "name": "WayPoint5_WayPoint9_0008",
+      "x": -2.5839999999999996,
+      "y": 10.758000000000001,
+      "neighbors": [
+        "WayPoint5_WayPoint9_0007",
+        "WayPoint5_WayPoint9_0009"
+      ]
+    },
+    {
+      "name": "WayPoint5_WayPoint9_0009",
+      "x": -2.0919999999999996,
+      "y": 10.824,
+      "neighbors": [
+        "WayPoint5_WayPoint9_0008",
+        "WayPoint9"
+      ]
+    },
+    {
+      "name": "WayPoint6",
+      "x": -3.33,
+      "y": -11.66,
+      "neighbors": [
+        "WayPoint10_WayPoint6_0009",
+        "WayPoint2_WayPoint6_0009",
+        "WayPoint45_WayPoint6_0005"
+      ]
+    },
+    {
+      "name": "WayPoint60",
+      "x": 0.32,
+      "y": -2.11,
+      "neighbors": [
+        "WayPoint59_WayPoint60_0004",
+        "WayPoint60_WayPoint61_0001"
+      ]
+    },
+    {
+      "name": "WayPoint60_WayPoint61_0001",
+      "x": 0.374,
+      "y": -2.532,
+      "neighbors": [
+        "WayPoint60",
+        "WayPoint60_WayPoint61_0002"
+      ]
+    },
+    {
+      "name": "WayPoint60_WayPoint61_0002",
+      "x": 0.428,
+      "y": -2.9539999999999997,
+      "neighbors": [
+        "WayPoint60_WayPoint61_0001",
+        "WayPoint60_WayPoint61_0003"
+      ]
+    },
+    {
+      "name": "WayPoint60_WayPoint61_0003",
+      "x": 0.482,
+      "y": -3.3759999999999994,
+      "neighbors": [
+        "WayPoint60_WayPoint61_0002",
+        "WayPoint60_WayPoint61_0004"
+      ]
+    },
+    {
+      "name": "WayPoint60_WayPoint61_0004",
+      "x": 0.536,
+      "y": -3.798,
+      "neighbors": [
+        "WayPoint60_WayPoint61_0003",
+        "WayPoint61"
+      ]
+    },
+    {
+      "name": "WayPoint61",
+      "x": 0.59,
+      "y": -4.22,
+      "neighbors": [
+        "WayPoint60_WayPoint61_0004",
+        "WayPoint61_WayPoint62_0001"
+      ]
+    },
+    {
+      "name": "WayPoint61_WayPoint62_0001",
+      "x": 0.656,
+      "y": -4.6419999999999995,
+      "neighbors": [
+        "WayPoint61",
+        "WayPoint61_WayPoint62_0002"
+      ]
+    },
+    {
+      "name": "WayPoint61_WayPoint62_0002",
+      "x": 0.722,
+      "y": -5.064,
+      "neighbors": [
+        "WayPoint61_WayPoint62_0001",
+        "WayPoint61_WayPoint62_0003"
+      ]
+    },
+    {
+      "name": "WayPoint61_WayPoint62_0003",
+      "x": 0.788,
+      "y": -5.486,
+      "neighbors": [
+        "WayPoint61_WayPoint62_0002",
+        "WayPoint61_WayPoint62_0004"
+      ]
+    },
+    {
+      "name": "WayPoint61_WayPoint62_0004",
+      "x": 0.8540000000000001,
+      "y": -5.908,
+      "neighbors": [
+        "WayPoint61_WayPoint62_0003",
+        "WayPoint62"
+      ]
+    },
+    {
+      "name": "WayPoint62",
+      "x": 0.92,
+      "y": -6.33,
+      "neighbors": [
+        "WayPoint61_WayPoint62_0004",
+        "WayPoint62_WayPoint63_0001"
+      ]
+    },
+    {
+      "name": "WayPoint62_WayPoint63_0001",
+      "x": 0.986,
+      "y": -6.73,
+      "neighbors": [
+        "WayPoint62",
+        "WayPoint62_WayPoint63_0002"
+      ]
+    },
+    {
+      "name": "WayPoint62_WayPoint63_0002",
+      "x": 1.052,
+      "y": -7.13,
+      "neighbors": [
+        "WayPoint62_WayPoint63_0001",
+        "WayPoint62_WayPoint63_0003"
+      ]
+    },
+    {
+      "name": "WayPoint62_WayPoint63_0003",
+      "x": 1.118,
+      "y": -7.53,
+      "neighbors": [
+        "WayPoint62_WayPoint63_0002",
+        "WayPoint62_WayPoint63_0004"
+      ]
+    },
+    {
+      "name": "WayPoint62_WayPoint63_0004",
+      "x": 1.184,
+      "y": -7.93,
+      "neighbors": [
+        "WayPoint62_WayPoint63_0003",
+        "WayPoint63"
+      ]
+    },
+    {
+      "name": "WayPoint63",
+      "x": 1.25,
+      "y": -8.33,
+      "neighbors": [
+        "WayPoint10_WayPoint63_0005",
+        "WayPoint62_WayPoint63_0004"
+      ]
+    },
+    {
+      "name": "WayPoint64",
+      "x": 1.19,
+      "y": 8.67,
+      "neighbors": [
+        "WayPoint11_WayPoint64_0005",
+        "WayPoint64_WayPoint65_0001"
+      ]
+    },
+    {
+      "name": "WayPoint64_WayPoint65_0001",
+      "x": 1.256,
+      "y": 8.27,
+      "neighbors": [
+        "WayPoint64",
+        "WayPoint64_WayPoint65_0002"
+      ]
+    },
+    {
+      "name": "WayPoint64_WayPoint65_0002",
+      "x": 1.322,
+      "y": 7.87,
+      "neighbors": [
+        "WayPoint64_WayPoint65_0001",
+        "WayPoint64_WayPoint65_0003"
+      ]
+    },
+    {
+      "name": "WayPoint64_WayPoint65_0003",
+      "x": 1.388,
+      "y": 7.47,
+      "neighbors": [
+        "WayPoint64_WayPoint65_0002",
+        "WayPoint64_WayPoint65_0004"
+      ]
+    },
+    {
+      "name": "WayPoint64_WayPoint65_0004",
+      "x": 1.454,
+      "y": 7.07,
+      "neighbors": [
+        "WayPoint64_WayPoint65_0003",
+        "WayPoint65"
+      ]
+    },
+    {
+      "name": "WayPoint65",
+      "x": 1.52,
+      "y": 6.67,
+      "neighbors": [
+        "WayPoint64_WayPoint65_0004",
+        "WayPoint65_WayPoint66_0001"
+      ]
+    },
+    {
+      "name": "WayPoint65_WayPoint66_0001",
+      "x": 1.586,
+      "y": 6.248,
+      "neighbors": [
+        "WayPoint65",
+        "WayPoint65_WayPoint66_0002"
+      ]
+    },
+    {
+      "name": "WayPoint65_WayPoint66_0002",
+      "x": 1.6520000000000001,
+      "y": 5.826,
+      "neighbors": [
+        "WayPoint65_WayPoint66_0001",
+        "WayPoint65_WayPoint66_0003"
+      ]
+    },
+    {
+      "name": "WayPoint65_WayPoint66_0003",
+      "x": 1.718,
+      "y": 5.404,
+      "neighbors": [
+        "WayPoint65_WayPoint66_0002",
+        "WayPoint65_WayPoint66_0004"
+      ]
+    },
+    {
+      "name": "WayPoint65_WayPoint66_0004",
+      "x": 1.784,
+      "y": 4.981999999999999,
+      "neighbors": [
+        "WayPoint65_WayPoint66_0003",
+        "WayPoint66"
+      ]
+    },
+    {
+      "name": "WayPoint66",
+      "x": 1.85,
+      "y": 4.56,
+      "neighbors": [
+        "WayPoint65_WayPoint66_0004",
+        "WayPoint66_WayPoint67_0001"
+      ]
+    },
+    {
+      "name": "WayPoint66_WayPoint67_0001",
+      "x": 1.9040000000000001,
+      "y": 4.138,
+      "neighbors": [
+        "WayPoint66",
+        "WayPoint66_WayPoint67_0002"
+      ]
+    },
+    {
+      "name": "WayPoint66_WayPoint67_0002",
+      "x": 1.9580000000000002,
+      "y": 3.7159999999999997,
+      "neighbors": [
+        "WayPoint66_WayPoint67_0001",
+        "WayPoint66_WayPoint67_0003"
+      ]
+    },
+    {
+      "name": "WayPoint66_WayPoint67_0003",
+      "x": 2.012,
+      "y": 3.294,
+      "neighbors": [
+        "WayPoint66_WayPoint67_0002",
+        "WayPoint66_WayPoint67_0004"
+      ]
+    },
+    {
+      "name": "WayPoint66_WayPoint67_0004",
+      "x": 2.0660000000000003,
+      "y": 2.872,
+      "neighbors": [
+        "WayPoint66_WayPoint67_0003",
+        "WayPoint67"
+      ]
+    },
+    {
+      "name": "WayPoint67",
+      "x": 2.12,
+      "y": 2.45,
+      "neighbors": [
+        "WayPoint66_WayPoint67_0004",
+        "WayPoint67_WayPoint68_0001"
+      ]
+    },
+    {
+      "name": "WayPoint67_WayPoint68_0001",
+      "x": 2.186,
+      "y": 2.028,
+      "neighbors": [
+        "WayPoint67",
+        "WayPoint67_WayPoint68_0002"
+      ]
+    },
+    {
+      "name": "WayPoint67_WayPoint68_0002",
+      "x": 2.2520000000000002,
+      "y": 1.6059999999999999,
+      "neighbors": [
+        "WayPoint67_WayPoint68_0001",
+        "WayPoint67_WayPoint68_0003"
+      ]
+    },
+    {
+      "name": "WayPoint67_WayPoint68_0003",
+      "x": 2.318,
+      "y": 1.184,
+      "neighbors": [
+        "WayPoint67_WayPoint68_0002",
+        "WayPoint67_WayPoint68_0004"
+      ]
+    },
+    {
+      "name": "WayPoint67_WayPoint68_0004",
+      "x": 2.3840000000000003,
+      "y": 0.7619999999999998,
+      "neighbors": [
+        "WayPoint67_WayPoint68_0003",
+        "WayPoint68"
+      ]
+    },
+    {
+      "name": "WayPoint68",
+      "x": 2.45,
+      "y": 0.34,
+      "neighbors": [
+        "WayPoint67_WayPoint68_0004",
+        "WayPoint68_WayPoint69_0001"
+      ]
+    },
+    {
+      "name": "WayPoint68_WayPoint69_0001",
+      "x": 2.516,
+      "y": -0.06,
+      "neighbors": [
+        "WayPoint68",
+        "WayPoint68_WayPoint69_0002"
+      ]
+    },
+    {
+      "name": "WayPoint68_WayPoint69_0002",
+      "x": 2.582,
+      "y": -0.46,
+      "neighbors": [
+        "WayPoint68_WayPoint69_0001",
+        "WayPoint68_WayPoint69_0003"
+      ]
+    },
+    {
+      "name": "WayPoint68_WayPoint69_0003",
+      "x": 2.648,
+      "y": -0.8599999999999999,
+      "neighbors": [
+        "WayPoint68_WayPoint69_0002",
+        "WayPoint68_WayPoint69_0004"
+      ]
+    },
+    {
+      "name": "WayPoint68_WayPoint69_0004",
+      "x": 2.714,
+      "y": -1.26,
+      "neighbors": [
+        "WayPoint68_WayPoint69_0003",
+        "WayPoint69"
+      ]
+    },
+    {
+      "name": "WayPoint69",
+      "x": 2.78,
+      "y": -1.66,
+      "neighbors": [
+        "WayPoint68_WayPoint69_0004",
+        "WayPoint69_WayPoint70_0001"
+      ]
+    },
+    {
+      "name": "WayPoint69_WayPoint70_0001",
+      "x": 2.8339999999999996,
+      "y": -2.082,
+      "neighbors": [
+        "WayPoint69",
+        "WayPoint69_WayPoint70_0002"
+      ]
+    },
+    {
+      "name": "WayPoint69_WayPoint70_0002",
+      "x": 2.888,
+      "y": -2.504,
+      "neighbors": [
+        "WayPoint69_WayPoint70_0001",
+        "WayPoint69_WayPoint70_0003"
+      ]
+    },
+    {
+      "name": "WayPoint69_WayPoint70_0003",
+      "x": 2.9419999999999997,
+      "y": -2.926,
+      "neighbors": [
+        "WayPoint69_WayPoint70_0002",
+        "WayPoint69_WayPoint70_0004"
+      ]
+    },
+    {
+      "name": "WayPoint69_WayPoint70_0004",
+      "x": 2.996,
+      "y": -3.3480000000000003,
+      "neighbors": [
+        "WayPoint69_WayPoint70_0003",
+        "WayPoint70"
+      ]
+    },
+    {
+      "name": "WayPoint7",
+      "x": -4.06,
+      "y": 10.56,
+      "neighbors": [
+        "WayPoint11_WayPoint7_0009",
+        "WayPoint3_WayPoint7_0009",
+        "WayPoint46_WayPoint7_0005"
+      ]
+    },
+    {
+      "name": "WayPoint70",
+      "x": 3.05,
+      "y": -3.77,
+      "neighbors": [
+        "WayPoint69_WayPoint70_0004",
+        "WayPoint70_WayPoint71_0001"
+      ]
+    },
+    {
+      "name": "WayPoint70_WayPoint71_0001",
+      "x": 3.1159999999999997,
+      "y": -4.192,
+      "neighbors": [
+        "WayPoint70",
+        "WayPoint70_WayPoint71_0002"
+      ]
+    },
+    {
+      "name": "WayPoint70_WayPoint71_0002",
+      "x": 3.182,
+      "y": -4.614,
+      "neighbors": [
+        "WayPoint70_WayPoint71_0001",
+        "WayPoint70_WayPoint71_0003"
+      ]
+    },
+    {
+      "name": "WayPoint70_WayPoint71_0003",
+      "x": 3.2479999999999998,
+      "y": -5.036,
+      "neighbors": [
+        "WayPoint70_WayPoint71_0002",
+        "WayPoint70_WayPoint71_0004"
+      ]
+    },
+    {
+      "name": "WayPoint70_WayPoint71_0004",
+      "x": 3.314,
+      "y": -5.458,
+      "neighbors": [
+        "WayPoint70_WayPoint71_0003",
+        "WayPoint71"
+      ]
+    },
+    {
+      "name": "WayPoint71",
+      "x": 3.38,
+      "y": -5.88,
+      "neighbors": [
+        "WayPoint70_WayPoint71_0004",
+        "WayPoint71_WayPoint72_0001"
+      ]
+    },
+    {
+      "name": "WayPoint71_WayPoint72_0001",
+      "x": 3.4339999999999997,
+      "y": -6.28,
+      "neighbors": [
+        "WayPoint71",
+        "WayPoint71_WayPoint72_0002"
+      ]
+    },
+    {
+      "name": "WayPoint71_WayPoint72_0002",
+      "x": 3.488,
+      "y": -6.68,
+      "neighbors": [
+        "WayPoint71_WayPoint72_0001",
+        "WayPoint71_WayPoint72_0003"
+      ]
+    },
+    {
+      "name": "WayPoint71_WayPoint72_0003",
+      "x": 3.542,
+      "y": -7.08,
+      "neighbors": [
+        "WayPoint71_WayPoint72_0002",
+        "WayPoint71_WayPoint72_0004"
+      ]
+    },
+    {
+      "name": "WayPoint71_WayPoint72_0004",
+      "x": 3.596,
+      "y": -7.48,
+      "neighbors": [
+        "WayPoint71_WayPoint72_0003",
+        "WayPoint72"
+      ]
+    },
+    {
+      "name": "WayPoint72",
+      "x": 3.65,
+      "y": -7.88,
+      "neighbors": [
+        "WayPoint12_WayPoint72_0005",
+        "WayPoint71_WayPoint72_0004"
+      ]
+    },
+    {
+      "name": "WayPoint73",
+      "x": 3.71,
+      "y": 9.01,
+      "neighbors": [
+        "WayPoint13_WayPoint73_0005",
+        "WayPoint73_WayPoint74_0001"
+      ]
+    },
+    {
+      "name": "WayPoint73_WayPoint74_0001",
+      "x": 3.764,
+      "y": 8.61,
+      "neighbors": [
+        "WayPoint73",
+        "WayPoint73_WayPoint74_0002"
+      ]
+    },
+    {
+      "name": "WayPoint73_WayPoint74_0002",
+      "x": 3.818,
+      "y": 8.209999999999999,
+      "neighbors": [
+        "WayPoint73_WayPoint74_0001",
+        "WayPoint73_WayPoint74_0003"
+      ]
+    },
+    {
+      "name": "WayPoint73_WayPoint74_0003",
+      "x": 3.872,
+      "y": 7.81,
+      "neighbors": [
+        "WayPoint73_WayPoint74_0002",
+        "WayPoint73_WayPoint74_0004"
+      ]
+    },
+    {
+      "name": "WayPoint73_WayPoint74_0004",
+      "x": 3.926,
+      "y": 7.41,
+      "neighbors": [
+        "WayPoint73_WayPoint74_0003",
+        "WayPoint74"
+      ]
+    },
+    {
+      "name": "WayPoint74",
+      "x": 3.98,
+      "y": 7.01,
+      "neighbors": [
+        "WayPoint73_WayPoint74_0004",
+        "WayPoint74_WayPoint75_0001"
+      ]
+    },
+    {
+      "name": "WayPoint74_WayPoint75_0001",
+      "x": 4.046,
+      "y": 6.585999999999999,
+      "neighbors": [
+        "WayPoint74",
+        "WayPoint74_WayPoint75_0002"
+      ]
+    },
+    {
+      "name": "WayPoint74_WayPoint75_0002",
+      "x": 4.112,
+      "y": 6.162,
+      "neighbors": [
+        "WayPoint74_WayPoint75_0001",
+        "WayPoint74_WayPoint75_0003"
+      ]
+    },
+    {
+      "name": "WayPoint74_WayPoint75_0003",
+      "x": 4.178,
+      "y": 5.7379999999999995,
+      "neighbors": [
+        "WayPoint74_WayPoint75_0002",
+        "WayPoint74_WayPoint75_0004"
+      ]
+    },
+    {
+      "name": "WayPoint74_WayPoint75_0004",
+      "x": 4.244,
+      "y": 5.314,
+      "neighbors": [
+        "WayPoint74_WayPoint75_0003",
+        "WayPoint75"
+      ]
+    },
+    {
+      "name": "WayPoint75",
+      "x": 4.31,
+      "y": 4.89,
+      "neighbors": [
+        "WayPoint74_WayPoint75_0004",
+        "WayPoint75_WayPoint76_0001"
+      ]
+    },
+    {
+      "name": "WayPoint75_WayPoint76_0001",
+      "x": 4.364,
+      "y": 4.468,
+      "neighbors": [
+        "WayPoint75",
+        "WayPoint75_WayPoint76_0002"
+      ]
+    },
+    {
+      "name": "WayPoint75_WayPoint76_0002",
+      "x": 4.418,
+      "y": 4.045999999999999,
+      "neighbors": [
+        "WayPoint75_WayPoint76_0001",
+        "WayPoint75_WayPoint76_0003"
+      ]
+    },
+    {
+      "name": "WayPoint75_WayPoint76_0003",
+      "x": 4.4719999999999995,
+      "y": 3.6239999999999997,
+      "neighbors": [
+        "WayPoint75_WayPoint76_0002",
+        "WayPoint75_WayPoint76_0004"
+      ]
+    },
+    {
+      "name": "WayPoint75_WayPoint76_0004",
+      "x": 4.526,
+      "y": 3.202,
+      "neighbors": [
+        "WayPoint75_WayPoint76_0003",
+        "WayPoint76"
+      ]
+    },
+    {
+      "name": "WayPoint76",
+      "x": 4.58,
+      "y": 2.78,
+      "neighbors": [
+        "WayPoint75_WayPoint76_0004",
+        "WayPoint76_WayPoint77_0001"
+      ]
+    },
+    {
+      "name": "WayPoint76_WayPoint77_0001",
+      "x": 4.646,
+      "y": 2.38,
+      "neighbors": [
+        "WayPoint76",
+        "WayPoint76_WayPoint77_0002"
+      ]
+    },
+    {
+      "name": "WayPoint76_WayPoint77_0002",
+      "x": 4.712,
+      "y": 1.98,
+      "neighbors": [
+        "WayPoint76_WayPoint77_0001",
+        "WayPoint76_WayPoint77_0003"
+      ]
+    },
+    {
+      "name": "WayPoint76_WayPoint77_0003",
+      "x": 4.7780000000000005,
+      "y": 1.58,
+      "neighbors": [
+        "WayPoint76_WayPoint77_0002",
+        "WayPoint76_WayPoint77_0004"
+      ]
+    },
+    {
+      "name": "WayPoint76_WayPoint77_0004",
+      "x": 4.844,
+      "y": 1.18,
+      "neighbors": [
+        "WayPoint76_WayPoint77_0003",
+        "WayPoint77"
+      ]
+    },
+    {
+      "name": "WayPoint77",
+      "x": 4.91,
+      "y": 0.78,
+      "neighbors": [
+        "WayPoint76_WayPoint77_0004",
+        "WayPoint77_WayPoint78_0001"
+      ]
+    },
+    {
+      "name": "WayPoint77_WayPoint78_0001",
+      "x": 4.976,
+      "y": 0.35799999999999993,
+      "neighbors": [
+        "WayPoint77",
+        "WayPoint77_WayPoint78_0002"
+      ]
+    },
+    {
+      "name": "WayPoint77_WayPoint78_0002",
+      "x": 5.042,
+      "y": -0.06400000000000017,
+      "neighbors": [
+        "WayPoint77_WayPoint78_0001",
+        "WayPoint77_WayPoint78_0003"
+      ]
+    },
+    {
+      "name": "WayPoint77_WayPoint78_0003",
+      "x": 5.1080000000000005,
+      "y": -0.4860000000000002,
+      "neighbors": [
+        "WayPoint77_WayPoint78_0002",
+        "WayPoint77_WayPoint78_0004"
+      ]
+    },
+    {
+      "name": "WayPoint77_WayPoint78_0004",
+      "x": 5.174,
+      "y": -0.9080000000000004,
+      "neighbors": [
+        "WayPoint77_WayPoint78_0003",
+        "WayPoint78"
+      ]
+    },
+    {
+      "name": "WayPoint78",
+      "x": 5.24,
+      "y": -1.33,
+      "neighbors": [
+        "WayPoint77_WayPoint78_0004",
+        "WayPoint78_WayPoint79_0001"
+      ]
+    },
+    {
+      "name": "WayPoint78_WayPoint79_0001",
+      "x": 5.2940000000000005,
+      "y": -1.752,
+      "neighbors": [
+        "WayPoint78",
+        "WayPoint78_WayPoint79_0002"
+      ]
+    },
+    {
+      "name": "WayPoint78_WayPoint79_0002",
+      "x": 5.348,
+      "y": -2.174,
+      "neighbors": [
+        "WayPoint78_WayPoint79_0001",
+        "WayPoint78_WayPoint79_0003"
+      ]
+    },
+    {
+      "name": "WayPoint78_WayPoint79_0003",
+      "x": 5.402,
+      "y": -2.596,
+      "neighbors": [
+        "WayPoint78_WayPoint79_0002",
+        "WayPoint78_WayPoint79_0004"
+      ]
+    },
+    {
+      "name": "WayPoint78_WayPoint79_0004",
+      "x": 5.4559999999999995,
+      "y": -3.018,
+      "neighbors": [
+        "WayPoint78_WayPoint79_0003",
+        "WayPoint79"
+      ]
+    },
+    {
+      "name": "WayPoint79",
+      "x": 5.51,
+      "y": -3.44,
+      "neighbors": [
+        "WayPoint78_WayPoint79_0004",
+        "WayPoint79_WayPoint80_0001"
+      ]
+    },
+    {
+      "name": "WayPoint79_WayPoint80_0001",
+      "x": 5.576,
+      "y": -3.862,
+      "neighbors": [
+        "WayPoint79",
+        "WayPoint79_WayPoint80_0002"
+      ]
+    },
+    {
+      "name": "WayPoint79_WayPoint80_0002",
+      "x": 5.6419999999999995,
+      "y": -4.284,
+      "neighbors": [
+        "WayPoint79_WayPoint80_0001",
+        "WayPoint79_WayPoint80_0003"
+      ]
+    },
+    {
+      "name": "WayPoint79_WayPoint80_0003",
+      "x": 5.708,
+      "y": -4.7059999999999995,
+      "neighbors": [
+        "WayPoint79_WayPoint80_0002",
+        "WayPoint79_WayPoint80_0004"
+      ]
+    },
+    {
+      "name": "WayPoint79_WayPoint80_0004",
+      "x": 5.774,
+      "y": -5.128,
+      "neighbors": [
+        "WayPoint79_WayPoint80_0003",
+        "WayPoint80"
+      ]
+    },
+    {
+      "name": "WayPoint8",
+      "x": -0.87,
+      "y": -11.33,
+      "neighbors": [
+        "WayPoint12_WayPoint8_0009",
+        "WayPoint4_WayPoint8_0009",
+        "WayPoint54_WayPoint8_0005"
+      ]
+    },
+    {
+      "name": "WayPoint80",
+      "x": 5.84,
+      "y": -5.55,
+      "neighbors": [
+        "WayPoint79_WayPoint80_0004",
+        "WayPoint80_WayPoint81_0001"
+      ]
+    },
+    {
+      "name": "WayPoint80_WayPoint81_0001",
+      "x": 5.894,
+      "y": -5.95,
+      "neighbors": [
+        "WayPoint80",
+        "WayPoint80_WayPoint81_0002"
+      ]
+    },
+    {
+      "name": "WayPoint80_WayPoint81_0002",
+      "x": 5.948,
+      "y": -6.35,
+      "neighbors": [
+        "WayPoint80_WayPoint81_0001",
+        "WayPoint80_WayPoint81_0003"
+      ]
+    },
+    {
+      "name": "WayPoint80_WayPoint81_0003",
+      "x": 6.002,
+      "y": -6.75,
+      "neighbors": [
+        "WayPoint80_WayPoint81_0002",
+        "WayPoint80_WayPoint81_0004"
+      ]
+    },
+    {
+      "name": "WayPoint80_WayPoint81_0004",
+      "x": 6.056,
+      "y": -7.15,
+      "neighbors": [
+        "WayPoint80_WayPoint81_0003",
+        "WayPoint81"
+      ]
+    },
+    {
+      "name": "WayPoint81",
+      "x": 6.11,
+      "y": -7.55,
+      "neighbors": [
+        "WayPoint14_WayPoint81_0005",
+        "WayPoint80_WayPoint81_0004"
+      ]
+    },
+    {
+      "name": "WayPoint82",
+      "x": 6.17,
+      "y": 9.34,
+      "neighbors": [
+        "WayPoint15_WayPoint82_0005",
+        "WayPoint82_WayPoint83_0001"
+      ]
+    },
+    {
+      "name": "WayPoint82_WayPoint83_0001",
+      "x": 6.236,
+      "y": 8.918,
+      "neighbors": [
+        "WayPoint82",
+        "WayPoint82_WayPoint83_0002"
+      ]
+    },
+    {
+      "name": "WayPoint82_WayPoint83_0002",
+      "x": 6.302,
+      "y": 8.496,
+      "neighbors": [
+        "WayPoint82_WayPoint83_0001",
+        "WayPoint82_WayPoint83_0003"
+      ]
+    },
+    {
+      "name": "WayPoint82_WayPoint83_0003",
+      "x": 6.368,
+      "y": 8.074,
+      "neighbors": [
+        "WayPoint82_WayPoint83_0002",
+        "WayPoint82_WayPoint83_0004"
+      ]
+    },
+    {
+      "name": "WayPoint82_WayPoint83_0004",
+      "x": 6.434,
+      "y": 7.652,
+      "neighbors": [
+        "WayPoint82_WayPoint83_0003",
+        "WayPoint83"
+      ]
+    },
+    {
+      "name": "WayPoint83",
+      "x": 6.5,
+      "y": 7.23,
+      "neighbors": [
+        "WayPoint82_WayPoint83_0004",
+        "WayPoint83_WayPoint84_0001"
+      ]
+    },
+    {
+      "name": "WayPoint83_WayPoint84_0001",
+      "x": 6.554,
+      "y": 6.83,
+      "neighbors": [
+        "WayPoint83",
+        "WayPoint83_WayPoint84_0002"
+      ]
+    },
+    {
+      "name": "WayPoint83_WayPoint84_0002",
+      "x": 6.608,
+      "y": 6.430000000000001,
+      "neighbors": [
+        "WayPoint83_WayPoint84_0001",
+        "WayPoint83_WayPoint84_0003"
+      ]
+    },
+    {
+      "name": "WayPoint83_WayPoint84_0003",
+      "x": 6.662,
+      "y": 6.03,
+      "neighbors": [
+        "WayPoint83_WayPoint84_0002",
+        "WayPoint83_WayPoint84_0004"
+      ]
+    },
+    {
+      "name": "WayPoint83_WayPoint84_0004",
+      "x": 6.715999999999999,
+      "y": 5.630000000000001,
+      "neighbors": [
+        "WayPoint83_WayPoint84_0003",
+        "WayPoint84"
+      ]
+    },
+    {
+      "name": "WayPoint84",
+      "x": 6.77,
+      "y": 5.23,
+      "neighbors": [
+        "WayPoint83_WayPoint84_0004",
+        "WayPoint84_WayPoint85_0001"
+      ]
+    },
+    {
+      "name": "WayPoint84_WayPoint85_0001",
+      "x": 6.835999999999999,
+      "y": 4.808000000000001,
+      "neighbors": [
+        "WayPoint84",
+        "WayPoint84_WayPoint85_0002"
+      ]
+    },
+    {
+      "name": "WayPoint84_WayPoint85_0002",
+      "x": 6.901999999999999,
+      "y": 4.386,
+      "neighbors": [
+        "WayPoint84_WayPoint85_0001",
+        "WayPoint84_WayPoint85_0003"
+      ]
+    },
+    {
+      "name": "WayPoint84_WayPoint85_0003",
+      "x": 6.968,
+      "y": 3.9640000000000004,
+      "neighbors": [
+        "WayPoint84_WayPoint85_0002",
+        "WayPoint84_WayPoint85_0004"
+      ]
+    },
+    {
+      "name": "WayPoint84_WayPoint85_0004",
+      "x": 7.034,
+      "y": 3.542,
+      "neighbors": [
+        "WayPoint84_WayPoint85_0003",
+        "WayPoint85"
+      ]
+    },
+    {
+      "name": "WayPoint85",
+      "x": 7.1,
+      "y": 3.12,
+      "neighbors": [
+        "WayPoint84_WayPoint85_0004",
+        "WayPoint85_WayPoint86_0001"
+      ]
+    },
+    {
+      "name": "WayPoint85_WayPoint86_0001",
+      "x": 7.1659999999999995,
+      "y": 2.72,
+      "neighbors": [
+        "WayPoint85",
+        "WayPoint85_WayPoint86_0002"
+      ]
+    },
+    {
+      "name": "WayPoint85_WayPoint86_0002",
+      "x": 7.231999999999999,
+      "y": 2.3200000000000003,
+      "neighbors": [
+        "WayPoint85_WayPoint86_0001",
+        "WayPoint85_WayPoint86_0003"
+      ]
+    },
+    {
+      "name": "WayPoint85_WayPoint86_0003",
+      "x": 7.298,
+      "y": 1.9200000000000002,
+      "neighbors": [
+        "WayPoint85_WayPoint86_0002",
+        "WayPoint85_WayPoint86_0004"
+      ]
+    },
+    {
+      "name": "WayPoint85_WayPoint86_0004",
+      "x": 7.364,
+      "y": 1.52,
+      "neighbors": [
+        "WayPoint85_WayPoint86_0003",
+        "WayPoint86"
+      ]
+    },
+    {
+      "name": "WayPoint86",
+      "x": 7.43,
+      "y": 1.12,
+      "neighbors": [
+        "WayPoint85_WayPoint86_0004",
+        "WayPoint86_WayPoint87_0001"
+      ]
+    },
+    {
+      "name": "WayPoint86_WayPoint87_0001",
+      "x": 7.484,
+      "y": 0.698,
+      "neighbors": [
+        "WayPoint86",
+        "WayPoint86_WayPoint87_0002"
+      ]
+    },
+    {
+      "name": "WayPoint86_WayPoint87_0002",
+      "x": 7.538,
+      "y": 0.2759999999999999,
+      "neighbors": [
+        "WayPoint86_WayPoint87_0001",
+        "WayPoint86_WayPoint87_0003"
+      ]
+    },
+    {
+      "name": "WayPoint86_WayPoint87_0003",
+      "x": 7.592,
+      "y": -0.14600000000000013,
+      "neighbors": [
+        "WayPoint86_WayPoint87_0002",
+        "WayPoint86_WayPoint87_0004"
+      ]
+    },
+    {
+      "name": "WayPoint86_WayPoint87_0004",
+      "x": 7.646,
+      "y": -0.5680000000000003,
+      "neighbors": [
+        "WayPoint86_WayPoint87_0003",
+        "WayPoint87"
+      ]
+    },
+    {
+      "name": "WayPoint87",
+      "x": 7.7,
+      "y": -0.99,
+      "neighbors": [
+        "WayPoint86_WayPoint87_0004",
+        "WayPoint87_WayPoint88_0001"
+      ]
+    },
+    {
+      "name": "WayPoint87_WayPoint88_0001",
+      "x": 7.766,
+      "y": -1.4140000000000001,
+      "neighbors": [
+        "WayPoint87",
+        "WayPoint87_WayPoint88_0002"
+      ]
+    },
+    {
+      "name": "WayPoint87_WayPoint88_0002",
+      "x": 7.832,
+      "y": -1.838,
+      "neighbors": [
+        "WayPoint87_WayPoint88_0001",
+        "WayPoint87_WayPoint88_0003"
+      ]
+    },
+    {
+      "name": "WayPoint87_WayPoint88_0003",
+      "x": 7.898,
+      "y": -2.262,
+      "neighbors": [
+        "WayPoint87_WayPoint88_0002",
+        "WayPoint87_WayPoint88_0004"
+      ]
+    },
+    {
+      "name": "WayPoint87_WayPoint88_0004",
+      "x": 7.9639999999999995,
+      "y": -2.686,
+      "neighbors": [
+        "WayPoint87_WayPoint88_0003",
+        "WayPoint88"
+      ]
+    },
+    {
+      "name": "WayPoint88",
+      "x": 8.03,
+      "y": -3.11,
+      "neighbors": [
+        "WayPoint87_WayPoint88_0004",
+        "WayPoint88_WayPoint89_0001"
+      ]
+    },
+    {
+      "name": "WayPoint88_WayPoint89_0001",
+      "x": 8.084,
+      "y": -3.51,
+      "neighbors": [
+        "WayPoint88",
+        "WayPoint88_WayPoint89_0002"
+      ]
+    },
+    {
+      "name": "WayPoint88_WayPoint89_0002",
+      "x": 8.138,
+      "y": -3.91,
+      "neighbors": [
+        "WayPoint88_WayPoint89_0001",
+        "WayPoint88_WayPoint89_0003"
+      ]
+    },
+    {
+      "name": "WayPoint88_WayPoint89_0003",
+      "x": 8.192,
+      "y": -4.3100000000000005,
+      "neighbors": [
+        "WayPoint88_WayPoint89_0002",
+        "WayPoint88_WayPoint89_0004"
+      ]
+    },
+    {
+      "name": "WayPoint88_WayPoint89_0004",
+      "x": 8.246,
+      "y": -4.710000000000001,
+      "neighbors": [
+        "WayPoint88_WayPoint89_0003",
+        "WayPoint89"
+      ]
+    },
+    {
+      "name": "WayPoint89",
+      "x": 8.3,
+      "y": -5.11,
+      "neighbors": [
+        "WayPoint88_WayPoint89_0004",
+        "WayPoint89_WayPoint90_0001"
+      ]
+    },
+    {
+      "name": "WayPoint89_WayPoint90_0001",
+      "x": 8.366000000000001,
+      "y": -5.532,
+      "neighbors": [
+        "WayPoint89",
+        "WayPoint89_WayPoint90_0002"
+      ]
+    },
+    {
+      "name": "WayPoint89_WayPoint90_0002",
+      "x": 8.432,
+      "y": -5.954000000000001,
+      "neighbors": [
+        "WayPoint89_WayPoint90_0001",
+        "WayPoint89_WayPoint90_0003"
+      ]
+    },
+    {
+      "name": "WayPoint89_WayPoint90_0003",
+      "x": 8.498000000000001,
+      "y": -6.3759999999999994,
+      "neighbors": [
+        "WayPoint89_WayPoint90_0002",
+        "WayPoint89_WayPoint90_0004"
+      ]
+    },
+    {
+      "name": "WayPoint89_WayPoint90_0004",
+      "x": 8.564,
+      "y": -6.798,
+      "neighbors": [
+        "WayPoint89_WayPoint90_0003",
+        "WayPoint90"
+      ]
+    },
+    {
+      "name": "WayPoint9",
+      "x": -1.6,
+      "y": 10.89,
+      "neighbors": [
+        "WayPoint13_WayPoint9_0009",
+        "WayPoint55_WayPoint9_0005",
+        "WayPoint5_WayPoint9_0009"
+      ]
+    },
+    {
+      "name": "WayPoint90",
+      "x": 8.63,
+      "y": -7.22,
+      "neighbors": [
+        "WayPoint16_WayPoint90_0005",
+        "WayPoint89_WayPoint90_0004"
+      ]
+    },
+    {
+      "name": "WayPoint91",
+      "x": 8.7,
+      "y": 9.67,
+      "neighbors": [
+        "WayPoint17_WayPoint91_0005",
+        "WayPoint91_WayPoint92_0001"
+      ]
+    },
+    {
+      "name": "WayPoint91_WayPoint92_0001",
+      "x": 8.751999999999999,
+      "y": 9.27,
+      "neighbors": [
+        "WayPoint91",
+        "WayPoint91_WayPoint92_0002"
+      ]
+    },
+    {
+      "name": "WayPoint91_WayPoint92_0002",
+      "x": 8.804,
+      "y": 8.87,
+      "neighbors": [
+        "WayPoint91_WayPoint92_0001",
+        "WayPoint91_WayPoint92_0003"
+      ]
+    },
+    {
+      "name": "WayPoint91_WayPoint92_0003",
+      "x": 8.856,
+      "y": 8.47,
+      "neighbors": [
+        "WayPoint91_WayPoint92_0002",
+        "WayPoint91_WayPoint92_0004"
+      ]
+    },
+    {
+      "name": "WayPoint91_WayPoint92_0004",
+      "x": 8.908000000000001,
+      "y": 8.07,
+      "neighbors": [
+        "WayPoint91_WayPoint92_0003",
+        "WayPoint92"
+      ]
+    },
+    {
+      "name": "WayPoint92",
+      "x": 8.96,
+      "y": 7.67,
+      "neighbors": [
+        "WayPoint91_WayPoint92_0004",
+        "WayPoint92_WayPoint93_0001"
+      ]
+    },
+    {
+      "name": "WayPoint92_WayPoint93_0001",
+      "x": 9.028,
+      "y": 7.248,
+      "neighbors": [
+        "WayPoint92",
+        "WayPoint92_WayPoint93_0002"
+      ]
+    },
+    {
+      "name": "WayPoint92_WayPoint93_0002",
+      "x": 9.096,
+      "y": 6.826,
+      "neighbors": [
+        "WayPoint92_WayPoint93_0001",
+        "WayPoint92_WayPoint93_0003"
+      ]
+    },
+    {
+      "name": "WayPoint92_WayPoint93_0003",
+      "x": 9.164000000000001,
+      "y": 6.404,
+      "neighbors": [
+        "WayPoint92_WayPoint93_0002",
+        "WayPoint92_WayPoint93_0004"
+      ]
+    },
+    {
+      "name": "WayPoint92_WayPoint93_0004",
+      "x": 9.232000000000001,
+      "y": 5.981999999999999,
+      "neighbors": [
+        "WayPoint92_WayPoint93_0003",
+        "WayPoint93"
+      ]
+    },
+    {
+      "name": "WayPoint93",
+      "x": 9.3,
+      "y": 5.56,
+      "neighbors": [
+        "WayPoint92_WayPoint93_0004",
+        "WayPoint93_WayPoint94_0001"
+      ]
+    },
+    {
+      "name": "WayPoint93_WayPoint94_0001",
+      "x": 9.352,
+      "y": 5.138,
+      "neighbors": [
+        "WayPoint93",
+        "WayPoint93_WayPoint94_0002"
+      ]
+    },
+    {
+      "name": "WayPoint93_WayPoint94_0002",
+      "x": 9.404,
+      "y": 4.715999999999999,
+      "neighbors": [
+        "WayPoint93_WayPoint94_0001",
+        "WayPoint93_WayPoint94_0003"
+      ]
+    },
+    {
+      "name": "WayPoint93_WayPoint94_0003",
+      "x": 9.456000000000001,
+      "y": 4.2940000000000005,
+      "neighbors": [
+        "WayPoint93_WayPoint94_0002",
+        "WayPoint93_WayPoint94_0004"
+      ]
+    },
+    {
+      "name": "WayPoint93_WayPoint94_0004",
+      "x": 9.508000000000001,
+      "y": 3.872,
+      "neighbors": [
+        "WayPoint93_WayPoint94_0003",
+        "WayPoint94"
+      ]
+    },
+    {
+      "name": "WayPoint94",
+      "x": 9.56,
+      "y": 3.45,
+      "neighbors": [
+        "WayPoint93_WayPoint94_0004",
+        "WayPoint94_WayPoint95_0001"
+      ]
+    },
+    {
+      "name": "WayPoint94_WayPoint95_0001",
+      "x": 9.626000000000001,
+      "y": 3.0500000000000003,
+      "neighbors": [
+        "WayPoint94",
+        "WayPoint94_WayPoint95_0002"
+      ]
+    },
+    {
+      "name": "WayPoint94_WayPoint95_0002",
+      "x": 9.692,
+      "y": 2.6500000000000004,
+      "neighbors": [
+        "WayPoint94_WayPoint95_0001",
+        "WayPoint94_WayPoint95_0003"
+      ]
+    },
+    {
+      "name": "WayPoint94_WayPoint95_0003",
+      "x": 9.758000000000001,
+      "y": 2.25,
+      "neighbors": [
+        "WayPoint94_WayPoint95_0002",
+        "WayPoint94_WayPoint95_0004"
+      ]
+    },
+    {
+      "name": "WayPoint94_WayPoint95_0004",
+      "x": 9.824,
+      "y": 1.85,
+      "neighbors": [
+        "WayPoint94_WayPoint95_0003",
+        "WayPoint95"
+      ]
+    },
+    {
+      "name": "WayPoint95",
+      "x": 9.89,
+      "y": 1.45,
+      "neighbors": [
+        "WayPoint94_WayPoint95_0004",
+        "WayPoint95_WayPoint96_0001"
+      ]
+    },
+    {
+      "name": "WayPoint95_WayPoint96_0001",
+      "x": 9.958,
+      "y": 1.028,
+      "neighbors": [
+        "WayPoint95",
+        "WayPoint95_WayPoint96_0002"
+      ]
+    },
+    {
+      "name": "WayPoint95_WayPoint96_0002",
+      "x": 10.026,
+      "y": 0.606,
+      "neighbors": [
+        "WayPoint95_WayPoint96_0001",
+        "WayPoint95_WayPoint96_0003"
+      ]
+    },
+    {
+      "name": "WayPoint95_WayPoint96_0003",
+      "x": 10.094000000000001,
+      "y": 0.18400000000000016,
+      "neighbors": [
+        "WayPoint95_WayPoint96_0002",
+        "WayPoint95_WayPoint96_0004"
+      ]
+    },
+    {
+      "name": "WayPoint95_WayPoint96_0004",
+      "x": 10.162,
+      "y": -0.238,
+      "neighbors": [
+        "WayPoint95_WayPoint96_0003",
+        "WayPoint96"
+      ]
+    },
+    {
+      "name": "WayPoint96",
+      "x": 10.23,
+      "y": -0.66,
+      "neighbors": [
+        "WayPoint95_WayPoint96_0004",
+        "WayPoint96_WayPoint97_0001"
+      ]
+    },
+    {
+      "name": "WayPoint96_WayPoint97_0001",
+      "x": 10.282,
+      "y": -1.082,
+      "neighbors": [
+        "WayPoint96",
+        "WayPoint96_WayPoint97_0002"
+      ]
+    },
+    {
+      "name": "WayPoint96_WayPoint97_0002",
+      "x": 10.334,
+      "y": -1.504,
+      "neighbors": [
+        "WayPoint96_WayPoint97_0001",
+        "WayPoint96_WayPoint97_0003"
+      ]
+    },
+    {
+      "name": "WayPoint96_WayPoint97_0003",
+      "x": 10.386000000000001,
+      "y": -1.9259999999999997,
+      "neighbors": [
+        "WayPoint96_WayPoint97_0002",
+        "WayPoint96_WayPoint97_0004"
+      ]
+    },
+    {
+      "name": "WayPoint96_WayPoint97_0004",
+      "x": 10.438,
+      "y": -2.348,
+      "neighbors": [
+        "WayPoint96_WayPoint97_0003",
+        "WayPoint97"
+      ]
+    },
+    {
+      "name": "WayPoint97",
+      "x": 10.49,
+      "y": -2.77,
+      "neighbors": [
+        "WayPoint96_WayPoint97_0004",
+        "WayPoint97_WayPoint98_0001"
+      ]
+    },
+    {
+      "name": "WayPoint97_WayPoint98_0001",
+      "x": 10.556000000000001,
+      "y": -3.192,
+      "neighbors": [
+        "WayPoint97",
+        "WayPoint97_WayPoint98_0002"
+      ]
+    },
+    {
+      "name": "WayPoint97_WayPoint98_0002",
+      "x": 10.622,
+      "y": -3.614,
+      "neighbors": [
+        "WayPoint97_WayPoint98_0001",
+        "WayPoint97_WayPoint98_0003"
+      ]
+    },
+    {
+      "name": "WayPoint97_WayPoint98_0003",
+      "x": 10.688,
+      "y": -4.036,
+      "neighbors": [
+        "WayPoint97_WayPoint98_0002",
+        "WayPoint97_WayPoint98_0004"
+      ]
+    },
+    {
+      "name": "WayPoint97_WayPoint98_0004",
+      "x": 10.754,
+      "y": -4.458,
+      "neighbors": [
+        "WayPoint97_WayPoint98_0003",
+        "WayPoint98"
+      ]
+    },
+    {
+      "name": "WayPoint98",
+      "x": 10.82,
+      "y": -4.88,
+      "neighbors": [
+        "WayPoint97_WayPoint98_0004",
+        "WayPoint98_WayPoint99_0001"
+      ]
+    },
+    {
+      "name": "WayPoint98_WayPoint99_0001",
+      "x": 10.874,
+      "y": -5.28,
+      "neighbors": [
+        "WayPoint98",
+        "WayPoint98_WayPoint99_0002"
+      ]
+    },
+    {
+      "name": "WayPoint98_WayPoint99_0002",
+      "x": 10.928,
+      "y": -5.68,
+      "neighbors": [
+        "WayPoint98_WayPoint99_0001",
+        "WayPoint98_WayPoint99_0003"
+      ]
+    },
+    {
+      "name": "WayPoint98_WayPoint99_0003",
+      "x": 10.982,
+      "y": -6.08,
+      "neighbors": [
+        "WayPoint98_WayPoint99_0002",
+        "WayPoint98_WayPoint99_0004"
+      ]
+    },
+    {
+      "name": "WayPoint98_WayPoint99_0004",
+      "x": 11.036,
+      "y": -6.48,
+      "neighbors": [
+        "WayPoint98_WayPoint99_0003",
+        "WayPoint99"
+      ]
+    },
+    {
+      "name": "WayPoint99",
+      "x": 11.09,
+      "y": -6.88,
+      "neighbors": [
+        "WayPoint18_WayPoint99_0005",
+        "WayPoint98_WayPoint99_0004"
+      ]
+    }
+  ]
+}
