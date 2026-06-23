@@ -79,20 +79,22 @@ ABLATION_AGG_METRICS = [
     *KEY_METRICS,
 ]
 
-LOWER_IS_BETTER = {
-    "ape_raw_rmse",
-    "ape_align_rmse",
-    "rpe_2m_align_rmse",
-    "rpe_5m_align_rmse",
-    "rpe_10m_align_rmse",
-    "cross_track_mean",
-    "row_switch_events",
-    "speed_mean",
-    "accel_rms",
-    "jerk_rms",
-    "heading_rate_rms",
-    "heading_accel_rms",
+HIGHER_IS_BETTER = {
+    "row_correct_fraction",
+    "xt_below_0p25_fraction",
+    "xt_below_0p5_fraction",
+    "xt_below_1p0_fraction",
+    "headland_row_correct_fraction",
+    "headland_xt_below_0p25_fraction",
+    "headland_xt_below_0p5_fraction",
+    "headland_xt_below_1p0_fraction",
+    "inrow_row_correct_fraction",
+    "inrow_xt_below_0p25_fraction",
+    "inrow_xt_below_0p5_fraction",
+    "inrow_xt_below_1p0_fraction",
 }
+
+LOWER_IS_BETTER = set(ABLATION_AGG_METRICS) - HIGHER_IS_BETTER
 
 
 def parse_int_list(text: str) -> List[int]:
