@@ -1,0 +1,40 @@
+Reviewer 13 of IROS 2026 submission 1263
+
+Comments to the author
+======================
+
+This paper presents a robot localization method in
+vineyards utilizing the semantic landmark particle filter.
+The concept of developing a new robot localizer considering
+the agricultural environmental challenges is interesting,
+and the authors handle an important problem in precision
+agriculture and agricultural automation.
+
+The paper is well organized, and the authors have conducted
+various significant ablation studies to show the novelty of
+the proposed approach. However, the reviewer has a concern
+about the performance of the proposed method in this paper.
+
+
+The concept that the authors have proposed, which
+incorporates the panoptic segmentations results with GNSS
+data, is reasonable. However, the demonstrated quantitative
+results do not look promising. Even if the proposed method
+estimated the robot poses more accurate than other baseline
+methods, such as AMCL+NoisyGNSS, RTAB-Map RGBD, and
+NoisyGNSS, the proposed method still lacks the accuracy as
+the estimated robot pose trajectory by SLPF still crosses
+the row lines. It is unrealistic and difficult to be used
+in the real agricultural applications. Of course, in the
+perspective of research, it is a great progress for
+improving the robot localization in vineyard. However, it
+is still difficult to say that the proposed method
+outperforms other baselines.
+
+Also, quantitative results in the tables show that the RMSE
+is close to 1 meter. This error is relatively large
+regarding the robot localization. 
+
+In conclusion, the paper is well organized, but the
+reviewer suggests the authors to conduct additional
+research to improve its performance.

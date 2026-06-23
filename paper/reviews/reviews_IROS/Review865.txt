@@ -1,0 +1,129 @@
+Reviewer 2 of IROS 2026 submission 1263
+
+Comments to the author
+======================
+
+### Summary ### 
+The paper "Semantic Landmark Particle Filter for Robot
+Localisation in Vineyards" proposes a particle-filter based
+localization framework specifically tackling the challenge
+of robot localization in vineyards. It fuses 2D LiDAR, GNSS
+and semantics from RGB-D cameras. Pole and Trunk detections
+are integrated to address robustness of the proposed
+Semantic Landmark Particle Filter (SLPF), especially with
+respect to row correctness in vineyards. In these highly
+repetitive environments, the authors claim that most
+compared baselines will fail mostly due to the lacking
+capability to correctly distinguish between adjacent rows.
+
+### Evaluation ###
+The problem shows an interesting example of real-world
+robotic applications and some of the proposed ideas (using
+semantic cues to improve localization robustness) seem
+promising for the specific application. Also, I appreciate
+the effort of the authors to address all comments made by
+previous reviewers. However, I think that the newly added
+experiments but also in general, the paper still lack
+clarity in some aspects and raises some major questions
+with respect to its methodology and especially also the
+experimental evaluation which complicate an assessment of
+the individual contributions.
+
+With respect to the method my major questions are:
+
+- What is the source of the odometry measurements? It is
+never stated how the odometry increments are obtained which
+can have a huge impact on the systems overall accuracy.
+- The proposed SPFL framework is framed as fully
+probabilistic but I am missing explanations on how the
+uncertainties are actually modeled. Eqs. (6), (8) and (9)
+introduce uncertainty weights without further mentioning
+how these can be derived.
+- I was wondering how the GNSS and the local odometry frame
+are aligned. Does it require some form of initial heading
+direction initialization / alignment?
+
+Besides of these open points regarding the methodology, I
+have some concerns with respect to the experimental
+evaluation, especially the following points need some
+careful revision in my opinion:
+
+- Choice, Implementation and Usage of Baselines /
+Competitions
+    * What is the reasoning to chose as RTAB-Map as a
+baseline other than that it is vision-based? It is not
+mentioned in the Related Work / Introduction section, nor
+is it stated why this specifically is a suitable baseline.
+I find the comparison somewhat unsuitable  as RTAB-Map
+seems to be to me a pure SLAM framework, not a localization
+framework.
+    * Also, are you sure that RTAB-Map was correctly
+configured? Looking at Fig. 4 (column III), it seems to me
+that also the turns estimated by RTAB-Map are always in the
+wrong direction. This is why to me it looks like there
+might be some misconfiguration with respect to the sensor
+setup. I highly recommend to double-check the setup.
+    * I would recommend to state which implementations of
+the compared frameworks are used (for AMCL, I am guessing
+the standard version which is part of the ROS Nav2
+Toolbox). Furthermore, as (to the best of my knowledge) the
+standard implementation of AMCL does not provide any
+interface for AMCL+GNSS, I think it should be described how
+the *AMCL+NoisyGNSS* baseline is implemented.
+- Evaluation of GNSS and its impact on the accuracy.
+    * Looking at Fig. 2, I am wondering if the RTK-GNSS is
+sufficiently accurate to be used as a ground-truth for
+quantitative evaluations. It seems to follow quite jerky
+trajectories at some point or was that actually the
+movement of the robot?
+    * GNSS is called a "lightweight probabilistic prior"
+but the results seem to indicate that without GNSS the
+framework almost fails completely (Ablation Study Table
+III).
+    * Also, I find it surprising that the *AMCL+NoisyGNSS*
+implementation does not benefit at all from the usage of
+GNSS. Do the authors have any reasoning for that? (Might
+also refer to the previous comment that details on the
+implementation would maybe help to understand this
+behavior).
+- Usage of SE3-Alignment and Relative Pose Errors for
+quantitative evaluation
+    * I might disagree with some of the previous reviewers
+but I do not think that the evaluation of relative pose
+errors and SE3 alignment before APE are well suited for
+localization frameworks. If so, it needs additional
+information on the source of odometry measurements.
+- Results of the Ablation Study: While in general, I
+appreciate the effort to do ablation studies for the impact
+of several modules of the system, I think the presented
+ablation study raises a lot of questions.
+    * The proposed SPFL seems to mostly benefit from the
+usage of GNSS. The impact of the semantics seems to be
+quite minor in comparison to that.
+    * Why is the overall accuracy so much worse than AMCL?
+Why is the GNSS then leading to a major improvement but not
+for AMCL?
+    * There is an ablation of removing pose smoothing
+(`no_pose_smoothing`) but this smoothing of poses has never
+been mentioned before in the method description.
+
+Besides of the points above, there are some minor comments
+to improve the clarity in presentation:
+
+- Still some abbreviations are not introduced at all or not
+at the first mention, e.g. AMCL (abstract).
+- Introduce all quantities and provide reasoning for them
+(e.g. MAD eq. (10), lambda_c eq.(12)).
+- Explain non-standard metrics, e.g.: cross-track error
+(XT).
+- I would recommend to use consistent headers for Table I &
+II as they are showing the same metrics.
+
+Comments on the Author Response for a Previously Considered Paper
+=================================================================
+
+The authors provided an adequate summary of previous
+reviews and showed significant efforts to address all
+comments. A summary of changes has been presented. While
+highly appreciated, I think that the paper needs further
+improvement for publication.

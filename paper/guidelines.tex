@@ -1,0 +1,145 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BEFORE YOU START:
+%%
+%% 1. Rename the paper.tex file into your paper name. Use the BibTeX key policy
+%%    for the naming convention (see end of this file)
+%%
+%% 2. Change line 3 in the Makefile from "TARGET=paper" to "TARGET=name-of-tex-file"
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper, 10 pt, conference]{ieeeconf} % A4
+% \documentclass[letterpaper, 10 pt, conference]{ieeeconf} % US Letter
+\IEEEoverridecommandlockouts    % This command is only needed if
+\overrideIEEEmargins            % Needed to meet printer requirements.
+
+\input{stachnisslab-latex}
+\input{stachnisslab-math}
+
+%% Aligns the last page but causes errors on 
+%% some machines (such as OSX), so don't use it for now.
+%\usepackage{flushend}
+
+%% Style hacks to save space between floating objects and text
+%\setlength{\textfloatsep}{1.3em}
+%\setlength{\dbltextfloatsep}{1.3em}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{\LARGE \bf Leveraging Semantic Object Detection for Robust Particle Filter Localization in Vineyards}
+
+\author{Rajitha de Silva$^{1}$ \and Jonathan Cox$^{1}$ \and James R. Heselden$^{1}$ \and Ollie Hardy$^{1}$ \and Marija Popovi\'{c}$^{2}$ \and Cesar Cadena$^{3}$ \and Riccardo Polvara$^{1}$% <-this % stops a space
+  \thanks{$^{1}$Rajitha de Silva, Jonathan Cox, James Heselden, Ollie Hardy and Riccardo Polvara are with Lincoln Centre for Autonomous Systems (L-CAS), University of Lincoln, UK. $^{2}$Marija Popovi\'{c} is with MAVLab, TU Delft, Netherlands. $^{3}$Cesar Cadena is with Robotics Systems Lab, ETH Zurich, Switzerland. (correspondence author: Rajitha de Silva {\tt\small $^{1}$odesilva@lincoln.ac.uk})}%
+  \thanks{This work was supported by Engineering and Physical Sciences Research Council (EPSRC), UK Project: ``GAIA: Ground-Aerial maps Integration for increased Autonomy outdoors" (EPSRC Reference: EP/Y003438/1).}% <-this % stops a space
+}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+\pagestyle{empty}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+  These document provides some guidelines and rules to format a paper according to the IPB style.
+  Our main goal is to provide rules to have a consistent look and provide sane defaults on the formatting.
+  The style guide is also intended to give general advice on the organization of the repository and things to avoid.
+\end{abstract}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+\label{sec:intro}
+
+We want our papers being published and read by others, we want to ship a great idea or a valuable lesson. Reading a paper, however, is an effort for the reader, especially if the reader does not know if the paper is a great one. 
+The first impression is always of key  importance and you have to work hard to change the mind of a person afterwards.
+Thus, ship great work from the beginning on. Style and formatting are important to make a good first impression and it is  something that is neglected by quite some authors.
+You have to think it from the perspective of a potential reviewer: ``The authors have not even invested an epsilon effort to create a reasonably looking paper---and now I should to put my valuable time into reviewing it? Fuck it.''
+Consequently, this style guide provides rules to format a paper in the IPB style.
+But without further ado, let's start.
+
+\section{Structure}
+\begin{itemize}
+  \item All our papers follow the same structure, check paper.tex file in this repository. Always stick with it, do not change it.
+\end{itemize}
+
+\section{General advice}
+
+\begin{itemize}
+  \item If the conference asks for 6 pages, provide 6 pages. There is no reason to have a shorter paper. You can always use the extra space to explain more, to show an additional figure, or to show results. The same holds the other way around. Do not submit papers than exceed the page limit unless it is explicitly allowed (by paying a fee).
+  \item Skip the "paper organization" part, since it usually does not provide any value (replace sections with the actual titles and you will notice that you write something like "related work introduces related work").
+  \item At IROS/ICRA/RSS/CVPR/ICCV the motivation figure is always in the upper right corner. At CVPR/ICCV a figure over the whole page is also common.
+  \item Use macros \verb_\etal_, \dots to have a consistent usage.
+  \item Have plots and data to generate these in your paper repository. It is highly recommended to generate plots on the fly through make. (TODO: add example)
+  \item Use abbreviations only when necessary and when you use the term at least two more times. Always define with first occurrence (but generally not within the abstract).
+  \item Do not use citations as nouns or objects, since it makes it harder to read and usually the name also provides context:
+  \begin{itemize}
+    \item \textbf{Bad:} \cite{stachniss2004iros} extracts point-
+    wise features using a PointNet, \dots
+    \item \textbf{Good:} (The approach of) Wang \etal~\cite{stachniss2004iros} extracts point-wise features using a PointNet, ...
+  \end{itemize}
+\end{itemize}
+
+
+\section{General Formatting}
+
+\begin{itemize}
+  \item Capitalization:
+  \begin{itemize}
+    \item Don't capitalize unless it is the name of a person (e.g., Kalman filter not Kalman Filter)
+    \item Capitalize headings (''All words four letters or more get capitalized, as do any nouns, pronouns, verbs, or adjectives. Any hyphenated word will require a capital letter after the hyphen in titles (for instance, Pre-University).''). Capitalize the title and all section/subsection names.
+    \item legend of a plot: always lower-case
+  \end{itemize}
+  \item No italics unless you \emph{want} to interrupt the reading flow (e.g. to emphasize -> use not more then two times on a page or paper)
+  \item Non-breaking space (\verb#~#)
+  \begin{itemize}
+    \item In front of formulas: 
+    \begin{verbatim}the width is computed as~$w=h^2$\end{verbatim}
+    \item before citations: \begin{verbatim}Stachniss \etal~\cite{stachniss2004icra}\end{verbatim}
+    \item before introducing abbreviations: 
+    \begin{verbatim}simultaneous localization and mapping~(SLAM)\end{verbatim}
+  \end{itemize}
+  \item Use for units a small space \verb#\,#in front of the unit: 
+  \verb#22\,cm, 256\,MB, 1.3\,m^2#
+  \item text in math mode should use \verb#\text#, e.g.,\begin{verbatim}$A_{\text{tree}}$\end{verbatim}
+  \item Never \verb#\texttt{}# except it's code.
+\end{itemize}
+
+\section{Figures}
+
+\begin{itemize}
+  \item Make sure the source files for images are in the pics folder as well (unless they are huge).
+  \item Figures should always top: \verb#\begin{figrue}[t]#, use only inline figure if it really makes sense (but Cyrill thinks it never does). A figure in between will always break the reading flow and it is harder to find the text below the figure.
+  \item Always reference figures in the text. Furthermore, you must refer them in the text in the correct order.
+  \item Captions should be descriptive, should explain what is seen. Figure + caption should work without text.
+  \item Ideally, figures can be understood even without reading the caption. Try to keep captions short.
+  \item To get consistent text size in figures: Draw/plot figures in the column width/line width, which you can get with \verb#\the\linewidth#, which will the print at that place the actual line width in points, \ie, \the\linewidth{} for this document. You can convert this to inch for matplotlib or use it in Inkscape to perfectly draw a figure at the right size. Font size of 8/9 is fine.
+  \item It is advised to generate the plots along with the paper, \ie, you put the data for generating the plot in the repository and generate it with the paper. \verb#make# makes sure that only the files needed are generated.
+\end{itemize}
+
+
+
+\section{Tables}
+
+\begin{itemize}
+   \item Use \verb#booktabs# package as it improves the formatting of the table significantly.
+   %TODO: \item For larger tables containing results of different approaches, you can use the LaTeX table generator easytabs that allows to create data-driven LaTeX tables.
+\end{itemize}
+
+\section{References}
+
+\begin{itemize}
+  \item Always use our glorified.bib file and if needed a second bib file called new.bib, in which you put new references.
+  \item Always stick with the style in glorified bib. For example, all key should be [lastname-of-first-author][4-digit-year][journal-or-conference], e.g., stachniss2005rss
+  \item Use the strings to have a consistent style for the proceedings, etc., \ie, \verb#booktitle = iros,#.
+  \item Use double braces \verb#{{...}}# around title tags, \ie,  \verb#{{A Capitalized Title}}# to get the correct capitalization in the references.
+  \item Provide a \verb#url={}# tag with the link to the pdf, since the paper repo will then download the pdf.
+  \item Use \verb#plain_abbrv# that automatically abbreviates first names, i.e., produces E.X. Ample for Eduarado Xavier Ample.
+  \item Cite the conference/journal version of an arXiv article in the citation if the paper was published at a conference or in a journal.
+  \item Keep the glorified.bib clean!
+\end{itemize}
+
+
+\bibliographystyle{plain_abbrv}
+\bibliography{glorified,new}
+
+\end{document}

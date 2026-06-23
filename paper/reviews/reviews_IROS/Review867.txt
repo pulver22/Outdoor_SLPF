@@ -1,0 +1,50 @@
+Reviewer 4 of IROS 2026 submission 1263
+
+Comments to the author
+======================
+
+The paper "Semantic Landmark Particle Filter for Robot
+Localisation in Vineyards" presents a novel probabilistic
+localization framework for vineyard environments. It uses
+detected vine trunks and poles as semantic walls to resolve
+corridor ambiguity in SLAM methods caused by repetitive
+geometry. GNSS provides anchoring when visual observations
+are sparse, with evaluation against RTK ground truth, noisy
+RTK as GNSS anchor, AMCL, AMCL+NoisyGNSS, and RTAB-Map. The
+method shows competitive or superior performance across key
+metrics.
+
+Major Contributions:
+The approach employs YOLOv9 for instance segmentation of
+poles and trunks, projecting them into a BEV fused with 2D
+LiDAR and GNSS for particle filter pose estimation. While
+innovative, the evaluation raises concerns given its
+reliance on both GNSS and visual detection.
+
+The authors test robustness to dropped detections but omit
+the detection network's accuracy, hindering assessment of
+landmark quality. Noisy RTK-derived GNSS is reasonable
+experimentally, but canopy occlusion risks in vineyards
+warrant analysis of severe degradation or GNSS denial
+scenarios.
+
+AMCL+NoisyGNSS provides a GNSS baseline, but no vision
+method uses GNSS anchoring, obscuring whether semantics
+truly outperform SOTA visual localization. To clarify this,
+the paper should include a GNSS-augmented vision baseline,
+or an ablation without the GNSS prior. Despite these gaps,
+the authors deliver thorough metric evaluation and
+ablations demonstrating robustness.
+
+Technical Accuracy:
+Primary concerns remain the missing GNSS-augmented vision
+baseline and limited GNSS source justification.
+
+Organization and Style:
+The paper is well organized and logically structured.
+
+Presentation:
+The manuscript is clearly written and well presented.
+
+Adequacy of Citations:
+Related work covers the field adequately.
