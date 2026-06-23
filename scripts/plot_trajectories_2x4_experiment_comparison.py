@@ -16,7 +16,6 @@ from pyproj import Transformer
 
 from geojson_rows import iter_projected_points
 from plot_trajectories import (
-    anchor_start_to_ground_truth,
     apply_transform,
     compute_errors,
     interpolate_ground_truth,
@@ -25,6 +24,7 @@ from plot_trajectories import (
     stride_keep_end,
     umeyama_alignment,
 )
+from run_ab_validation import start_pose_anchor_positions
 
 
 @dataclass(frozen=True)
@@ -34,7 +34,7 @@ class MethodSpec:
     ground_truth_path: Path
     stride: int = 1
     align_umeyama_scale: bool = False
-    anchor_start: bool = False
+    anchor_start_pose: bool = False
     error_vmin: float = 0.0
     error_vmax: float = 10.0
 
@@ -110,8 +110,8 @@ def load_method_plot_data(spec: MethodSpec) -> dict:
     if not spec.ground_truth_path.exists():
         raise FileNotFoundError(f"Missing ground-truth file: {spec.ground_truth_path}")
 
-    gt_ts, gt_pos, _ = read_tum_file(str(spec.ground_truth_path))
-    traj_ts, traj_pos, _ = read_tum_file(str(spec.trajectory_path))
+    gt_ts, gt_pos, gt_q = read_tum_file(str(spec.ground_truth_path))
+    traj_ts, traj_pos, traj_q = read_tum_file(str(spec.trajectory_path))
     if gt_pos is None or traj_pos is None:
         raise ValueError(f"Failed to read TUM data for method {spec.label}")
 
@@ -121,8 +121,8 @@ def load_method_plot_data(spec: MethodSpec) -> dict:
     if spec.align_umeyama_scale:
         scale, rot, trans = umeyama_alignment(traj_plot, gt_interp, with_scaling=True)
         traj_plot = apply_transform(traj_plot, scale, rot, trans)
-    if spec.anchor_start:
-        traj_plot = anchor_start_to_ground_truth(traj_plot, gt_interp)
+    if spec.anchor_start_pose:
+        traj_plot = start_pose_anchor_positions(traj_plot, traj_q, gt_interp, gt_q)
     if spec.stride > 1:
         traj_plot = stride_keep_end(traj_plot, spec.stride)
         gt_interp = stride_keep_end(gt_interp, spec.stride)
@@ -260,7 +260,7 @@ def build_method_specs(base_dir: Path, exp1_root: Path, exp2_root: Path) -> list
             trajectory_path=exp1_root / "rtabmap" / "rgbd" / "tum1" / "rtabmap_rgbd_filtered.tum",
             ground_truth_path=exp1_root / "rtabmap" / "rgbd" / "tum1" / "gps_pose.tum",
             align_umeyama_scale=False,
-            anchor_start=False,
+            anchor_start_pose=True,
             error_vmin=0.0,
             error_vmax=HIGH_ERROR_SHARED_VMAX,
         ),
@@ -294,7 +294,7 @@ def build_method_specs(base_dir: Path, exp1_root: Path, exp2_root: Path) -> list
             trajectory_path=exp2_root / "rtab_rgbd" / "seed_11" / "rtabmap_rgbd_filtered.tum",
             ground_truth_path=exp2_root / "rtab_rgbd" / "seed_11" / "gps_pose.tum",
             align_umeyama_scale=False,
-            anchor_start=False,
+            anchor_start_pose=True,
             error_vmin=0.0,
             error_vmax=HIGH_ERROR_SHARED_VMAX,
         ),

@@ -75,6 +75,28 @@ def interpolate_positions(ts_src: np.ndarray, pos_src: np.ndarray, ts_q: np.ndar
     return out
 
 
+def quaternion_to_yaw_xyzw(q: np.ndarray) -> float:
+    x, y, z, w = [float(v) for v in q]
+    return float(np.arctan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (y * y + z * z)))
+
+
+def start_pose_anchor(rtab: Trajectory, gt: Trajectory) -> Trajectory:
+    gt_interp = interpolate_positions(gt.timestamps, gt.positions, rtab.timestamps)
+    rel_xy = rtab.positions[:, :2] - rtab.positions[0, :2]
+    delta_yaw = quaternion_to_yaw_xyzw(gt.quaternions[0]) - quaternion_to_yaw_xyzw(rtab.quaternions[0])
+    c = float(np.cos(delta_yaw))
+    s = float(np.sin(delta_yaw))
+    rot = np.array([[c, -s], [s, c]], dtype=np.float64)
+    out_pos = np.array(rtab.positions, copy=True)
+    out_pos[:, :2] = rel_xy @ rot.T + gt_interp[0, :2]
+    out_pos[:, 2] = rtab.positions[:, 2] - rtab.positions[0, 2] + gt_interp[0, 2]
+    return Trajectory(
+        timestamps=np.array(rtab.timestamps, copy=True),
+        positions=out_pos,
+        quaternions=np.array(rtab.quaternions, copy=True),
+    )
+
+
 def umeyama_alignment(src: np.ndarray, dst: np.ndarray, with_scaling: bool = False):
     src = np.asarray(src, dtype=np.float64)
     dst = np.asarray(dst, dtype=np.float64)
@@ -344,6 +366,8 @@ def fuse_kalman(
             P = F @ P @ F.T + Q
 
         for z, R in ((z_rtab[k], R_rtab), (z_gps[k], R_gps)):
+            if not np.isfinite(z).all():
+                continue
             y = z - (H @ x)
             S = H @ P @ H.T + R
             K = P @ H.T @ np.linalg.inv(S)
@@ -398,6 +422,7 @@ def main() -> None:
     parser.add_argument("--rtab-std", type=float, default=0.35)
     parser.add_argument("--gps-std", type=float, default=1.8)
     parser.add_argument("--process-std", type=float, default=0.8)
+    parser.add_argument("--no-start-pose-anchor", action="store_true")
     args = parser.parse_args()
 
     rtab_tum = args.rtab_tum.expanduser()
@@ -428,8 +453,9 @@ def main() -> None:
         raise FileNotFoundError("evo_ape/evo_rpe not found in .venv/bin")
 
     rows_map = load_rows_from_geojson(geojson)
-    rtab = read_tum_file(rtab_tum)
+    rtab_raw = read_tum_file(rtab_tum)
     gt = read_tum_file(gt_tum)
+    rtab = rtab_raw if args.no_start_pose_anchor else start_pose_anchor(rtab_raw, gt)
 
     fused_dir = out_dir / "fused_tum"
     eval_dir = out_dir / "evo"
@@ -514,6 +540,7 @@ def main() -> None:
                 "rtab_std": float(args.rtab_std),
                 "gps_std": float(args.gps_std),
                 "process_std": float(args.process_std),
+                "start_pose_anchor": not args.no_start_pose_anchor,
                 "seeds": seeds,
                 "geojson": str(geojson),
             },

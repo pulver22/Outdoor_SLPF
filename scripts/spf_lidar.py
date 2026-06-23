@@ -176,6 +176,47 @@ def save_tum_trajectory(trajectory_data, output_path):
     print(f"[INFO] Trajectory saved to {output_path}")
 
 
+def load_external_noisy_gnss_tum(tum_path):
+    """Load a degraded/noisy GNSS TUM file in the local map frame."""
+    rows = []
+    with open(tum_path, "r", encoding="utf-8") as handle:
+        for line_no, line in enumerate(handle, start=1):
+            stripped = line.strip()
+            if not stripped or stripped.startswith("#"):
+                continue
+            parts = stripped.split()
+            if len(parts) < 4:
+                raise ValueError(f"Invalid TUM line {line_no} in {tum_path}: expected at least 4 columns")
+            rows.append([float(parts[0]), float(parts[1]), float(parts[2]), float(parts[3])])
+    if not rows:
+        raise ValueError(f"External degraded GNSS TUM is empty: {tum_path}")
+    data = np.asarray(rows, dtype=np.float64)
+    order = np.argsort(data[:, 0])
+    return data[order]
+
+
+def interpolate_external_noisy_gnss(external_gnss, timestamp):
+    """Interpolate external GNSS x/y by timestamp, preserving NaN outage intervals."""
+    data = np.asarray(external_gnss, dtype=np.float64)
+    if data.ndim != 2 or data.shape[1] < 3:
+        raise ValueError("external_gnss must be an Nx4 or Nx3 TUM-like array")
+    ts = data[:, 0]
+    if timestamp < ts[0] or timestamp > ts[-1]:
+        return float("nan"), float("nan")
+    x = float(np.interp(timestamp, ts, data[:, 1]))
+    y = float(np.interp(timestamp, ts, data[:, 2]))
+    return x, y
+
+
+def first_finite_external_gnss_xy(external_gnss):
+    data = np.asarray(external_gnss, dtype=np.float64)
+    finite = np.isfinite(data[:, 1:3]).all(axis=1)
+    if not np.any(finite):
+        return None
+    idx = int(np.flatnonzero(finite)[0])
+    return float(data[idx, 1]), float(data[idx, 2])
+
+
 def _sync_cuda_for_timing(enabled: bool):
     """Synchronize CUDA kernels so stage timing reflects real GPU elapsed time."""
     if enabled and torch.cuda.is_available():
@@ -1676,7 +1717,8 @@ def process_data_with_localization(csv_data_path, rgb_dir, depth_dir, lidar_dir,
                                      point_ang_gate=POINT_ANG_GATE, point_max_range_diff=POINT_MAX_RANGE_DIFF,
                                      segment_chunk=4096,
                                      profile_runtime=False,
-                                     profile_warmup_frames=0):
+                                     profile_warmup_frames=0,
+                                     external_noisy_gnss_tum=None):
     os.makedirs(os.path.join(output_folder, "particles"), exist_ok=True)
     if semantic_classes not in ("both", "poles", "trunks"):
         raise ValueError(f"Unsupported semantic class mode: {semantic_classes}")
@@ -1685,6 +1727,9 @@ def process_data_with_localization(csv_data_path, rgb_dir, depth_dir, lidar_dir,
         raise ValueError(f"detection_drop_rate must be within [0, 1], got {detection_drop_rate}")
     df_data = load_csv_with_utm(csv_data_path)
     grouped_map_points, center = load_landmarks_as_lines(geojson_path)
+    external_noisy_gnss = None
+    if external_noisy_gnss_tum is not None:
+        external_noisy_gnss = load_external_noisy_gnss_tum(external_noisy_gnss_tum)
 
     """ Initialize particles based on landmarks extent
     all_coords = np.vstack([poles_coords, trunks_coords])
@@ -1695,8 +1740,12 @@ def process_data_with_localization(csv_data_path, rgb_dir, depth_dir, lidar_dir,
 
     #""" Initial GPS-based pose (centered coordinates, heading assumed 0)
     first_row = df_data.iloc[0]
-    init_x = first_row["utm_easting"] - center[0]
-    init_y = first_row["utm_northing"] - center[1]
+    external_init_xy = first_finite_external_gnss_xy(external_noisy_gnss) if external_noisy_gnss is not None else None
+    if external_init_xy is None:
+        init_x = first_row["utm_easting"] - center[0]
+        init_y = first_row["utm_northing"] - center[1]
+    else:
+        init_x, init_y = external_init_xy
     init_theta = INIT_HEADING
     #init_theta = quaternion_to_yaw(first_row['odom_orient_x'],
     #                           first_row['odom_orient_y'],
@@ -1985,11 +2034,23 @@ def process_data_with_localization(csv_data_path, rgb_dir, depth_dir, lidar_dir,
         elif semantic_classes == "trunks":
             bev_poles_obs = np.empty((0, 2), dtype=np.float32)
 
+        # Prefer dataset timestamps if available; otherwise fall back to frame index.
+        if "timestamp" in row and pd.notna(row["timestamp"]):
+            frame_ts = float(row["timestamp"])
+        elif "timestamp_sec" in row and pd.notna(row["timestamp_sec"]):
+            frame_ts = float(row["timestamp_sec"])
+        else:
+            frame_ts = float(frame_idx)
+
         # Get GPS data for current frame (used for measurement update)
         gps_x = row["utm_easting"] - center[0]
         gps_y = row["utm_northing"] - center[1]
-        gps_x_noisy = row["utm_easting_noisy"] - center[0]
-        gps_y_noisy = row["utm_northing_noisy"] - center[1]
+        if external_noisy_gnss is None:
+            gps_x_noisy = row["utm_easting_noisy"] - center[0]
+            gps_y_noisy = row["utm_northing_noisy"] - center[1]
+        else:
+            gps_x_noisy, gps_y_noisy = interpolate_external_noisy_gnss(external_noisy_gnss, frame_ts)
+        gps_xy_noisy = (gps_x_noisy, gps_y_noisy) if np.isfinite([gps_x_noisy, gps_y_noisy]).all() else None
 
         # Get odometry data for the current frame
         motion_t0 = time.perf_counter() if profile_runtime else None
@@ -2033,7 +2094,7 @@ def process_data_with_localization(csv_data_path, rgb_dir, depth_dir, lidar_dir,
             miss_penalty=miss_penalty,
             wrong_hit_penalty=wrong_hit_penalty,
             gps_weight=gps_weight,
-            gps_xy=(gps_x_noisy, gps_y_noisy) if not disable_gps else None,
+            gps_xy=gps_xy_noisy if not disable_gps else None,
             gps_sigma=GPS_SIGMA,
             seg_p1=seg_p1, seg_p2=seg_p2, seg_v2=seg_v2, seg_cls=seg_cls,
             sem_seg_p1=sem_seg_p1, sem_seg_p2=sem_seg_p2, sem_seg_v2=sem_seg_v2, sem_seg_cls=sem_seg_cls,
@@ -2110,13 +2171,6 @@ def process_data_with_localization(csv_data_path, rgb_dir, depth_dir, lidar_dir,
                 )
             pose_out = pose_smoothed.copy()
 
-        # Prefer dataset timestamps if available; otherwise fall back to frame index.
-        if "timestamp" in row and pd.notna(row["timestamp"]):
-            frame_ts = float(row["timestamp"])
-        elif "timestamp_sec" in row and pd.notna(row["timestamp_sec"]):
-            frame_ts = float(row["timestamp_sec"])
-        else:
-            frame_ts = float(frame_idx)
         full_trajectory_data.append((frame_ts, pose_out[0], pose_out[1], pose_out[2]))
         gps_trajectory.append((gps_x, gps_y))
         gps_gt_trajectory.append((frame_ts, gps_x, gps_y, 0.0))
@@ -2279,6 +2333,8 @@ if __name__ == "__main__":
                         help='Dataset root containing data.csv, rgb/, depth/, and lidar/.')
     parser.add_argument('--csv-data-path', type=str, default=None,
                         help='Optional explicit CSV path. Defaults to <data-path>/data.csv.')
+    parser.add_argument('--external-noisy-gnss-tum', type=str, default=None,
+                        help='Optional degraded/noisy GNSS TUM in the local map frame; interpolated by frame timestamp.')
     parser.add_argument('--geojson-path', type=str, default=str(geojson_path),
                         help='GeoJSON map file used to build vineyard rows.')
     args = parser.parse_args()
@@ -2322,6 +2378,12 @@ if __name__ == "__main__":
     else:
         csv_data_path = data_path / "data.csv"
 
+    external_noisy_gnss_tum = None
+    if args.external_noisy_gnss_tum:
+        external_noisy_gnss_tum = Path(args.external_noisy_gnss_tum).expanduser()
+        if not external_noisy_gnss_tum.is_absolute():
+            external_noisy_gnss_tum = (base_dir / external_noisy_gnss_tum).resolve()
+
     geojson_path = Path(args.geojson_path).expanduser()
     if not geojson_path.is_absolute():
         geojson_path = (base_dir / geojson_path).resolve()
@@ -2334,6 +2396,8 @@ if __name__ == "__main__":
             raise FileNotFoundError(f"Missing dataset folder: {subdir}")
     if not geojson_path.exists():
         raise FileNotFoundError(f"Missing map geojson: {geojson_path}")
+    if external_noisy_gnss_tum is not None and not external_noisy_gnss_tum.exists():
+        raise FileNotFoundError(f"Missing external degraded GNSS TUM: {external_noisy_gnss_tum}")
 
     if args.output_folder:
         output_folder = args.output_folder
@@ -2351,6 +2415,7 @@ if __name__ == "__main__":
         f"StaticGPSWeight: {args.disable_dynamic_gps_weight}, DisablePoseSmooth: {args.disable_pose_smoothing}, "
         f"SemanticClasses: {SEMANTIC_CLASSES_MODE}, DetectionDropRate: {DETECTION_DROP_RATE}, "
         f"SegmentChunk: {SEGMENT_CHUNK}, "
+        f"ExternalNoisyGNSS: {external_noisy_gnss_tum}, "
         f"ProfileRuntime: {args.profile_runtime}, ProfileWarmup: {max(0, int(args.profile_warmup_frames))}"
     )
 
@@ -2381,5 +2446,6 @@ if __name__ == "__main__":
         segment_chunk=SEGMENT_CHUNK,
         profile_runtime=bool(args.profile_runtime),
         profile_warmup_frames=max(0, int(args.profile_warmup_frames)),
+        external_noisy_gnss_tum=str(external_noisy_gnss_tum) if external_noisy_gnss_tum is not None else None,
     )
     print("[INFO] Finished processing all frames from the CSV file.")

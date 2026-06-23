@@ -26,16 +26,30 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from run_ab_validation import (
-    BASE_DIR,
-    KEY_METRICS,
-    check_cuda_available,
-    evaluate_run,
-    interpolate_positions,
-    load_rows_from_geojson,
-    read_tum_file,
-    run_cmd,
-)
+try:
+    from run_ab_validation import (
+        BASE_DIR,
+        KEY_METRICS,
+        check_cuda_available,
+        evaluate_run,
+        interpolate_positions,
+        load_rows_from_geojson,
+        read_tum_file,
+        run_cmd,
+        start_pose_anchored_trajectory,
+    )
+except ModuleNotFoundError:
+    from scripts.run_ab_validation import (
+        BASE_DIR,
+        KEY_METRICS,
+        check_cuda_available,
+        evaluate_run,
+        interpolate_positions,
+        load_rows_from_geojson,
+        read_tum_file,
+        run_cmd,
+        start_pose_anchored_trajectory,
+    )
 
 
 DEFAULT_OUTPUT_ROOT = BASE_DIR / "results" / "iros"
@@ -44,6 +58,9 @@ DEFAULT_SEEDS = "11,22,33"
 DEFAULT_AMCL_NGPS_AMCL_STD = 0.35
 DEFAULT_AMCL_NGPS_GPS_STD = 1.8
 DEFAULT_AMCL_NGPS_PROCESS_STD = 0.8
+DEFAULT_RTAB_NGPS_RTAB_STD = 0.35
+DEFAULT_RTAB_NGPS_GPS_STD = 1.8
+DEFAULT_RTAB_NGPS_PROCESS_STD = 0.8
 
 # Static baselines copied into each seed folder for uniform evaluation.
 FIXED_BASELINES = {
@@ -135,9 +152,23 @@ def plot_multiseed_summary(agg_rows: List[Dict[str, object]], out_path: Path):
         if not (use_amcl_gps and str(r.get("method")) == "amcl")
     ]
 
-    method_order = ["slpf", "spf", "AMCL+NGPS", "ngps", "amcl", "rtab_rgbd", "rtab_rgb"]
+    method_order = [
+        "slpf",
+        "spf",
+        "AMCL+NGPS",
+        "RTAB-RGBD+NGPS",
+        "RTAB-RGB+NGPS",
+        "ngps",
+        "amcl",
+        "rtab_rgbd",
+        "rtab_rgb",
+    ]
     rows_sorted = sorted(rows_for_plot, key=lambda r: method_order.index(r["method"]) if r["method"] in method_order else 999)
-    label_map = {"AMCL+NGPS": "amcl+GPS"}
+    label_map = {
+        "AMCL+NGPS": "amcl+GPS",
+        "RTAB-RGBD+NGPS": "rtab-rgbd+GPS",
+        "RTAB-RGB+NGPS": "rtab-rgb+GPS",
+    }
     labels = [label_map.get(str(r["method"]), str(r["method"])) for r in rows_sorted]
     x = np.arange(len(labels))
 
@@ -227,6 +258,11 @@ def build_slpf_cmd(python_exec: Path, spf_script: Path, seed: int, out_dir: Path
     return cmd
 
 
+def method_uses_start_pose_anchor(method: str) -> bool:
+    """RTAB trajectories are started in the GT frame before metrics/plots."""
+    return method in {"rtab_rgbd", "rtab_rgb"}
+
+
 def copy_fixed_tum(src_est: Path, src_gt: Path, dst_dir: Path):
     dst_dir.mkdir(parents=True, exist_ok=True)
     est = dst_dir / "trajectory_0.5.tum"
@@ -258,45 +294,52 @@ def write_tum(path: Path, timestamps: np.ndarray, positions: np.ndarray, quatern
             )
 
 
-def build_amcl_ngps_fused_tum(
-    amcl_est: Path,
+def build_kalman_ngps_fused_tum(
+    primary_est: Path,
     ngps_est: Path,
     out_est: Path,
     *,
-    amcl_pos_std: float,
+    primary_pos_std: float,
     gps_pos_std: float,
     process_accel_std: float,
+    primary_gt: Path | None = None,
+    anchor_primary_start_pose: bool = False,
 ):
     """
-    AMCL+NGPS: constant-velocity Kalman fusion of AMCL and noisy GPS positions.
+    Constant-velocity Kalman fusion of a primary trajectory and noisy GPS positions.
 
     State x = [px, py, vx, vy]^T
     Measurement model for both sensors: z = [px, py]^T
-    Sequential updates: AMCL update, then GPS update at each time step.
-    Orientation is kept from AMCL.
+    Sequential updates: primary trajectory update, then GPS update at each time step.
+    Orientation is kept from the primary trajectory.
     """
-    amcl = read_tum_file(amcl_est)
+    if anchor_primary_start_pose:
+        if primary_gt is None:
+            raise ValueError("primary_gt is required when anchor_primary_start_pose=True")
+        primary = start_pose_anchored_trajectory(primary_est, primary_gt)
+    else:
+        primary = read_tum_file(primary_est)
     ngps = read_tum_file(ngps_est)
-    ngps_interp = interpolate_positions(ngps.timestamps, ngps.positions, amcl.timestamps)
+    ngps_interp = interpolate_positions(ngps.timestamps, ngps.positions, primary.timestamps)
 
-    ts = amcl.timestamps
-    z_amcl = amcl.positions[:, :2]
+    ts = primary.timestamps
+    z_primary = primary.positions[:, :2]
     z_gps = ngps_interp[:, :2]
     n = len(ts)
     if n == 0:
-        raise ValueError("Empty AMCL trajectory")
+        raise ValueError("Empty primary trajectory")
 
     I4 = np.eye(4, dtype=np.float64)
     H = np.array([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0]], dtype=np.float64)
-    R_amcl = (max(amcl_pos_std, 1e-6) ** 2) * np.eye(2, dtype=np.float64)
+    R_primary = (max(primary_pos_std, 1e-6) ** 2) * np.eye(2, dtype=np.float64)
     R_gps = (max(gps_pos_std, 1e-6) ** 2) * np.eye(2, dtype=np.float64)
     q = max(process_accel_std, 1e-6) ** 2
 
     x = np.zeros(4, dtype=np.float64)
-    x[:2] = z_amcl[0]
+    x[:2] = z_primary[0]
     if n > 1:
         dt0 = max(float(ts[1] - ts[0]), 1e-3)
-        x[2:] = (z_amcl[1] - z_amcl[0]) / dt0
+        x[2:] = (z_primary[1] - z_primary[0]) / dt0
     P = np.diag([1.0, 1.0, 2.0, 2.0]).astype(np.float64)
     fused_xy = np.zeros((n, 2), dtype=np.float64)
 
@@ -324,7 +367,9 @@ def build_amcl_ngps_fused_tum(
             x = F @ x
             P = F @ P @ F.T + Q
 
-        for z, R in ((z_amcl[k], R_amcl), (z_gps[k], R_gps)):
+        for z, R in ((z_primary[k], R_primary), (z_gps[k], R_gps)):
+            if not np.isfinite(z).all():
+                continue
             y = z - (H @ x)
             S = H @ P @ H.T + R
             K = P @ H.T @ np.linalg.inv(S)
@@ -333,9 +378,28 @@ def build_amcl_ngps_fused_tum(
 
         fused_xy[k] = x[:2]
 
-    fused_pos = np.array(amcl.positions, copy=True)
+    fused_pos = np.array(primary.positions, copy=True)
     fused_pos[:, :2] = fused_xy
-    write_tum(out_est, ts, fused_pos, amcl.quaternions)
+    write_tum(out_est, ts, fused_pos, primary.quaternions)
+
+
+def build_amcl_ngps_fused_tum(
+    amcl_est: Path,
+    ngps_est: Path,
+    out_est: Path,
+    *,
+    amcl_pos_std: float,
+    gps_pos_std: float,
+    process_accel_std: float,
+):
+    build_kalman_ngps_fused_tum(
+        primary_est=amcl_est,
+        ngps_est=ngps_est,
+        out_est=out_est,
+        primary_pos_std=amcl_pos_std,
+        gps_pos_std=gps_pos_std,
+        process_accel_std=process_accel_std,
+    )
 
 
 def main():
@@ -351,6 +415,9 @@ def main():
     parser.add_argument("--amcl-ngps-amcl-std", type=float, default=DEFAULT_AMCL_NGPS_AMCL_STD)
     parser.add_argument("--amcl-ngps-gps-std", type=float, default=DEFAULT_AMCL_NGPS_GPS_STD)
     parser.add_argument("--amcl-ngps-process-std", type=float, default=DEFAULT_AMCL_NGPS_PROCESS_STD)
+    parser.add_argument("--rtab-ngps-rtab-std", type=float, default=DEFAULT_RTAB_NGPS_RTAB_STD)
+    parser.add_argument("--rtab-ngps-gps-std", type=float, default=DEFAULT_RTAB_NGPS_GPS_STD)
+    parser.add_argument("--rtab-ngps-process-std", type=float, default=DEFAULT_RTAB_NGPS_PROCESS_STD)
     args = parser.parse_args()
 
     python_exec = args.python_exec.expanduser()
@@ -360,6 +427,9 @@ def main():
     amcl_ngps_amcl_std = float(max(1e-6, args.amcl_ngps_amcl_std))
     amcl_ngps_gps_std = float(max(1e-6, args.amcl_ngps_gps_std))
     amcl_ngps_process_std = float(max(1e-6, args.amcl_ngps_process_std))
+    rtab_ngps_rtab_std = float(max(1e-6, args.rtab_ngps_rtab_std))
+    rtab_ngps_gps_std = float(max(1e-6, args.rtab_ngps_gps_std))
+    rtab_ngps_process_std = float(max(1e-6, args.rtab_ngps_process_std))
     seeds = parse_int_list(args.seeds)
     if not seeds:
         raise ValueError("At least one seed is required.")
@@ -406,6 +476,12 @@ def main():
             "amcl_std_m": amcl_ngps_amcl_std,
             "gps_std_m": amcl_ngps_gps_std,
             "process_accel_std_mps2": amcl_ngps_process_std,
+        },
+        "rtab_ngps": {
+            "rtab_std_m": rtab_ngps_rtab_std,
+            "gps_std_m": rtab_ngps_gps_std,
+            "process_accel_std_mps2": rtab_ngps_process_std,
+            "anchor_primary_start_pose": True,
         },
         "commands": [],
     }
@@ -541,10 +617,62 @@ def main():
                 }
         )
 
+        # 5) RTAB+NGPS fused visual-GNSS baselines, using start-pose-anchored RTAB.
+        for rtab_method, fused_method in (
+            ("rtab_rgbd", "RTAB-RGBD+NGPS"),
+            ("rtab_rgb", "RTAB-RGB+NGPS"),
+        ):
+            rtab_ngps_dir = run_dir / f"{rtab_method}_ngps" / f"seed_{seed}"
+            rtab_ngps_dir.mkdir(parents=True, exist_ok=True)
+            rtab_ngps_est = rtab_ngps_dir / "trajectory_0.5.tum"
+            rtab_ngps_gt = rtab_ngps_dir / "gps_pose.tum"
+            shutil.copy2(FIXED_BASELINES[rtab_method]["gt"], rtab_ngps_gt)
+            build_kalman_ngps_fused_tum(
+                primary_est=FIXED_BASELINES[rtab_method]["est"],
+                ngps_est=ngps_est,
+                out_est=rtab_ngps_est,
+                primary_pos_std=rtab_ngps_rtab_std,
+                gps_pos_std=rtab_ngps_gps_std,
+                process_accel_std=rtab_ngps_process_std,
+                primary_gt=FIXED_BASELINES[rtab_method]["gt"],
+                anchor_primary_start_pose=True,
+            )
+            rtab_ngps_metrics = evaluate_run(
+                name=f"{rtab_method}_ngps_seed_{seed}",
+                est_tum=rtab_ngps_est,
+                gt_tum=rtab_ngps_gt,
+                out_dir=rtab_ngps_dir / "eval",
+                rows=rows_map,
+                evo_ape_bin=evo_ape_bin,
+                evo_rpe_bin=evo_rpe_bin,
+                env=env,
+            )
+            rtab_ngps_metrics.update({"method": fused_method, "seed": seed, "runtime_sec": 0.0})
+            per_seed_rows.append(rtab_ngps_metrics)
+            protocol["commands"].append(
+                {
+                    "method": fused_method,
+                    "seed": seed,
+                    "command": [
+                        (
+                            "kalman_fusion anchored_rtab+ngps "
+                            f"rtab_std={rtab_ngps_rtab_std} "
+                            f"gps_std={rtab_ngps_gps_std} "
+                            f"process_accel_std={rtab_ngps_process_std}"
+                        ),
+                        f"source_rtab={FIXED_BASELINES[rtab_method]['est']}",
+                        f"source_ngps={ngps_est}",
+                        f"gt={FIXED_BASELINES[rtab_method]['gt']}",
+                    ],
+                    "runtime_sec": 0.0,
+                }
+            )
+
         # 5) Fixed baselines (copied per seed for uniform eval protocol)
         for method, paths in FIXED_BASELINES.items():
             method_dir = run_dir / method / f"seed_{seed}"
             est_tum, gt_tum = copy_fixed_tum(paths["est"], paths["gt"], method_dir)
+            start_pose_anchor = method_uses_start_pose_anchor(method)
             metrics = evaluate_run(
                 name=f"{method}_seed_{seed}",
                 est_tum=est_tum,
@@ -554,6 +682,7 @@ def main():
                 evo_ape_bin=evo_ape_bin,
                 evo_rpe_bin=evo_rpe_bin,
                 env=env,
+                start_pose_anchor=start_pose_anchor,
             )
             metrics.update({"method": method, "seed": seed, "runtime_sec": 0.0})
             per_seed_rows.append(metrics)
@@ -567,7 +696,17 @@ def main():
             )
 
     # Deterministic output order
-    method_order = ["slpf", "spf", "AMCL+NGPS", "ngps", "amcl", "rtab_rgbd", "rtab_rgb"]
+    method_order = [
+        "slpf",
+        "spf",
+        "AMCL+NGPS",
+        "RTAB-RGBD+NGPS",
+        "RTAB-RGB+NGPS",
+        "ngps",
+        "amcl",
+        "rtab_rgbd",
+        "rtab_rgb",
+    ]
     per_seed_rows.sort(key=lambda r: (method_order.index(str(r["method"])) if str(r["method"]) in method_order else 999, int(r["seed"])))
 
     write_csv(run_dir / "trajectory_metrics_multiseed_per_seed.csv", per_seed_rows)

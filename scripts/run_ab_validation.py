@@ -182,6 +182,99 @@ def apply_transform(points: np.ndarray, scale: float, rot: np.ndarray, trans: np
     return (scale * (rot @ points.T)).T + trans
 
 
+def quaternion_to_yaw_xyzw(q: np.ndarray) -> float:
+    x, y, z, w = [float(v) for v in q]
+    return float(np.arctan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (y * y + z * z)))
+
+
+def yaw_to_quaternion_xyzw(yaw: float) -> np.ndarray:
+    return np.asarray([0.0, 0.0, np.sin(yaw * 0.5), np.cos(yaw * 0.5)], dtype=np.float64)
+
+
+def start_pose_anchor_positions(
+    est_pos: np.ndarray,
+    est_quat: np.ndarray,
+    gt_pos: np.ndarray,
+    gt_quat: np.ndarray | None = None,
+) -> np.ndarray:
+    """Translate and yaw-rotate an estimate so its first pose matches ground truth."""
+    est_pos = np.asarray(est_pos, dtype=np.float64)
+    gt_pos = np.asarray(gt_pos, dtype=np.float64)
+    if est_pos.size == 0 or gt_pos.size == 0:
+        return np.array(est_pos, copy=True)
+
+    anchored = np.array(est_pos, copy=True)
+    est_xy = est_pos[:, :2] - est_pos[0, :2]
+
+    if gt_quat is not None and len(est_quat) > 0 and len(gt_quat) > 0:
+        yaw_est = quaternion_to_yaw_xyzw(np.asarray(est_quat)[0])
+        yaw_gt = quaternion_to_yaw_xyzw(np.asarray(gt_quat)[0])
+        delta_yaw = yaw_gt - yaw_est
+        c = float(np.cos(delta_yaw))
+        s = float(np.sin(delta_yaw))
+        rot2 = np.array([[c, -s], [s, c]], dtype=np.float64)
+        est_xy = est_xy @ rot2.T
+
+    anchored[:, :2] = est_xy + gt_pos[0, :2]
+    anchored[:, 2] = est_pos[:, 2] - est_pos[0, 2] + gt_pos[0, 2]
+    return anchored
+
+
+def start_pose_anchor_quaternions(est_quat: np.ndarray, gt_quat: np.ndarray | None) -> np.ndarray:
+    """Yaw-rotate quaternions by the same initial-frame offset as the position anchor."""
+    est_quat = np.asarray(est_quat, dtype=np.float64)
+    if est_quat.size == 0:
+        return np.array(est_quat, copy=True)
+    if gt_quat is None or len(gt_quat) == 0:
+        return np.array(est_quat, copy=True)
+
+    yaw_est0 = quaternion_to_yaw_xyzw(est_quat[0])
+    yaw_gt0 = quaternion_to_yaw_xyzw(np.asarray(gt_quat)[0])
+    delta_yaw = yaw_gt0 - yaw_est0
+    anchored = np.array(est_quat, copy=True)
+    for idx, quat in enumerate(est_quat):
+        anchored[idx] = yaw_to_quaternion_xyzw(quaternion_to_yaw_xyzw(quat) + delta_yaw)
+    return anchored
+
+
+def write_tum_file(path: Path, trajectory: Trajectory) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as f:
+        f.write("# timestamp tx ty tz qx qy qz qw\n")
+        for t, p, q in zip(trajectory.timestamps, trajectory.positions, trajectory.quaternions):
+            f.write(
+                f"{float(t)} {float(p[0])} {float(p[1])} {float(p[2])} "
+                f"{float(q[0])} {float(q[1])} {float(q[2])} {float(q[3])}\n"
+            )
+
+
+def start_pose_anchored_trajectory(est_tum: Path, gt_tum: Path) -> Trajectory:
+    est = read_tum_file(est_tum)
+    gt = read_tum_file(gt_tum)
+    gt_interp = interpolate_positions(gt.timestamps, gt.positions, est.timestamps)
+    gt_quat_interp = np.empty((len(est.timestamps), 4), dtype=np.float64)
+    for idx in range(4):
+        gt_quat_interp[:, idx] = np.interp(est.timestamps, gt.timestamps, gt.quaternions[:, idx])
+    anchored_pos = start_pose_anchor_positions(est.positions, est.quaternions, gt_interp, gt_quat_interp)
+    anchored_quat = start_pose_anchor_quaternions(est.quaternions, gt_quat_interp)
+    return Trajectory(est.timestamps, anchored_pos, anchored_quat)
+
+
+def prepare_eval_trajectory(
+    est_tum: Path,
+    gt_tum: Path,
+    out_dir: Path,
+    *,
+    start_pose_anchor: bool = False,
+) -> Path:
+    if not start_pose_anchor:
+        return est_tum
+    anchored = start_pose_anchored_trajectory(est_tum, gt_tum)
+    anchored_path = out_dir / "start_pose_anchored_estimate.tum"
+    write_tum_file(anchored_path, anchored)
+    return anchored_path
+
+
 def parse_evo_stats(archive_path: Path) -> Dict[str, float | None]:
     if not archive_path.exists():
         return {"rmse": None, "mean": None, "median": None, "max": None, "std": None}
@@ -607,9 +700,11 @@ def evaluate_run(
     evo_ape_bin: Path,
     evo_rpe_bin: Path,
     env: Dict[str, str],
+    start_pose_anchor: bool = False,
 ) -> Dict[str, float | str]:
-    evo = run_evo_bundle(est_tum, gt_tum, name, out_dir, evo_ape_bin, evo_rpe_bin, env)
-    aligned = aligned_estimate(est_tum, gt_tum)
+    eval_est_tum = prepare_eval_trajectory(est_tum, gt_tum, out_dir, start_pose_anchor=start_pose_anchor)
+    evo = run_evo_bundle(eval_est_tum, gt_tum, name, out_dir, evo_ape_bin, evo_rpe_bin, env)
+    aligned = aligned_estimate(eval_est_tum, gt_tum)
     row_metrics = compute_row_metrics(
         aligned["est_aligned"],
         aligned["gt_interp"],
@@ -622,7 +717,9 @@ def evaluate_run(
     return {
         "run_name": name,
         "est_tum": str(est_tum),
+        "eval_est_tum": str(eval_est_tum),
         "gt_tum": str(gt_tum),
+        "start_pose_anchor": int(start_pose_anchor),
         **evo,
         **row_metrics,
         **smooth,

@@ -529,7 +529,7 @@ Experiments were conducted using a Thorvald robot platform (Saga Robotics) equip
 
 To emulate realistic noisy GNSS conditions, the RTK trajectory was degraded using a stochastic noise model capturing three common error modes: (i) slowly varying drift (temporally correlated bias), (ii) short-term receiver noise (zero-mean Gaussian), and (iii) occasional jump-like multipath errors (heavy-tailed outliers)~\cite{groves2013principles,kaplan2017understanding,brown2012introduction}. We report results over three independent noise realisations while preserving original timestamps and orientations.
 
-Evaluation is performed on two traversals using the same semantic-wall map (see Fig.~\ref{fig:wallmap}). For stochastic components, three random seeds (\{11,22,33\}) are used and statistics are aggregated across seeds; representative trajectory plots use seed~11. We compare SLPF against NoisyGNSS, AMCL, AMCL+NoisyGNSS (Kalman fusion), and RTAB-Map (RGB and RGBD)~\cite{rtabmap}. AMCL is run with the standard particle-filter laser and odometry model, with LiDAR maximum range truncated to \(5\)~m to match the semantic sensing range used by SLPF, ensuring comparable observation horizons. AMCL+NoisyGNSS fuses the AMCL pose estimate and degraded GNSS measurement in a constant-velocity Kalman filter with fixed AMCL and GNSS measurement covariances. RTAB-Map is included as a visual-SLAM reference for locally smooth visual tracking in the same data, while the map-based localisation baselines are AMCL and AMCL+NoisyGNSS.
+Evaluation is performed on two traversals using the same semantic-wall map (see Fig.~\ref{fig:wallmap}). For stochastic components, three random seeds (\{11,22,33\}) are used and statistics are aggregated across seeds; representative trajectory plots use seed~11. We compare SLPF against NoisyGNSS, AMCL, AMCL+NoisyGNSS (Kalman fusion), RTAB-Map (RGB and RGBD), and RTAB-Map+NoisyGNSS~\cite{rtabmap}. AMCL is run with the standard particle-filter laser and odometry model, with LiDAR maximum range truncated to \(5\)~m to match the semantic sensing range used by SLPF, ensuring comparable observation horizons. AMCL+NoisyGNSS fuses the AMCL pose estimate and degraded GNSS measurement in a constant-velocity Kalman filter with fixed AMCL and GNSS measurement covariances. For RTAB-Map and RTAB-Map+NoisyGNSS, the estimated trajectory is start-pose anchored to ground truth by translating and yaw-rotating the initial pose before metrics and plots; no scale correction or whole-trajectory fitting is applied before raw APE. RTAB-Map+NoisyGNSS then fuses the anchored visual trajectory with NoisyGNSS using the same constant-velocity Kalman pattern. RTAB-Map is included as a visual-SLAM reference for locally smooth visual tracking in the same data, while the map-based localisation baselines are AMCL and AMCL+NoisyGNSS.
 
 SLPF parameters are kept fixed across both traversals to avoid environment-specific tuning. Key settings include miss/wrong-hit penalties (4.0/4.0), GNSS weight 0.5 with adaptive scaling \(K=4\), semantic noise \(\sigma_{\mathrm{sem}}=0.05\), GNSS noise \(\sigma_{\mathrm{gnss}}=1.1\)~m, corridor weight 0.30, background weight 0.20, particle count \(N_p=100\), frame stride 4, and maximum semantic range \(r_{\max}=5\)~m. Pose smoothing and yaw filtering parameters are fixed across runs, and CUDA acceleration is enabled without visualisation.
 
@@ -586,19 +586,23 @@ The current map is static and does not update landmark positions online. It ther
       \cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-9}
       & & Raw & Aligned & 2\,m & 5\,m & Mean & Median & Max & Fraction & \# events\\
       \cmidrule(lr){2-11}
-      \multirow{7}{*}{\rotatebox{90}{\textbf{Experiment 1}}} & NoisyGNSS & 3.04$\pm$0.13 & 2.98$\pm$0.13 & 3.56$\pm$0.29 & 3.99$\pm$0.43 & 1.77$\pm$0.12 & 1.78 & 1.78 & 0.64$\pm$0.04 & 64.3$\pm$5.4\\
+      \multirow{8}{*}{\rotatebox{90}{\textbf{Experiment 1}}} & NoisyGNSS & 3.04$\pm$0.13 & 2.98$\pm$0.13 & 3.56$\pm$0.29 & 3.99$\pm$0.43 & 1.77$\pm$0.12 & 1.78 & 1.78 & 0.64$\pm$0.04 & 64.3$\pm$5.4\\
       & AMCL & 1.37$\pm$0.47 & 1.02$\pm$0.30 & 4.69$\pm$0.05 & 5.39$\pm$0.11 & 1.40$\pm$0.10 & 0.84 & 1.54 & 0.67$\pm$0.13 & 27.3$\pm$3.1\\
       & AMCL+NoisyGNSS & 1.33$\pm$0.46 & 0.99$\pm$0.30 & 4.66$\pm$0.04 & 5.35$\pm$0.10 & 1.39$\pm$0.09 & \textbf{0.80} & \textbf{1.52} & 0.67$\pm$0.13 & 27.3$\pm$3.1\\
       & RGB RTAB-Map & 59.62$\pm$0.48 & 6.68$\pm$0.03 & \textbf{1.19$\pm$0.01} & \textbf{2.21$\pm$0.01} & 6.21$\pm$0.03 & 6.15 & 19.49 & 0.45$\pm$0.00 & 14.0$\pm$0.0\\
       & RGBD RTAB-Map & 61.33$\pm$0.28 & 10.02$\pm$0.03 & 8.25$\pm$0.08 & 10.79$\pm$0.11 & 6.78$\pm$0.01 & 6.13 & 46.10 & 0.48$\pm$0.00 & \textbf{13.3$\pm$0.5}\\
+      & RGB RTAB-Map+NoisyGNSS & 37.78$\pm$0.07 & 6.28$\pm$0.00 & 1.20$\pm$0.00 & 2.30$\pm$0.00 & 5.35$\pm$0.00 & 5.04 & 18.04 & 0.38$\pm$0.00 & 17.0$\pm$0.0\\
+      & RGBD RTAB-Map+NoisyGNSS & 39.20$\pm$0.07 & 6.32$\pm$0.00 & 1.23$\pm$0.00 & 2.64$\pm$0.00 & 5.37$\pm$0.00 & 5.03 & 17.99 & 0.38$\pm$0.00 & 17.0$\pm$0.0\\
       \cmidrule(lr){2-11}
       & SLPF (ours) & \textbf{1.07$\pm$0.09} & \textbf{1.04$\pm$0.10} & 3.33$\pm$0.07 & 6.92$\pm$0.09 & \textbf{1.26$\pm$0.06} & 1.25 & 3.85 & \textbf{0.73$\pm$0.01} & 34.67$\pm$1.70\\
       \cmidrule(lr){1-11}
-      \multirow{7}{*}{\rotatebox{90}{\textbf{Experiment 2}}} & NoisyGNSS & 3.16$\pm$0.22 & 3.09$\pm$0.23 & 3.76$\pm$0.32 & 4.22$\pm$0.55 & 1.99$\pm$0.04 & 1.80 & 36.99 & 0.58$\pm$0.02 & 713.3$\pm$23.2\\
+      \multirow{8}{*}{\rotatebox{90}{\textbf{Experiment 2}}} & NoisyGNSS & 3.16$\pm$0.22 & 3.09$\pm$0.23 & 3.76$\pm$0.32 & 4.22$\pm$0.55 & 1.99$\pm$0.04 & 1.80 & 36.99 & 0.58$\pm$0.02 & 713.3$\pm$23.2\\
       & AMCL & 3.50$\pm$0.94 & 2.04$\pm$0.31 & 2.78$\pm$0.79 & 3.43$\pm$0.92 & 1.55$\pm$0.12 & 1.86 & 7.01 & 0.55$\pm$0.05 & 26.7$\pm$2.1\\
       & AMCL+NoisyGNSS & 3.38$\pm$0.91 & 1.98$\pm$0.31 & 2.80$\pm$0.78 & 3.42$\pm$0.92 & 1.51$\pm$0.11 & 1.77 & 6.38 & 0.55$\pm$0.05 & 26.7$\pm$1.2\\
       & RGB RTAB-Map & 85.95$\pm$0.19 & 9.12$\pm$0.41 & \textbf{1.63$\pm$0.01} & \textbf{2.48$\pm$0.00} & 6.81$\pm$0.31 & 6.26 & 20.80 & 0.39$\pm$0.02 & \textbf{17.0$\pm$0.8}\\
       & RGBD RTAB-Map & 87.17$\pm$0.01 & 9.06$\pm$0.00 & 1.81$\pm$0.00 & 3.43$\pm$0.00 & 7.25$\pm$0.08 & 6.73 & 38.15 & 0.42$\pm$0.00 & 18.7$\pm$0.5\\
+      & RGB RTAB-Map+NoisyGNSS & 41.96$\pm$1.08 & 8.33$\pm$0.38 & 1.69$\pm$0.07 & 2.53$\pm$0.13 & 6.16$\pm$0.29 & 5.75 & 19.12 & 0.39$\pm$0.02 & 18.7$\pm$0.5\\
+      & RGBD RTAB-Map+NoisyGNSS & 59.91$\pm$23.48 & 8.37$\pm$0.12 & 1.93$\pm$0.17 & 3.36$\pm$0.02 & 6.61$\pm$0.13 & 6.03 & 35.93 & 0.42$\pm$0.01 & 18.7$\pm$0.9\\
       \cmidrule(lr){2-11}
       & SLPF (ours) & \textbf{1.24$\pm$0.04} & \textbf{1.11$\pm$0.06} & 3.34$\pm$0.02 & 6.82$\pm$0.07 & \textbf{1.46$\pm$0.03} & \textbf{1.31} & \textbf{4.35} & \textbf{0.67$\pm$0.02} & 28.0$\pm$3.3\\
       \bottomrule
@@ -612,7 +616,33 @@ Across both traversal directions, SLPF consistently achieves the lowest raw APE 
 
 These improvements translate directly to row-level metrics. SLPF attains the highest row-correct fraction in both experiments (\(0.73\pm0.01\) and \(0.67\pm0.02\)), exceeding AMCL-based baselines and RTAB-Map variants. Mean cross-track error is also lowest for SLPF (\(1.26\pm0.06\)~m and \(1.46\pm0.03\)~m), indicating tighter adherence to the correct corridor.
 
-Fig.~\ref{fig:plots} illustrates the qualitative behaviour. AMCL and AMCL+NoisyGNSS produce smooth trajectories but remain vulnerable to geometric aliasing: once drifting into an adjacent row, recovery is limited. SLPF mitigates this failure mode through semantic wall constraints and adaptive GNSS weighting, enabling recovery from wrong-row hypotheses. NoisyGNSS remains globally bounded but lacks structural information, resulting in lower row correctness. RTAB-Map achieves low short-horizon RPE, consistent with locally smooth tracking; however, its large raw APE and reduced row-correct fraction indicate global row misalignment, particularly during headland transitions where visual similarity is amplified. Using SE(3)-aligned APE, the RMSE decreases to approximately 10\,m, confirming locally consistent tracking but persistent global row misalignment in the surveyed map frame. Default RTAB-Map configurations are retained to reflect typical deployment rather than environment-specific tuning.
+Fig.~\ref{fig:plots} illustrates the qualitative behaviour. AMCL and AMCL+NoisyGNSS produce smooth trajectories but remain vulnerable to geometric aliasing: once drifting into an adjacent row, recovery is limited. SLPF mitigates this failure mode through semantic wall constraints and adaptive GNSS weighting, enabling recovery from wrong-row hypotheses. NoisyGNSS remains globally bounded but lacks structural information, resulting in lower row correctness. RTAB-Map achieves low short-horizon RPE, consistent with locally smooth tracking; however, its large raw APE and reduced row-correct fraction indicate global row misalignment, particularly during headland transitions where visual similarity is amplified. RTAB-Map+NoisyGNSS reduces the raw visual-SLAM drift after start-pose anchoring, but its row-correct fraction remains below SLPF because the fused visual trajectory still lacks row-level semantic constraints. Default RTAB-Map configurations are retained to reflect typical deployment rather than environment-specific tuning.
+
+\begin{table*}[t]
+  \centering
+  \caption{GNSS degradation stress test over both traversals and three seeds. Each cell reports aligned APE RMSE [m] / row-correct fraction.}
+  \scriptsize
+  \setlength{\tabcolsep}{4.0pt}
+  \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{lcccc}
+      \toprule
+      \textbf{GNSS profile} & \textbf{SLPF} & \textbf{NoisyGNSS} & \textbf{AMCL+NoisyGNSS} & \textbf{RTAB RGB+NoisyGNSS}\\
+      \midrule
+      Nominal & \textbf{0.89 / 0.72} & 1.28 / 0.71 & 1.82 / 0.58 & 7.24 / 0.39\\
+      High Gaussian & \textbf{1.45 / 0.64} & 3.16 / 0.51 & 1.82 / 0.58 & 7.24 / 0.39\\
+      Drift bias & 3.24 / 0.39 & 4.10 / 0.41 & \textbf{1.82 / 0.58} & 7.24 / 0.39\\
+      Multipath bursts & \textbf{1.29 / 0.67} & 3.64 / 0.63 & 1.82 / 0.58 & 7.24 / 0.39\\
+      5 s outage & \textbf{0.88 / 0.71} & 1.44 / 0.71 & 1.82 / 0.58 & 7.24 / 0.39\\
+      10 s outage & \textbf{0.91 / 0.72} & 1.44 / 0.71 & 1.82 / 0.58 & 7.24 / 0.39\\
+      20 s outage & \textbf{0.92 / 0.71} & 1.44 / 0.71 & 1.82 / 0.58 & 7.24 / 0.39\\
+      Headland-only & \textbf{1.24 / 0.71} & 2.46 / 0.75 & 1.82 / 0.58 & 7.24 / 0.39\\
+      \bottomrule
+    \end{tabular}
+  \end{adjustbox}
+  \label{tab:gnss_degradation}
+\end{table*}
+
+Table~\ref{tab:gnss_degradation} isolates GNSS sensitivity by replaying the localisation pipeline with high Gaussian noise, temporally correlated drift, burst multipath, fixed outages, and headland-only degradation. SLPF remains best or competitive under nominal noise, high Gaussian noise, multipath bursts, and fixed outages because semantic-wall evidence can re-stabilise the particle set after transient GNSS degradation. The drift-bias profile is the hardest case: persistent biased GNSS can pull the global prior toward an incorrect row, exposing the operational limit that prolonged biased GNSS and weak semantics can overcome the adaptive weighting scheme.
 
 Row-mislocalisation events should be interpreted jointly with row-correct, cross-track, wrong-row duration, and recovery metrics, as switch counts do not distinguish brief recoverable errors from long wrong-row intervals. Although AMCL-based methods report fewer switch events in Experiment~1, SLPF achieves higher row correctness and lower cross-track error, indicating shorter and recoverable wrong-row episodes. Importantly, ablation results (Table~\ref{tab:spfpp_ablation}) show that removing the corridor term degrades performance but does not eliminate the gains from semantic likelihood integration, indicating that the primary improvement arises from structural semantic modelling rather than corridor regularisation alone.
 
@@ -650,6 +680,7 @@ mean$\pm$std over three seeds.
   \caption{Experiment~1 robustness under Detection Dropout and Section Landmark Removal. Values are mean$\pm$std over three runs.}
   \scriptsize
   \setlength{\tabcolsep}{3.0pt}
+  \begin{adjustbox}{max width=\columnwidth}
   \begin{tabular}{lccccc}
     \toprule
     \textbf{Variant} &
@@ -668,6 +699,7 @@ mean$\pm$std over three seeds.
     MapRemove 50\% & 1.13$\pm$0.13 & 3.36$\pm$0.06 & 1.32$\pm$0.02 & 0.72$\pm$0.01 & 31.00$\pm$0.82\\
     \bottomrule
   \end{tabular}
+  \end{adjustbox}
   \label{tab:robustness_run1}
 \end{table}
 

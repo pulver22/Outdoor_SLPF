@@ -8,6 +8,7 @@ from matplotlib.collections import LineCollection
 from matplotlib.colors import Normalize
 
 from geojson_rows import iter_projected_points
+from run_ab_validation import start_pose_anchor_positions
 
 
 def read_tum_file(filepath):
@@ -503,8 +504,8 @@ def main():
     if method_labels_csv:
         allowed = {x.strip() for x in method_labels_csv.split(',') if x.strip()}
         trajectories = {k: v for k, v in trajectories.items() if k in allowed}
-    # Keep explicit start-point anchoring only for RTAB-Map.
-    anchor_start_labels = {'RTABMAP RGBD'}
+    # Keep explicit start-pose anchoring only for RTAB-Map visual-SLAM outputs.
+    anchor_start_pose_labels = {'RTABMAP RGBD', 'RTABMAP RGB'}
 
     plot_data = []
     for label, paths in trajectories.items():
@@ -539,11 +540,12 @@ def main():
             except Exception:
                 traj_plot = traj_pos
 
-            if label in anchor_start_labels:
-                applied_shift = gt_interp[0] - traj_plot[0]
-                traj_plot = anchor_start_to_ground_truth(traj_plot, gt_interp)
+            if label in anchor_start_pose_labels:
+                before = traj_plot[0].copy()
+                traj_plot = start_pose_anchor_positions(traj_plot, traj_q, gt_interp, gt_q)
+                applied_shift = traj_plot[0] - before
                 print(
-                    f"  Start anchored to GT "
+                    f"  Start-pose anchored to GT "
                     f"(applied dx={applied_shift[0]:.4f}, dy={applied_shift[1]:.4f}, dz={applied_shift[2]:.4f})"
                 )
 
