@@ -58,6 +58,12 @@ def test_diagnostic_summary_reads_metrics_and_frame_stats(tmp_path: Path) -> Non
                 "correct_hits": 10,
                 "incorrect_hits": 1,
                 "no_hits": 30,
+                "row_hypothesis_id": "row_a",
+                "row_hypothesis_second_id": "row_b",
+                "row_hypothesis_gap": 0.2,
+                "row_hypothesis_entropy": 0.68,
+                "row_switch_event": 0,
+                "gnss_row_gate_scale": 1.0,
                 "smoother_status": "alpha",
             },
             {
@@ -69,6 +75,12 @@ def test_diagnostic_summary_reads_metrics_and_frame_stats(tmp_path: Path) -> Non
                 "correct_hits": 20,
                 "incorrect_hits": 2,
                 "no_hits": 10,
+                "row_hypothesis_id": "row_b",
+                "row_hypothesis_second_id": "row_a",
+                "row_hypothesis_gap": 0.5,
+                "row_hypothesis_entropy": 0.52,
+                "row_switch_event": 1,
+                "gnss_row_gate_scale": 0.55,
                 "smoother_status": "alpha",
             },
         ],
@@ -93,6 +105,13 @@ def test_diagnostic_summary_reads_metrics_and_frame_stats(tmp_path: Path) -> Non
     assert rows[0]["gnss_innovation_median"] == 6.0
     assert rows[0]["ess_min_first_50"] == 25.0
     assert rows[0]["semantic_hit_ratio_mean"] == np.mean([10 / 41, 20 / 32])
+    assert rows[0]["row_switch_count"] == 1
+    assert rows[0]["row_hypothesis_entropy_mean"] == np.mean([0.68, 0.52])
+    assert rows[0]["row_hypothesis_gap_median"] == 0.35
+    assert rows[0]["dominant_row_hypothesis_id"] == "row_a"
+    assert rows[0]["dominant_row_hypothesis_fraction"] == 0.5
+    assert np.isclose(rows[0]["gnss_row_switch_corr"], 1.0)
+    assert rows[0]["gnss_row_gate_scale_median"] == 0.775
     assert frame_rows[0]["traversal"] == "rh_run1"
     assert frame_rows[0]["frame_idx"] == 0
 
@@ -143,6 +162,33 @@ def test_followup_candidate_matrix_and_promotion_rules() -> None:
     assert [candidate["id"] for candidate in promoted] == ["accepted_alpha_huber3_cap20", "alpha_huber5_nocap"]
 
 
+def test_next_step_candidate_matrix_freezes_baseline_and_adds_row_identity_ablations() -> None:
+    candidates = followup.next_step_candidate_matrix()
+
+    assert [candidate["id"] for candidate in candidates] == [
+        "baseline_alpha_huber3_cap50",
+        "row_mixture",
+        "delayed_correction",
+        "row_mixture_delayed",
+        "row_mixture_delayed_gnss_gating",
+    ]
+    assert candidates[0]["args"] == [
+        "--pose-backend",
+        "alpha",
+        "--gnss-robust-mode",
+        "huber",
+        "--gnss-outlier-threshold",
+        "3.0",
+        "--semantic-penalty-cap",
+        "50",
+    ]
+    assert "--row-likelihood-mode" in candidates[1]["args"]
+    assert "--row-mixture-top-k" in candidates[1]["args"]
+    assert "--delayed-row-correction" in candidates[2]["args"]
+    assert "--gnss-row-gating" in candidates[4]["args"]
+    assert all("gtsam" not in candidate["id"] for candidate in candidates)
+
+
 def test_followup_command_contains_dataset_candidate_and_output_paths(tmp_path: Path) -> None:
     candidate = followup.candidate_matrix(include_gtsam=False)[4]
     cmd = followup.build_spf_command(
@@ -171,7 +217,20 @@ def test_report_generation_includes_required_sections_and_artifacts(tmp_path: Pa
     followup_csv = tmp_path / "followup.csv"
     current_rh2.write_text(json.dumps({"ape_align_rmse_mean": 0.843, "per_seed_ape_align_rmse": {"11": 0.79}}))
     current_rh1.write_text(json.dumps({"ape_align_rmse_mean": 1.300, "per_seed_ape_align_rmse": {"11": 1.99}}))
-    _write_csv(diagnostics_csv, [{"traversal": "rh_run1", "seed": 11, "ape_align_rmse": 1.99}])
+    _write_csv(
+        diagnostics_csv,
+        [
+            {
+                "traversal": "rh_run1",
+                "seed": 11,
+                "ape_align_rmse": 1.99,
+                "row_switch_count": 7,
+                "row_hypothesis_entropy_mean": 0.61,
+                "row_hypothesis_gap_median": 0.12,
+                "gnss_row_switch_corr": 0.4,
+            }
+        ],
+    )
     _write_csv(followup_csv, [{"stage": "screen", "candidate_id": "accepted_alpha_huber3_cap20", "ape_align_rmse": 1.2}])
 
     out_md = tmp_path / "report.md"
@@ -193,6 +252,10 @@ def test_report_generation_includes_required_sections_and_artifacts(tmp_path: Pa
     assert "## Changes Implemented" in text
     assert "## Current Metric Summary" in text
     assert "## Follow-Up Experiments" in text
+    assert "## Row-Identity Diagnostics" in text
+    assert "## Controlled Row-Identity Ablation" in text
+    assert "## Acceptance Check" in text
+    assert "multi-hypothesis row reasoning" in text
     assert "## Next Experiments" in text
     assert "6bd2fb9" in text
     assert data["git"]["branch"] == "iros_revision_plan"

@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import csv
 import math
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 from statistics import median
@@ -103,6 +104,21 @@ def _numeric_column(rows: list[dict[str, object]], key: str) -> list[float]:
     return [_safe_float(row.get(key)) for row in rows]
 
 
+def _pearson(x_values: Iterable[float], y_values: Iterable[float]) -> float:
+    pairs = [
+        (float(x), float(y))
+        for x, y in zip(x_values, y_values)
+        if math.isfinite(float(x)) and math.isfinite(float(y))
+    ]
+    if len(pairs) < 2:
+        return math.nan
+    x = np.asarray([p[0] for p in pairs], dtype=np.float64)
+    y = np.asarray([p[1] for p in pairs], dtype=np.float64)
+    if float(np.std(x)) <= 1e-12 or float(np.std(y)) <= 1e-12:
+        return math.nan
+    return float(np.corrcoef(x, y)[0, 1])
+
+
 def summarize_frame_stats(stats_path: Path) -> dict[str, object]:
     """Summarise per-frame SPF diagnostics from a ``stats.csv`` file."""
     rows = _read_csv(stats_path)
@@ -122,6 +138,14 @@ def summarize_frame_stats(stats_path: Path) -> dict[str, object]:
     first_50_ess = ess_values[:50]
     smoother_values = [str(row.get("smoother_status", "")) for row in rows if row.get("smoother_status")]
     backend_values = [str(row.get("pose_backend_used", "")) for row in rows if row.get("pose_backend_used")]
+    row_ids = [str(row.get("row_hypothesis_id", "")) for row in rows if row.get("row_hypothesis_id")]
+    row_counts = Counter(row_ids)
+    dominant_row_id = ""
+    dominant_row_fraction = math.nan
+    if row_counts:
+        dominant_row_id, dominant_count = row_counts.most_common(1)[0]
+        dominant_row_fraction = float(dominant_count / len(row_ids))
+    row_switches = _numeric_column(rows, "row_switch_event")
 
     return {
         "frame_count": len(rows),
@@ -139,6 +163,15 @@ def summarize_frame_stats(stats_path: Path) -> dict[str, object]:
         "semantic_hit_ratio_mean": _mean(semantic_ratios),
         "smoother_status_last": smoother_values[-1] if smoother_values else "",
         "pose_backend_used": backend_values[-1] if backend_values else "",
+        "row_switch_count": int(sum(v for v in row_switches if math.isfinite(v))),
+        "row_hypothesis_entropy_mean": _mean(_numeric_column(rows, "row_hypothesis_entropy")),
+        "row_hypothesis_gap_median": _median(_numeric_column(rows, "row_hypothesis_gap")),
+        "dominant_row_hypothesis_id": dominant_row_id,
+        "dominant_row_hypothesis_fraction": dominant_row_fraction,
+        "gnss_row_switch_corr": _pearson(_numeric_column(rows, "gnss_innovation"), row_switches),
+        "ess_row_switch_corr": _pearson(_numeric_column(rows, "ess"), row_switches),
+        "max_weight_row_switch_corr": _pearson(_numeric_column(rows, "max_weight"), row_switches),
+        "gnss_row_gate_scale_median": _median(_numeric_column(rows, "gnss_row_gate_scale")),
     }
 
 
@@ -149,9 +182,19 @@ def collect_diagnostics(run_specs: list[RunSpec]) -> tuple[list[dict[str, object
 
     for spec in run_specs:
         metrics_path = spec.root / "trajectory_metrics_per_seed.csv"
-        for metric_row in _read_csv(metrics_path):
+        metric_rows = _read_csv(metrics_path)
+        if not metric_rows:
+            followup_path = spec.root / "followup_metrics_per_seed.csv"
+            metric_rows = [
+                row
+                for row in _read_csv(followup_path)
+                if str(row.get("traversal", "")) == spec.traversal
+                and str(row.get("candidate_id", row.get("variant", ""))) == spec.variant
+            ]
+        for metric_row in metric_rows:
             seed = _safe_int(metric_row.get("seed"))
-            stats_path = spec.root / f"seed_{seed}" / "stats.csv"
+            run_dir = str(metric_row.get("run_dir", ""))
+            stats_path = Path(run_dir) / "stats.csv" if run_dir else spec.root / f"seed_{seed}" / "stats.csv"
             stats = summarize_frame_stats(stats_path)
             merged: dict[str, object] = {
                 "traversal": spec.traversal,
@@ -250,9 +293,13 @@ def _plot_timeline(row: dict[str, object], frame_rows: list[dict[str, object]], 
         ("ess", "ESS", _numeric_column(rows, "ess")),
         ("max_weight", "Max weight", _numeric_column(rows, "max_weight")),
         ("semantic_hit_ratio", "Semantic hit ratio", semantic_ratio),
+        ("row_hypothesis_entropy", "Row entropy", _numeric_column(rows, "row_hypothesis_entropy")),
+        ("row_hypothesis_gap", "Row top-2 gap", _numeric_column(rows, "row_hypothesis_gap")),
+        ("row_switch_event", "Row switch", _numeric_column(rows, "row_switch_event")),
+        ("gnss_row_gate_scale", "GNSS row gate scale", _numeric_column(rows, "gnss_row_gate_scale")),
     ]
     out_path = out_dir / f"diagnostics_{row['traversal']}_seed_{row['seed']}.png"
-    fig, axes = plt.subplots(len(series), 1, figsize=(10, 8), sharex=True)
+    fig, axes = plt.subplots(len(series), 1, figsize=(10, 13), sharex=True)
     for ax, (_, ylabel, values) in zip(axes, series):
         ax.plot(x, values, linewidth=1.5)
         ax.set_ylabel(ylabel)

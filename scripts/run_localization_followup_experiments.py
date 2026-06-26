@@ -181,6 +181,61 @@ def candidate_matrix(include_gtsam: bool = False) -> list[dict[str, object]]:
     return candidates
 
 
+def next_step_candidate_matrix() -> list[dict[str, object]]:
+    """Return the controlled row-identity ambiguity ablation matrix."""
+    baseline_args = [
+        "--pose-backend",
+        "alpha",
+        "--gnss-robust-mode",
+        "huber",
+        "--gnss-outlier-threshold",
+        "3.0",
+        "--semantic-penalty-cap",
+        "50",
+    ]
+    row_mixture_args = baseline_args + [
+        "--row-likelihood-mode",
+        "mixture",
+        "--row-mixture-top-k",
+        "3",
+    ]
+    delayed_args = baseline_args + [
+        "--delayed-row-correction",
+    ]
+    row_mixture_delayed_args = row_mixture_args + [
+        "--delayed-row-correction",
+    ]
+    return [
+        {
+            "id": "baseline_alpha_huber3_cap50",
+            "description": "Frozen reference baseline: alpha smoother, Huber GNSS threshold 3.0, semantic cap 50.",
+            "args": baseline_args,
+        },
+        {
+            "id": "row_mixture",
+            "description": "Baseline plus top-k row-mixture corridor likelihood.",
+            "args": row_mixture_args,
+        },
+        {
+            "id": "delayed_correction",
+            "description": "Baseline plus lightweight delayed row-identity correction.",
+            "args": delayed_args,
+        },
+        {
+            "id": "row_mixture_delayed",
+            "description": "Baseline plus row-mixture likelihood and delayed correction.",
+            "args": row_mixture_delayed_args,
+        },
+        {
+            "id": "row_mixture_delayed_gnss_gating",
+            "description": "Baseline plus row mixture, delayed correction, and adaptive GNSS row gating.",
+            "args": row_mixture_delayed_args + [
+                "--gnss-row-gating",
+            ],
+        },
+    ]
+
+
 def parse_csv_list(value: str, cast=str) -> list:
     return [cast(part.strip()) for part in value.split(",") if part.strip()]
 
@@ -519,6 +574,7 @@ def main() -> int:
     parser.add_argument("--traversals", type=str, default="rh_run1")
     parser.add_argument("--seeds", type=str, default="11")
     parser.add_argument("--candidate-ids", type=str, default="")
+    parser.add_argument("--matrix", choices=["followup", "row-identity"], default="followup")
     parser.add_argument("--include-gtsam", action="store_true")
     parser.add_argument("--promote-from", type=Path, default=None)
     parser.add_argument("--top-n", type=int, default=2)
@@ -530,7 +586,11 @@ def main() -> int:
 
     traversals = parse_csv_list(args.traversals, str)
     seeds = parse_csv_list(args.seeds, int)
-    candidates = candidate_matrix(include_gtsam=args.include_gtsam)
+    candidates = (
+        next_step_candidate_matrix()
+        if args.matrix == "row-identity"
+        else candidate_matrix(include_gtsam=args.include_gtsam)
+    )
     lookup = candidate_by_id(candidates)
 
     if args.candidate_ids:

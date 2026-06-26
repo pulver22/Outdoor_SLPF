@@ -15,6 +15,12 @@ DEFAULT_DIAGNOSTICS = DEFAULT_OUTPUT_DIR / "diagnostics/diagnostic_metrics.csv"
 DEFAULT_FOLLOWUP = BASE_DIR / "results/localization_improvement_followup/followup_metrics_per_seed.csv"
 DEFAULT_FOLLOWUP_AGGREGATE = BASE_DIR / "results/localization_improvement_followup/followup_metrics_aggregate.csv"
 DEFAULT_GTSAM = BASE_DIR / "results/localization_improvement_gtsam_smoke/gtsam_seed22_rh2/metric_summary.json"
+ROW_IDENTITY_CANDIDATES = {
+    "row_mixture",
+    "delayed_correction",
+    "row_mixture_delayed",
+    "row_mixture_delayed_gnss_gating",
+}
 
 
 def _read_json(path: Path) -> dict:
@@ -79,7 +85,7 @@ def _markdown_table(rows: list[dict[str, object]], columns: list[str]) -> str:
     return "\n".join([header, sep, *body])
 
 
-def _compact_metric_rows(rows: list[dict[str, object]], limit: int = 24) -> list[dict[str, object]]:
+def _compact_metric_rows(rows: list[dict[str, object]], limit: int = 40) -> list[dict[str, object]]:
     compact = []
     for row in rows[:limit]:
         compact.append(
@@ -110,6 +116,171 @@ def _compact_aggregate_rows(rows: list[dict[str, object]]) -> list[dict[str, obj
                 "cross_track_mean_mean": _format_float(row.get("cross_track_mean_mean")),
                 "row_correct_fraction_mean": _format_float(row.get("row_correct_fraction_mean")),
                 "wrong_row_duration_sec_mean": _format_float(row.get("wrong_row_duration_sec_mean")),
+            }
+        )
+    return compact
+
+
+def _compact_row_identity_rows(rows: list[dict[str, object]], limit: int = 40) -> list[dict[str, object]]:
+    compact = []
+    for row in rows[:limit]:
+        compact.append(
+            {
+                "traversal": row.get("traversal", ""),
+                "variant": row.get("variant", row.get("candidate_id", "")),
+                "seed": row.get("seed", ""),
+                "ape_align_rmse": _format_float(row.get("ape_align_rmse")),
+                "row_switch_count": row.get("row_switch_count", ""),
+                "row_entropy_mean": _format_float(row.get("row_hypothesis_entropy_mean")),
+                "row_gap_median": _format_float(row.get("row_hypothesis_gap_median")),
+                "gnss_row_switch_corr": _format_float(row.get("gnss_row_switch_corr")),
+                "gnss_gate_scale_median": _format_float(row.get("gnss_row_gate_scale_median")),
+            }
+        )
+    return compact
+
+
+def _controlled_ablation_rows(rows: list[dict[str, object]]) -> list[dict[str, object]]:
+    wanted = {
+        "baseline_alpha_huber3_cap50",
+        "row_mixture",
+        "delayed_correction",
+        "row_mixture_delayed",
+        "row_mixture_delayed_gnss_gating",
+    }
+    compact = []
+    for row in rows:
+        candidate_id = str(row.get("candidate_id", ""))
+        if candidate_id not in wanted:
+            continue
+        compact.append(
+            {
+                "stage": row.get("stage", ""),
+                "traversal": row.get("traversal", ""),
+                "candidate_id": candidate_id,
+                "seed_count": row.get("seed_count", ""),
+                "ape_align_rmse_mean": _format_float(row.get("ape_align_rmse_mean")),
+                "cross_track_mean_mean": _format_float(row.get("cross_track_mean_mean")),
+                "wrong_row_duration_sec_mean": _format_float(row.get("wrong_row_duration_sec_mean")),
+            }
+        )
+    return compact
+
+
+def _acceptance_summary(
+    followup_rows: list[dict[str, object]],
+    aggregate_rows: list[dict[str, object]],
+) -> dict[str, object]:
+    aggregate_by_key = {
+        (str(row.get("traversal", "")), str(row.get("candidate_id", ""))): row
+        for row in aggregate_rows
+        if row.get("stage") == "full"
+    }
+    seed_by_key = {
+        (str(row.get("traversal", "")), str(row.get("candidate_id", "")), str(row.get("seed", ""))): row
+        for row in followup_rows
+        if row.get("stage") == "full"
+    }
+    baseline_rh1 = aggregate_by_key.get(("rh_run1", "baseline_alpha_huber3_cap50"), {})
+    baseline_rh2 = aggregate_by_key.get(("rh_run2", "baseline_alpha_huber3_cap50"), {})
+    baseline_rh1_ape = _safe_float(baseline_rh1.get("ape_align_rmse_mean"))
+    baseline_rh2_ape = _safe_float(baseline_rh2.get("ape_align_rmse_mean"))
+    baseline_rh1_wrong = _safe_float(baseline_rh1.get("wrong_row_duration_sec_mean"))
+    baseline_rh2_wrong = _safe_float(baseline_rh2.get("wrong_row_duration_sec_mean"))
+    baseline_rh1_ct = _safe_float(baseline_rh1.get("cross_track_mean_mean"))
+    baseline_rh2_ct = _safe_float(baseline_rh2.get("cross_track_mean_mean"))
+
+    checks: list[dict[str, object]] = []
+    for candidate_id in sorted(ROW_IDENTITY_CANDIDATES):
+        rh1 = aggregate_by_key.get(("rh_run1", candidate_id), {})
+        rh2 = aggregate_by_key.get(("rh_run2", candidate_id), {})
+        seed11 = seed_by_key.get(("rh_run1", candidate_id, "11"), {})
+        rh1_seed11_ape = _safe_float(seed11.get("ape_align_rmse"))
+        rh1_ape = _safe_float(rh1.get("ape_align_rmse_mean"))
+        rh2_ape = _safe_float(rh2.get("ape_align_rmse_mean"))
+        rh1_wrong = _safe_float(rh1.get("wrong_row_duration_sec_mean"))
+        rh2_wrong = _safe_float(rh2.get("wrong_row_duration_sec_mean"))
+        rh1_ct = _safe_float(rh1.get("cross_track_mean_mean"))
+        rh2_ct = _safe_float(rh2.get("cross_track_mean_mean"))
+        check = {
+            "candidate_id": candidate_id,
+            "rh_run1_seed11_lt_1p2": rh1_seed11_ape is not None and rh1_seed11_ape < 1.2,
+            "rh_run1_mean_lt_1p0": rh1_ape is not None and rh1_ape < 1.0,
+            "rh_run2_no_ape_regression": (
+                rh2_ape is not None and baseline_rh2_ape is not None and rh2_ape <= baseline_rh2_ape
+            ),
+            "rh_run1_wrong_row_reduced": (
+                rh1_wrong is not None and baseline_rh1_wrong is not None and rh1_wrong < baseline_rh1_wrong
+            ),
+            "rh_run2_wrong_row_reduced": (
+                rh2_wrong is not None and baseline_rh2_wrong is not None and rh2_wrong < baseline_rh2_wrong
+            ),
+            "rh_run1_cross_track_reduced": (
+                rh1_ct is not None and baseline_rh1_ct is not None and rh1_ct < baseline_rh1_ct
+            ),
+            "rh_run2_cross_track_reduced": (
+                rh2_ct is not None and baseline_rh2_ct is not None and rh2_ct < baseline_rh2_ct
+            ),
+            "rh_run1_seed11_ape": rh1_seed11_ape,
+            "rh_run1_mean_ape": rh1_ape,
+            "rh_run2_mean_ape": rh2_ape,
+            "rh_run1_wrong_row_sec": rh1_wrong,
+            "rh_run2_wrong_row_sec": rh2_wrong,
+            "rh_run1_cross_track_mean": rh1_ct,
+            "rh_run2_cross_track_mean": rh2_ct,
+        }
+        check["accepted"] = all(
+            bool(check[key])
+            for key in [
+                "rh_run1_seed11_lt_1p2",
+                "rh_run1_mean_lt_1p0",
+                "rh_run2_no_ape_regression",
+                "rh_run1_wrong_row_reduced",
+                "rh_run2_wrong_row_reduced",
+                "rh_run1_cross_track_reduced",
+                "rh_run2_cross_track_reduced",
+            ]
+        )
+        checks.append(check)
+
+    accepted = [check["candidate_id"] for check in checks if check["accepted"]]
+    ape_improved = [
+        check["candidate_id"]
+        for check in checks
+        if check["rh_run1_mean_ape"] is not None
+        and baseline_rh1_ape is not None
+        and check["rh_run1_mean_ape"] < baseline_rh1_ape
+    ]
+    outcome = "success" if accepted else ("partial" if ape_improved else "failure")
+    return {
+        "baseline": {
+            "rh_run1_ape": baseline_rh1_ape,
+            "rh_run2_ape": baseline_rh2_ape,
+            "rh_run1_wrong_row_sec": baseline_rh1_wrong,
+            "rh_run2_wrong_row_sec": baseline_rh2_wrong,
+            "rh_run1_cross_track_mean": baseline_rh1_ct,
+            "rh_run2_cross_track_mean": baseline_rh2_ct,
+        },
+        "accepted_candidate": accepted[0] if accepted else "",
+        "outcome": outcome,
+        "checks": checks,
+    }
+
+
+def _compact_acceptance_rows(acceptance: dict[str, object]) -> list[dict[str, object]]:
+    compact = []
+    for row in acceptance.get("checks", []):
+        compact.append(
+            {
+                "candidate_id": row.get("candidate_id", ""),
+                "accepted": row.get("accepted", False),
+                "rh1_seed11": _format_float(row.get("rh_run1_seed11_ape")),
+                "rh1_mean": _format_float(row.get("rh_run1_mean_ape")),
+                "rh2_mean": _format_float(row.get("rh_run2_mean_ape")),
+                "rh1_wrong_s": _format_float(row.get("rh_run1_wrong_row_sec")),
+                "rh2_wrong_s": _format_float(row.get("rh_run2_wrong_row_sec")),
+                "rh1_ct": _format_float(row.get("rh_run1_cross_track_mean")),
+                "rh2_ct": _format_float(row.get("rh_run2_cross_track_mean")),
             }
         )
     return compact
@@ -208,6 +379,9 @@ def _interpretation(
             notes.append(f"Outcome branch: {_outcome_branch(best_full)}.")
     else:
         notes.append("Follow-up runner output was not present when this report was generated.")
+    notes.append(
+        "Scientific hypothesis under test: multi-hypothesis row reasoning should reduce worst-case wrong-row recovery errors beyond scalar robust-loss tuning."
+    )
     return notes
 
 
@@ -243,6 +417,15 @@ def generate_report(
     interpretation = _interpretation(current_rh2, current_rh1, followup_rows, aggregate_rows, gtsam)
     next_experiments = _next_experiments()
     best_full = _best_full_candidate(followup_rows, aggregate_rows)
+    row_identity_rows = _compact_row_identity_rows(diagnostics_rows)
+    controlled_ablation_rows = _controlled_ablation_rows(aggregate_rows)
+    acceptance = _acceptance_summary(followup_rows, aggregate_rows)
+    if acceptance["accepted_candidate"]:
+        interpretation.append(f"Full acceptance passed for {acceptance['accepted_candidate']}.")
+    else:
+        interpretation.append(
+            "No row-identity candidate passed the full acceptance gate; the current result is partial because APE improvements trade off against rh_run2 regression or wrong-row duration."
+        )
 
     data = {
         "git": {"branch": branch, "commit": commit},
@@ -255,6 +438,7 @@ def generate_report(
             "csv": str(diagnostics_csv),
             "row_count": len(diagnostics_rows),
             "rows": diagnostics_rows,
+            "row_identity_rows": row_identity_rows,
         },
         "followup": {
             "csv": str(followup_csv),
@@ -265,9 +449,11 @@ def generate_report(
             "csv": str(aggregate_path),
             "row_count": len(aggregate_rows),
             "rows": aggregate_rows,
+            "controlled_row_identity_ablation": controlled_ablation_rows,
         },
         "best_full_candidate": best_full,
-        "outcome_branch": _outcome_branch(best_full),
+        "acceptance": acceptance,
+        "outcome_branch": acceptance["outcome"],
         "gtsam_smoke": gtsam,
         "commands": commands,
         "artifacts": {
@@ -295,8 +481,11 @@ def generate_report(
         for row in summary_rows
     ]
     diagnostic_table = _compact_metric_rows(diagnostics_rows)
+    row_identity_table = _compact_row_identity_rows(diagnostics_rows)
     followup_table = _compact_metric_rows(followup_rows)
     followup_aggregate_table = _compact_aggregate_rows(aggregate_rows)
+    controlled_ablation_table = _controlled_ablation_rows(aggregate_rows)
+    acceptance_table = _compact_acceptance_rows(acceptance)
     command_text = "\n".join(f"- `{command}`" for command in commands) if commands else "_No commands recorded._"
     interpretation_text = "\n".join(f"- {note}" for note in interpretation)
     next_text = "\n".join(f"- {note}" for note in next_experiments)
@@ -307,8 +496,9 @@ def generate_report(
 Branch `{branch}` at commit `{commit}`. This report captures the current localisation improvement state, the diagnostic artifacts generated for the rh_run1 seed-11 failure, and the follow-up experiment decision tree for external review.
 
 ## Changes Implemented
-- Added diagnostics that compare traversal/seed metrics with frame-level GNSS innovation, ESS, max weight, semantic-hit, and smoother-status signals.
-- Added a fixed candidate matrix runner for the accepted alpha setting, robust-loss/cap variants, no-smoothing, fixed-lag, and optional GTSAM smoke.
+- Added diagnostics that compare traversal/seed metrics with frame-level GNSS innovation, ESS, max weight, semantic-hit, smoother-status, row-hypothesis, row-switch, and GNSS-row-gating signals.
+- Added opt-in SPF switches for top-k row-mixture likelihood, lightweight delayed row correction, and adaptive GNSS row gating while freezing `alpha_huber3_cap50` as the reference baseline.
+- Added a controlled row-identity ablation runner matrix for baseline, row mixture, delayed correction, row mixture plus delayed correction, and row mixture plus delayed correction plus GNSS gating.
 - Added this Markdown plus JSON report for sharing with ChatGPT or parsing programmatically.
 
 ## Current Metric Summary
@@ -317,11 +507,22 @@ Branch `{branch}` at commit `{commit}`. This report captures the current localis
 ## Diagnostics
 {_markdown_table(diagnostic_table, ["traversal", "candidate_id", "seed", "ape_align_rmse", "cross_track_mean", "row_correct_fraction", "wrong_row_duration_sec"])}
 
+## Row-Identity Diagnostics
+{_markdown_table(row_identity_table, ["traversal", "variant", "seed", "ape_align_rmse", "row_switch_count", "row_entropy_mean", "row_gap_median", "gnss_row_switch_corr", "gnss_gate_scale_median"])}
+
 ## Follow-Up Experiments
 {_markdown_table(followup_table, ["stage", "traversal", "candidate_id", "seed", "ape_align_rmse", "cross_track_mean", "row_correct_fraction", "wrong_row_duration_sec"])}
 
 ### Follow-Up Aggregates
 {_markdown_table(followup_aggregate_table, ["stage", "traversal", "candidate_id", "seed_count", "ape_align_rmse_mean", "cross_track_mean_mean", "row_correct_fraction_mean", "wrong_row_duration_sec_mean"])}
+
+## Controlled Row-Identity Ablation
+{_markdown_table(controlled_ablation_table, ["stage", "traversal", "candidate_id", "seed_count", "ape_align_rmse_mean", "cross_track_mean_mean", "wrong_row_duration_sec_mean"])}
+
+## Acceptance Check
+Outcome: `{acceptance["outcome"]}`. Accepted candidate: `{acceptance["accepted_candidate"] or "none"}`.
+
+{_markdown_table(acceptance_table, ["candidate_id", "accepted", "rh1_seed11", "rh1_mean", "rh2_mean", "rh1_wrong_s", "rh2_wrong_s", "rh1_ct", "rh2_ct"])}
 
 ## Commands
 {command_text}
