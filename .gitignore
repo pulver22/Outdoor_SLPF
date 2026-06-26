@@ -252,4 +252,3 @@ results/plots/fig4_zoom_headland_transition_experiment2_candidate.pdf
 
 # Out-of-scope local scripts
 scripts/run_jojo_multiseed.py
-scripts/tune_spfpp_optuna.py

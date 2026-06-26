@@ -22,46 +22,117 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from run_ab_validation import (
-    BASE_DIR,
-    KEY_METRICS,
-    aligned_estimate,
-    check_cuda_available,
-    evaluate_run,
-    load_rows_from_geojson,
-    run_cmd,
-)
+try:
+    from run_ab_validation import (
+        BASE_DIR,
+        KEY_METRICS,
+        aligned_estimate,
+        check_cuda_available,
+        evaluate_run,
+        load_rows_from_geojson,
+        run_cmd,
+    )
+except ModuleNotFoundError:
+    from scripts.run_ab_validation import (
+        BASE_DIR,
+        KEY_METRICS,
+        aligned_estimate,
+        check_cuda_available,
+        evaluate_run,
+        load_rows_from_geojson,
+        run_cmd,
+    )
 
 
 DEFAULT_OUTPUT_ROOT = BASE_DIR / "results" / "iros_ablation"
 DEFAULT_GEOJSON = BASE_DIR / "data" / "riseholme_poles_trunk.geojson"
+DEFAULT_DATA_PATH = BASE_DIR / "data" / "2025" / "rh_run2"
 DEFAULT_SEEDS = "11,22,33"
+REQUIRED_DATA_ENTRIES = ("data.csv", "rgb", "depth", "lidar")
 
 VARIANT_ORDER = [
     "full",
-    "poles_only",
+    "no_semantic_walls",
+    "point_only_semantics",
     "trunks_only",
-    "no_gps",
-    "no_semantic",
-    "no_corridor",
-    "non_wall_points",
+    "poles_only",
     "no_background",
-    "static_gps_weight",
+    "no_corridor",
+    "no_gnss",
+    "static_gnss_weight",
     "no_pose_smoothing",
+    "pf_only",
+    "pf_fixed_lag_smoother",
 ]
 
 VARIANT_ARGS = {
     "full": [],
-    "poles_only": ["--semantic-classes", "poles"],
+    "no_semantic_walls": ["--semantic-model", "point"],
+    "point_only_semantics": ["--semantic-model", "point", "--disable-corridor", "--disable-background"],
     "trunks_only": ["--semantic-classes", "trunks"],
-    "no_gps": ["--disable-gps"],
-    "no_semantic": ["--disable-semantic"],
-    "no_corridor": ["--disable-corridor"],
-    "non_wall_points": ["--semantic-model", "point"],
+    "poles_only": ["--semantic-classes", "poles"],
     "no_background": ["--disable-background"],
-    "static_gps_weight": ["--disable-dynamic-gps-weight"],
+    "no_corridor": ["--disable-corridor"],
+    "no_gnss": ["--disable-gps"],
+    "static_gnss_weight": ["--disable-dynamic-gps-weight"],
     "no_pose_smoothing": ["--disable-pose-smoothing"],
+    "pf_only": ["--disable-gps", "--disable-semantic", "--disable-corridor", "--disable-background", "--disable-pose-smoothing"],
+    "pf_fixed_lag_smoother": ["--pose-backend", "fixed-lag"],
 }
+
+
+def validate_data_path(data_path: Path) -> None:
+    missing = [entry for entry in REQUIRED_DATA_ENTRIES if not (data_path / entry).exists()]
+    if missing:
+        raise FileNotFoundError(
+            f"Dataset root {data_path} is missing required entries: {', '.join(missing)}"
+        )
+
+
+def build_spf_command(args, python_exec: Path, spf_script: Path, seed_dir: Path, seed: int, variant: str) -> List[str]:
+    cmd = [
+        str(python_exec),
+        str(spf_script),
+        "--miss-penalty", str(args.miss_penalty),
+        "--wrong-hit-penalty", str(args.wrong_hit_penalty),
+        "--gps-weight", str(args.gps_weight),
+        "--seed", str(seed),
+        "--output-folder", str(seed_dir),
+        "--data-path", str(args.data_path),
+        "--geojson-path", str(args.geojson),
+        "--frame-stride", str(args.frame_stride),
+        "--semantic-sigma", str(args.semantic_sigma),
+        "--gps-sigma", str(args.gps_sigma),
+        "--corridor-weight", str(args.corridor_weight),
+        "--corridor-dist-sigma", str(args.corridor_dist_sigma),
+        "--corridor-heading-sigma", str(args.corridor_heading_sigma),
+        "--background-class-weight", str(args.background_class_weight),
+        "--max-background-obs", str(args.max_background_obs),
+        "--expected-obs-count", str(args.expected_obs_count),
+        "--pose-smooth-alpha-pos", str(args.pose_smooth_alpha_pos),
+        "--pose-smooth-alpha-theta", str(args.pose_smooth_alpha_theta),
+        "--odom-yaw-filter-alpha", str(args.odom_yaw_filter_alpha),
+        "--particle-count", str(args.particle_count),
+        "--point-ang-sigma", str(args.point_ang_sigma),
+        "--point-range-sigma", str(args.point_range_sigma),
+        "--point-ang-gate", str(args.point_ang_gate),
+        "--point-max-range-diff", str(args.point_max_range_diff),
+        "--pose-backend", str(args.pose_backend),
+        "--fixed-lag-window", str(args.fixed_lag_window),
+        "--gnss-robust-mode", str(args.gnss_robust_mode),
+        "--gnss-outlier-threshold", str(args.gnss_outlier_threshold),
+        "--log-particle-cloud-every", str(args.log_particle_cloud_every),
+        "--diagnostics-level", str(args.diagnostics_level),
+        "--no-visualization",
+    ]
+    if args.semantic_penalty_cap is not None:
+        cmd.extend(["--semantic-penalty-cap", str(args.semantic_penalty_cap)])
+    if args.max_frames is not None:
+        cmd.extend(["--max-frames", str(args.max_frames)])
+    if args.require_cuda:
+        cmd.append("--require-cuda")
+    cmd.extend(VARIANT_ARGS[variant])
+    return cmd
 
 CORE_METRICS = [
     "ape_align_rmse",
@@ -357,6 +428,7 @@ The per-particle semantic score is averaged across rays and fused with GPS and c
 def main():
     parser = argparse.ArgumentParser(description="Run SPF++ ablation study (IROS protocol).")
     parser.add_argument("--python-exec", type=Path, default=BASE_DIR / ".venv" / "bin" / "python")
+    parser.add_argument("--data-path", type=Path, default=DEFAULT_DATA_PATH)
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     parser.add_argument("--geojson", type=Path, default=DEFAULT_GEOJSON)
     parser.add_argument("--seeds", type=str, default=DEFAULT_SEEDS)
@@ -383,6 +455,13 @@ def main():
     parser.add_argument("--odom-yaw-filter-alpha", type=float, default=0.90)
     parser.add_argument("--particle-count", type=int, default=100)
     parser.add_argument("--frame-stride", type=int, default=4)
+    parser.add_argument("--pose-backend", choices=["alpha", "fixed-lag", "gtsam"], default="alpha")
+    parser.add_argument("--fixed-lag-window", type=int, default=8)
+    parser.add_argument("--gnss-robust-mode", choices=["off", "huber", "cauchy", "gate"], default="huber")
+    parser.add_argument("--gnss-outlier-threshold", type=float, default=3.0)
+    parser.add_argument("--semantic-penalty-cap", type=float, default=20.0)
+    parser.add_argument("--log-particle-cloud-every", type=int, default=0)
+    parser.add_argument("--diagnostics-level", choices=["minimal", "standard", "full"], default="standard")
 
     # Point model defaults.
     parser.add_argument("--point-ang-sigma", type=float, default=0.08)
@@ -398,6 +477,11 @@ def main():
 
     output_root = args.output_root.resolve()
     geojson = args.geojson.resolve()
+    data_path = args.data_path.expanduser()
+    if not data_path.is_absolute():
+        data_path = (BASE_DIR / data_path).resolve()
+    args.data_path = data_path
+    args.geojson = geojson
     seeds = parse_int_list(args.seeds)
     if not seeds:
         raise ValueError("At least one seed is required.")
@@ -411,6 +495,7 @@ def main():
 
     if args.require_cuda and not check_cuda_available(python_exec):
         raise RuntimeError("CUDA is required but not visible in the selected Python runtime.")
+    validate_data_path(data_path)
 
     evo_ape_bin = python_exec.parent / "evo_ape"
     evo_rpe_bin = python_exec.parent / "evo_rpe"
@@ -456,6 +541,15 @@ def main():
             "odom_yaw_filter_alpha": args.odom_yaw_filter_alpha,
             "particle_count": args.particle_count,
             "frame_stride": args.frame_stride,
+            "data_path": str(data_path),
+            "geojson": str(geojson),
+            "pose_backend": args.pose_backend,
+            "fixed_lag_window": args.fixed_lag_window,
+            "gnss_robust_mode": args.gnss_robust_mode,
+            "gnss_outlier_threshold": args.gnss_outlier_threshold,
+            "semantic_penalty_cap": args.semantic_penalty_cap,
+            "log_particle_cloud_every": args.log_particle_cloud_every,
+            "diagnostics_level": args.diagnostics_level,
             "point_ang_sigma": args.point_ang_sigma,
             "point_range_sigma": args.point_range_sigma,
             "point_ang_gate": args.point_ang_gate,
@@ -474,38 +568,7 @@ def main():
             seed_dir = run_dir / variant / f"seed_{seed}"
             seed_dir.mkdir(parents=True, exist_ok=True)
 
-            cmd = [
-                str(python_exec),
-                str(spf_script),
-                "--miss-penalty", str(args.miss_penalty),
-                "--wrong-hit-penalty", str(args.wrong_hit_penalty),
-                "--gps-weight", str(args.gps_weight),
-                "--seed", str(seed),
-                "--output-folder", str(seed_dir),
-                "--frame-stride", str(args.frame_stride),
-                "--semantic-sigma", str(args.semantic_sigma),
-                "--gps-sigma", str(args.gps_sigma),
-                "--corridor-weight", str(args.corridor_weight),
-                "--corridor-dist-sigma", str(args.corridor_dist_sigma),
-                "--corridor-heading-sigma", str(args.corridor_heading_sigma),
-                "--background-class-weight", str(args.background_class_weight),
-                "--max-background-obs", str(args.max_background_obs),
-                "--expected-obs-count", str(args.expected_obs_count),
-                "--pose-smooth-alpha-pos", str(args.pose_smooth_alpha_pos),
-                "--pose-smooth-alpha-theta", str(args.pose_smooth_alpha_theta),
-                "--odom-yaw-filter-alpha", str(args.odom_yaw_filter_alpha),
-                "--particle-count", str(args.particle_count),
-                "--point-ang-sigma", str(args.point_ang_sigma),
-                "--point-range-sigma", str(args.point_range_sigma),
-                "--point-ang-gate", str(args.point_ang_gate),
-                "--point-max-range-diff", str(args.point_max_range_diff),
-                "--no-visualization",
-            ]
-            if args.max_frames is not None:
-                cmd.extend(["--max-frames", str(args.max_frames)])
-            if args.require_cuda:
-                cmd.append("--require-cuda")
-            cmd.extend(VARIANT_ARGS[variant])
+            cmd = build_spf_command(args, python_exec, spf_script, seed_dir, seed, variant)
 
             run_log = seed_dir / "run_spf_lidar.log"
             runtime = run_cmd(cmd, run_log, cwd=BASE_DIR, env=env)

@@ -7,6 +7,7 @@ import math
 import random
 import time
 import json
+import sys
 from pathlib import Path
 from ultralytics import YOLO
 from tqdm import tqdm
@@ -19,10 +20,21 @@ import pandas as pd
 from datetime import datetime, timezone, timedelta
 from pyproj import Transformer
 
+base_dir = Path(__file__).parent.parent
+if str(base_dir) not in sys.path:
+    sys.path.insert(0, str(base_dir))
+
 from geojson_rows import extract_row_id as extract_geojson_row_id
+from outdoor_slpf.config import apply_config_defaults
+from outdoor_slpf.measurement import resolve_robust_gnss_weight
+from outdoor_slpf.pipeline import (
+    build_stats_fieldnames,
+    effective_sample_size,
+    maybe_log_particle_cloud,
+)
+from outdoor_slpf.smoothing import create_pose_backend
 
 # ---------- CONFIG ----------
-base_dir = Path(__file__).parent.parent
 FRAME_STRIDE = 4
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f"Using device: {device}")
@@ -1070,7 +1082,10 @@ def measurement_likelihood_gpu(grouped_map_points_unused,
                                point_ang_sigma=POINT_ANG_SIGMA,
                                point_range_sigma=POINT_RANGE_SIGMA,
                                point_ang_gate=POINT_ANG_GATE,
-                               point_max_range_diff=POINT_MAX_RANGE_DIFF):
+                               point_max_range_diff=POINT_MAX_RANGE_DIFF,
+                               gnss_robust_mode="off",
+                               gnss_outlier_threshold=5.0,
+                               semantic_penalty_cap=None):
     """
     GPU vectorized measurement likelihood with per-frame log-term normalization.
 
@@ -1125,6 +1140,30 @@ def measurement_likelihood_gpu(grouped_map_points_unused,
 
     def wrap_angle(x: torch.Tensor) -> torch.Tensor:
         return torch.atan2(torch.sin(x), torch.cos(x))
+
+    def gnss_loss_tensor(distances: torch.Tensor) -> torch.Tensor:
+        mode = str(gnss_robust_mode)
+        threshold = max(float(gnss_outlier_threshold), 1e-9)
+        if mode in ("off", "gate"):
+            return distances ** 2
+        if mode == "huber":
+            abs_d = distances.abs()
+            return torch.where(abs_d <= threshold, distances ** 2, 2.0 * threshold * abs_d - threshold ** 2)
+        if mode == "cauchy":
+            return threshold ** 2 * torch.log1p((distances / threshold) ** 2)
+        raise ValueError(f"Unsupported GNSS robust mode: {mode}")
+
+    def robust_weight_result(base_weight: float, distances: torch.Tensor):
+        return resolve_robust_gnss_weight(
+            base_weight=float(base_weight),
+            distances=distances.detach().cpu().numpy(),
+            mode=str(gnss_robust_mode),
+            threshold=float(gnss_outlier_threshold),
+        )
+
+    semantic_cap = None
+    if semantic_penalty_cap is not None and np.isfinite(float(semantic_penalty_cap)) and float(semantic_penalty_cap) > 0.0:
+        semantic_cap = float(semantic_penalty_cap)
 
     # ---- Particles on GPU ----
     parts_xy = torch.as_tensor(particles[:, :2], dtype=torch.float32, device=torch_device)  # (N,2)
@@ -1194,12 +1233,19 @@ def measurement_likelihood_gpu(grouped_map_points_unused,
         if (not disable_gps) and gps_xy is not None:
             gps_t = torch.as_tensor(gps_xy, dtype=torch.float32, device=torch_device)
             d_gps = torch.linalg.norm(parts_xy - gps_t, dim=1)
-            log_gps = -(d_gps ** 2) / (2.0 * (gps_sigma ** 2))
             gps_weight_t = float(max(0.05, min(0.95, gps_weight)))
-            gps_weight_tensor = torch.tensor(gps_weight_t, dtype=torch.float32, device=torch_device)
+            gnss_robust = robust_weight_result(gps_weight_t, d_gps)
+            gps_weight_t = float(gnss_robust.weight)
+            log_gps = -gnss_loss_tensor(d_gps) / (2.0 * (gps_sigma ** 2))
         else:
             gps_weight_t = 0.0
-            gps_weight_tensor = torch.tensor(0.0, dtype=torch.float32, device=torch_device)
+            gnss_robust = resolve_robust_gnss_weight(
+                base_weight=0.0,
+                distances=np.asarray([], dtype=np.float64),
+                mode=str(gnss_robust_mode),
+                threshold=float(gnss_outlier_threshold),
+            )
+        gps_weight_tensor = torch.tensor(gps_weight_t, dtype=torch.float32, device=torch_device)
 
         log_semantic = torch.zeros(N, dtype=torch.float32, device=torch_device)
         corridor_weight_used = 0.0 if disable_corridor else float(max(0.0, min(1.0, corridor_weight)))
@@ -1225,6 +1271,9 @@ def measurement_likelihood_gpu(grouped_map_points_unused,
             'no_hits': 0,
             'weight': float(weights[best_idx].item()),
             'gps_weight_used': float(gps_weight_t),
+            'gnss_innovation': float(gnss_robust.innovation),
+            'gnss_robust_scale': float(gnss_robust.scale),
+            'gnss_robust_mode': str(gnss_robust.mode),
             'corridor_weight_used': float(corridor_weight_used),
             'num_background_used': 0,
             'num_observations': 0,
@@ -1248,7 +1297,6 @@ def measurement_likelihood_gpu(grouped_map_points_unused,
     else:
         gps_weight_t = 1.0 / (1.0 + (J / EXPECTED_OBS_COUNT))
         gps_weight_t = float(max(0.05, min(0.95, gps_weight_t)))
-    gps_weight_tensor = torch.tensor(gps_weight_t, dtype=torch.float32, device=torch_device)
 
     # ---- Precompute per-observation constants on GPU ----
     obs_range = torch.linalg.norm(obs_all, dim=1)                  # (J,)
@@ -1338,6 +1386,8 @@ def measurement_likelihood_gpu(grouped_map_points_unused,
 
             contrib = torch.where(is_sem, contrib_sem, contrib_bg)
             contrib = contrib * cw
+            if semantic_cap is not None:
+                contrib = torch.clamp(contrib, min=-semantic_cap)
             log_semantic = contrib.mean(dim=1)
         else:
             # Point-based semantic model: poles/trunks are matched as individual objects.
@@ -1436,6 +1486,8 @@ def measurement_likelihood_gpu(grouped_map_points_unused,
 
             contrib = torch.where(bg_obs_mask_b, bg_contrib, sem_contrib)
             contrib = contrib * cw
+            if semantic_cap is not None:
+                contrib = torch.clamp(contrib, min=-semantic_cap)
             log_semantic = contrib.mean(dim=1)
 
             hit_and_match = has_same & sem_obs_mask_b
@@ -1448,10 +1500,19 @@ def measurement_likelihood_gpu(grouped_map_points_unused,
     if (not disable_gps) and gps_xy is not None:
         gps_t = torch.as_tensor(gps_xy, dtype=torch.float32, device=torch_device)
         d_gps = torch.linalg.norm(parts_xy - gps_t, dim=1)  # (N,)
-        log_gps = -(d_gps**2) / (2.0 * (gps_sigma**2))      # (N,)
+        gnss_robust = robust_weight_result(gps_weight_t, d_gps)
+        gps_weight_t = float(gnss_robust.weight)
+        log_gps = -gnss_loss_tensor(d_gps) / (2.0 * (gps_sigma**2))      # (N,)
     else:
         d_gps = torch.zeros(N, dtype=torch.float32, device=torch_device)
         log_gps = torch.zeros(N, dtype=torch.float32, device=torch_device)
+        gnss_robust = resolve_robust_gnss_weight(
+            base_weight=0.0,
+            distances=np.asarray([], dtype=np.float64),
+            mode=str(gnss_robust_mode),
+            threshold=float(gnss_outlier_threshold),
+        )
+    gps_weight_tensor = torch.tensor(gps_weight_t, dtype=torch.float32, device=torch_device)
 
     # ---- Per-frame normalization ----
     log_sem_n = normalize_term(log_semantic)
@@ -1484,6 +1545,9 @@ def measurement_likelihood_gpu(grouped_map_points_unused,
         'incorrect_hits': int(incorrect_hits),
         'no_hits': int(no_hits),
         'gps_weight_used': float(gps_weight_t),           # dynamic GPS weight
+        'gnss_innovation': float(gnss_robust.innovation),
+        'gnss_robust_scale': float(gnss_robust.scale),
+        'gnss_robust_mode': str(gnss_robust.mode),
         'corridor_weight_used': float(corridor_weight_used),
         'num_background_used': int(num_background_used),
         'num_observations': int(J),
@@ -1718,7 +1782,16 @@ def process_data_with_localization(csv_data_path, rgb_dir, depth_dir, lidar_dir,
                                      segment_chunk=4096,
                                      profile_runtime=False,
                                      profile_warmup_frames=0,
-                                     external_noisy_gnss_tum=None):
+                                     external_noisy_gnss_tum=None,
+                                     pose_backend="alpha",
+                                     fixed_lag_window=8,
+                                     gnss_robust_mode="off",
+                                     gnss_outlier_threshold=5.0,
+                                     semantic_penalty_cap=None,
+                                     log_particle_cloud_every=0,
+                                     diagnostics_level="standard",
+                                     pole_class_weight=1.0,
+                                     trunk_class_weight=1.0):
     os.makedirs(os.path.join(output_folder, "particles"), exist_ok=True)
     if semantic_classes not in ("both", "poles", "trunks"):
         raise ValueError(f"Unsupported semantic class mode: {semantic_classes}")
@@ -1765,7 +1838,22 @@ def process_data_with_localization(csv_data_path, rgb_dir, depth_dir, lidar_dir,
     noisy_gps_trajectory = []
     # Initialize odometry state variables
     prev_odom_pos_x, prev_odom_pos_y, prev_odom_yaw = None, None, None
-    pose_smoothed = None
+    pose_smoother = None
+    if not disable_pose_smoothing:
+        if pose_backend == "alpha":
+            pose_smoother = create_pose_backend(
+                "alpha",
+                alpha_pos=POSE_SMOOTH_ALPHA_POS,
+                alpha_theta=POSE_SMOOTH_ALPHA_THETA,
+            )
+        else:
+            pose_smoother = create_pose_backend(
+                pose_backend,
+                window=max(2, int(fixed_lag_window)),
+                pf_std=max(float(PARTICLE_STD), 1e-6),
+                odom_std=0.25,
+                gnss_std=max(float(GPS_SIGMA), 1e-6),
+            )
 
     stats_fieldnames = [
         'frame_idx',
@@ -1795,7 +1883,11 @@ def process_data_with_localization(csv_data_path, rgb_dir, depth_dir, lidar_dir,
         'detections_raw',
         'detections_kept',
         'detections_dropped',
+        'pose_backend_used',
+        'diagnostics_level',
+        'gnss_robust_mode',
     ]
+    stats_fieldnames = build_stats_fieldnames(stats_fieldnames, diagnostics_level=diagnostics_level)
     CSV_OUTPUT_PATH = os.path.join(output_folder, "stats.csv")
     if semantic_classes == "poles":
         semantic_enabled_classes = {2}
@@ -1816,6 +1908,8 @@ def process_data_with_localization(csv_data_path, rgb_dir, depth_dir, lidar_dir,
     point_poles, point_trunks = build_point_tensors(grouped_semantic_points, device=device)
 
     class_weights = dict(CLASS_WEIGHTS)
+    class_weights[2] = float(pole_class_weight)
+    class_weights[4] = float(trunk_class_weight)
     if semantic_classes == "poles":
         class_weights[4] = 0.0
     elif semantic_classes == "trunks":
@@ -2118,6 +2212,9 @@ def process_data_with_localization(csv_data_path, rgb_dir, depth_dir, lidar_dir,
             point_range_sigma=point_range_sigma,
             point_ang_gate=point_ang_gate,
             point_max_range_diff=point_max_range_diff,
+            gnss_robust_mode=gnss_robust_mode,
+            gnss_outlier_threshold=gnss_outlier_threshold,
+            semantic_penalty_cap=semantic_penalty_cap,
         )
         if profile_runtime:
             _sync_cuda_for_timing(True)
@@ -2129,12 +2226,9 @@ def process_data_with_localization(csv_data_path, rgb_dir, depth_dir, lidar_dir,
         frame_stats['detections_raw'] = int(detections_raw)
         frame_stats['detections_kept'] = int(detections_kept)
         frame_stats['detections_dropped'] = int(detections_dropped)
-        stats_write_t0 = time.perf_counter() if profile_runtime else None
-        with open(CSV_OUTPUT_PATH, 'a', newline='') as f:
-            writer = csv.DictWriter(f, fieldnames=stats_fieldnames)
-            writer.writerow(frame_stats)
-        if profile_runtime and stats_write_t0 is not None:
-            frame_timing["stats_write_sec"] += (time.perf_counter() - stats_write_t0)
+        frame_stats['pose_backend_used'] = "raw" if disable_pose_smoothing else str(pose_backend)
+        frame_stats['diagnostics_level'] = str(diagnostics_level)
+        frame_stats['gnss_robust_mode'] = str(gnss_robust_mode)
 
         pose_post_t0 = time.perf_counter() if profile_runtime else None
         if np.sum(weights) > 0:
@@ -2143,40 +2237,58 @@ def process_data_with_localization(csv_data_path, rgb_dir, depth_dir, lidar_dir,
             # Handle case of zero weights, e.g., re-initialize or assign uniform weights
             weights = np.ones(len(particles), dtype=np.float64) / len(particles)
 
+        raw_best_pose = particles[int(np.argmax(weights))].copy()
         est_pose_raw = estimate_pose_from_particles(particles, weights)
         if disable_pose_smoothing:
             pose_out = est_pose_raw.copy()
         else:
-            if pose_smoothed is None:
-                pose_smoothed = est_pose_raw.copy()
-            else:
-                predicted_pose = pose_smoothed.copy()
-                if had_prev_odom:
-                    predicted_pose[0] += delta_distance * np.cos(pose_smoothed[2])
-                    predicted_pose[1] += delta_distance * np.sin(pose_smoothed[2])
-                    predicted_pose[2] = wrap_to_pi(pose_smoothed[2] + delta_theta)
-
-                pose_smoothed[0] = (
-                    (1.0 - POSE_SMOOTH_ALPHA_POS) * predicted_pose[0]
-                    + POSE_SMOOTH_ALPHA_POS * est_pose_raw[0]
-                )
-                pose_smoothed[1] = (
-                    (1.0 - POSE_SMOOTH_ALPHA_POS) * predicted_pose[1]
-                    + POSE_SMOOTH_ALPHA_POS * est_pose_raw[1]
-                )
-                pose_smoothed[2] = circular_lerp(
-                    predicted_pose[2],
-                    est_pose_raw[2],
-                    POSE_SMOOTH_ALPHA_THETA
-                )
-            pose_out = pose_smoothed.copy()
+            pose_out = pose_smoother.update(
+                timestamp=frame_ts,
+                raw_pose=est_pose_raw,
+                delta_distance=delta_distance,
+                delta_theta=delta_theta,
+                had_prev_odom=had_prev_odom,
+                gnss_xy=gps_xy_noisy,
+            )
 
         full_trajectory_data.append((frame_ts, pose_out[0], pose_out[1], pose_out[2]))
         gps_trajectory.append((gps_x, gps_y))
         gps_gt_trajectory.append((frame_ts, gps_x, gps_y, 0.0))
         noisy_gps_trajectory.append((frame_ts, gps_x_noisy, gps_y_noisy, 0))
+        frame_stats.update({
+            'raw_best_x': float(raw_best_pose[0]),
+            'raw_best_y': float(raw_best_pose[1]),
+            'raw_best_theta': float(raw_best_pose[2]),
+            'raw_weighted_x': float(est_pose_raw[0]),
+            'raw_weighted_y': float(est_pose_raw[1]),
+            'raw_weighted_theta': float(est_pose_raw[2]),
+            'smoothed_x': float(pose_out[0]),
+            'smoothed_y': float(pose_out[1]),
+            'smoothed_theta': float(pose_out[2]),
+            'ess': float(effective_sample_size(weights)),
+            'max_weight': float(np.max(weights)) if len(weights) else 0.0,
+            'particle_count': int(len(particles)),
+            'semantic_penalty_cap': "" if semantic_penalty_cap is None else float(semantic_penalty_cap),
+            'smoother_status': "raw" if disable_pose_smoothing else getattr(pose_smoother, "status", getattr(pose_smoother, "name", str(pose_backend))),
+        })
+        maybe_log_particle_cloud(
+            output_folder=output_folder,
+            processed_idx=processed_frames,
+            frame_idx=frame_idx,
+            timestamp=frame_ts,
+            particles=particles,
+            weights=weights,
+            interval=log_particle_cloud_every,
+        )
         if profile_runtime and pose_post_t0 is not None:
             frame_timing["pose_post_sec"] += (time.perf_counter() - pose_post_t0)
+
+        stats_write_t0 = time.perf_counter() if profile_runtime else None
+        with open(CSV_OUTPUT_PATH, 'a', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=stats_fieldnames)
+            writer.writerow(frame_stats)
+        if profile_runtime and stats_write_t0 is not None:
+            frame_timing["stats_write_sec"] += (time.perf_counter() - stats_write_t0)
 
         #""" Visualize overlap for best particle
         if visualize:
@@ -2255,6 +2367,8 @@ def process_data_with_localization(csv_data_path, rgb_dir, depth_dir, lidar_dir,
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run AMCL with configurable penalties and weights.")
+    parser.add_argument('--config-yaml', type=str, default=None,
+                        help='Optional YAML file whose keys set CLI defaults; explicit CLI args still override parser defaults.')
     parser.add_argument('--miss-penalty', type=float, default=4.0,
                         help='Penalty value for a ray not hitting any map feature.')
     parser.add_argument('--wrong-hit-penalty', type=float, default=4.0,
@@ -2313,6 +2427,24 @@ if __name__ == "__main__":
                         help='Use fixed --gps-weight instead of dynamic weighting from observation count.')
     parser.add_argument('--disable-pose-smoothing', action='store_true',
                         help='Disable final pose smoothing and export raw particle estimates.')
+    parser.add_argument('--pose-backend', choices=['alpha', 'fixed-lag', 'gtsam'], default='alpha',
+                        help='Final pose backend: current alpha smoother, pure-Python fixed-lag smoother, or optional GTSAM.')
+    parser.add_argument('--fixed-lag-window', type=int, default=8,
+                        help='Number of recent poses optimized by fixed-lag/gtsam backends.')
+    parser.add_argument('--gnss-robust-mode', choices=['off', 'huber', 'cauchy', 'gate'], default='off',
+                        help='Robust loss or gating applied to the GNSS measurement term.')
+    parser.add_argument('--gnss-outlier-threshold', type=float, default=5.0,
+                        help='GNSS innovation threshold in metres for robust losses/gating.')
+    parser.add_argument('--semantic-penalty-cap', type=float, default=None,
+                        help='Optional positive cap on negative semantic log contributions; disabled by default.')
+    parser.add_argument('--pole-class-weight', type=float, default=1.0,
+                        help='Reliability weight for pole observations.')
+    parser.add_argument('--trunk-class-weight', type=float, default=1.0,
+                        help='Reliability weight for trunk observations.')
+    parser.add_argument('--log-particle-cloud-every', type=int, default=0,
+                        help='Write diagnostics/particle_cloud.csv.gz every N processed frames; 0 disables.')
+    parser.add_argument('--diagnostics-level', choices=['minimal', 'standard', 'full'], default='standard',
+                        help='Controls optional diagnostics detail; stats.csv keeps a superset schema.')
     parser.add_argument('--semantic-model', choices=['wall', 'point'], default=SEMANTIC_MODEL,
                         help='Semantic matching model: wall segments or individual points.')
     parser.add_argument('--semantic-classes', choices=['both', 'poles', 'trunks'], default=SEMANTIC_CLASSES_MODE,
@@ -2337,6 +2469,8 @@ if __name__ == "__main__":
                         help='Optional degraded/noisy GNSS TUM in the local map frame; interpolated by frame timestamp.')
     parser.add_argument('--geojson-path', type=str, default=str(geojson_path),
                         help='GeoJSON map file used to build vineyard rows.')
+    pre_args, _ = parser.parse_known_args()
+    apply_config_defaults(parser, pre_args.config_yaml)
     args = parser.parse_args()
 
     if args.require_cuda and not torch.cuda.is_available():
@@ -2365,6 +2499,14 @@ if __name__ == "__main__":
     POINT_MAX_RANGE_DIFF = max(0.0, float(args.point_max_range_diff))
     SEGMENT_CHUNK = max(32, int(args.segment_chunk))
     DETECTION_DROP_RATE = float(args.detection_drop_rate)
+    FIXED_LAG_WINDOW = max(2, int(args.fixed_lag_window))
+    GNSS_OUTLIER_THRESHOLD = max(1e-6, float(args.gnss_outlier_threshold))
+    LOG_PARTICLE_CLOUD_EVERY = max(0, int(args.log_particle_cloud_every))
+    SEMANTIC_PENALTY_CAP = args.semantic_penalty_cap
+    if SEMANTIC_PENALTY_CAP is not None:
+        SEMANTIC_PENALTY_CAP = float(SEMANTIC_PENALTY_CAP)
+        if SEMANTIC_PENALTY_CAP <= 0.0:
+            SEMANTIC_PENALTY_CAP = None
     if DETECTION_DROP_RATE < 0.0 or DETECTION_DROP_RATE > 1.0:
         raise ValueError(f"--detection-drop-rate must be within [0,1], got {DETECTION_DROP_RATE}")
 
@@ -2413,6 +2555,10 @@ if __name__ == "__main__":
         f"Model: {SEMANTIC_MODEL}, DisableGPS: {args.disable_gps}, DisableSemantic: {args.disable_semantic}, "
         f"DisableCorridor: {args.disable_corridor}, DisableBackground: {args.disable_background}, "
         f"StaticGPSWeight: {args.disable_dynamic_gps_weight}, DisablePoseSmooth: {args.disable_pose_smoothing}, "
+        f"PoseBackend: {args.pose_backend}, FixedLagWindow: {FIXED_LAG_WINDOW}, "
+        f"GNSSRobust: {args.gnss_robust_mode}/{GNSS_OUTLIER_THRESHOLD}, SemanticPenaltyCap: {SEMANTIC_PENALTY_CAP}, "
+        f"ClassWeights: pole={args.pole_class_weight}, trunk={args.trunk_class_weight}, "
+        f"Diagnostics: {args.diagnostics_level}, ParticleCloudEvery: {LOG_PARTICLE_CLOUD_EVERY}, "
         f"SemanticClasses: {SEMANTIC_CLASSES_MODE}, DetectionDropRate: {DETECTION_DROP_RATE}, "
         f"SegmentChunk: {SEGMENT_CHUNK}, "
         f"ExternalNoisyGNSS: {external_noisy_gnss_tum}, "
@@ -2447,5 +2593,14 @@ if __name__ == "__main__":
         profile_runtime=bool(args.profile_runtime),
         profile_warmup_frames=max(0, int(args.profile_warmup_frames)),
         external_noisy_gnss_tum=str(external_noisy_gnss_tum) if external_noisy_gnss_tum is not None else None,
+        pose_backend=str(args.pose_backend),
+        fixed_lag_window=FIXED_LAG_WINDOW,
+        gnss_robust_mode=str(args.gnss_robust_mode),
+        gnss_outlier_threshold=GNSS_OUTLIER_THRESHOLD,
+        semantic_penalty_cap=SEMANTIC_PENALTY_CAP,
+        log_particle_cloud_every=LOG_PARTICLE_CLOUD_EVERY,
+        diagnostics_level=str(args.diagnostics_level),
+        pole_class_weight=float(args.pole_class_weight),
+        trunk_class_weight=float(args.trunk_class_weight),
     )
     print("[INFO] Finished processing all frames from the CSV file.")

@@ -215,6 +215,12 @@ def _build_trial_command(
     miss_penalty: float,
     wrong_hit_penalty: float,
     gps_weight: float,
+    pose_backend: str,
+    fixed_lag_window: int,
+    gnss_robust_mode: str,
+    gnss_outlier_threshold: float,
+    semantic_penalty_cap: float | None,
+    diagnostics_level: str,
 ) -> List[str]:
     cmd = [
         str(python_exec),
@@ -241,11 +247,23 @@ def _build_trial_command(
         str(wrong_hit_penalty),
         "--gps-weight",
         str(gps_weight),
+        "--pose-backend",
+        str(pose_backend),
+        "--fixed-lag-window",
+        str(max(1, fixed_lag_window)),
+        "--gnss-robust-mode",
+        str(gnss_robust_mode),
+        "--gnss-outlier-threshold",
+        str(gnss_outlier_threshold),
+        "--diagnostics-level",
+        str(diagnostics_level),
         "--no-visualization",
         "--profile-runtime",
         "--profile-warmup-frames",
         str(max(0, warmup_frames)),
     ]
+    if semantic_penalty_cap is not None:
+        cmd.extend(["--semantic-penalty-cap", str(semantic_penalty_cap)])
     if require_cuda:
         cmd.append("--require-cuda")
     return cmd
@@ -267,6 +285,12 @@ def main() -> None:
     parser.add_argument("--miss-penalty", type=float, default=4.0)
     parser.add_argument("--wrong-hit-penalty", type=float, default=4.0)
     parser.add_argument("--gps-weight", type=float, default=0.5)
+    parser.add_argument("--pose-backend", choices=["alpha", "fixed-lag", "gtsam"], default="alpha")
+    parser.add_argument("--fixed-lag-window", type=int, default=8)
+    parser.add_argument("--gnss-robust-mode", choices=["off", "huber", "cauchy", "gate"], default="off")
+    parser.add_argument("--gnss-outlier-threshold", type=float, default=5.0)
+    parser.add_argument("--semantic-penalty-cap", type=float, default=None)
+    parser.add_argument("--diagnostics-level", choices=["minimal", "standard", "full"], default="standard")
     parser.add_argument("--require-cuda", dest="require_cuda", action="store_true", default=True)
     parser.add_argument("--allow-cpu", dest="require_cuda", action="store_false")
     args = parser.parse_args()
@@ -333,6 +357,12 @@ def main() -> None:
             miss_penalty=args.miss_penalty,
             wrong_hit_penalty=args.wrong_hit_penalty,
             gps_weight=args.gps_weight,
+            pose_backend=args.pose_backend,
+            fixed_lag_window=args.fixed_lag_window,
+            gnss_robust_mode=args.gnss_robust_mode,
+            gnss_outlier_threshold=args.gnss_outlier_threshold,
+            semantic_penalty_cap=args.semantic_penalty_cap,
+            diagnostics_level=args.diagnostics_level,
         )
         print(f"[trial {trial_num}/{args.trials}] seed={seed} -> {' '.join(cmd)}")
         duration = _run_cmd(cmd, cwd=BASE_DIR, env=env, log_path=trial_dir / "run.log")
@@ -402,6 +432,12 @@ def main() -> None:
             "miss_penalty": args.miss_penalty,
             "wrong_hit_penalty": args.wrong_hit_penalty,
             "gps_weight": args.gps_weight,
+            "pose_backend": args.pose_backend,
+            "fixed_lag_window": args.fixed_lag_window,
+            "gnss_robust_mode": args.gnss_robust_mode,
+            "gnss_outlier_threshold": args.gnss_outlier_threshold,
+            "semantic_penalty_cap": args.semantic_penalty_cap,
+            "diagnostics_level": args.diagnostics_level,
             "require_cuda": bool(args.require_cuda),
             "python_exec": str(python_exec),
             "data_path": str(data_path),
