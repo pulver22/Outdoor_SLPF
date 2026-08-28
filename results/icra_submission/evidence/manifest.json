@@ -26,7 +26,7 @@
   },
   "configuration": "configs/icra/alpha_huber3_cap50.yaml",
   "git": {
-    "commit": "3d21a7e68756d6f90c60a3cd8f6986f6e97669a2"
+    "commit": "3b0a8dc9ce16b1b56f3b11200c39d90442997174"
   },
   "inputs": {
     "followup_metrics": "results/localization_improvement_row_identity/followup_metrics_per_seed.csv",
@@ -41,10 +41,18 @@
     "claim_checks": "results/icra_submission/evidence/claim_checks.json",
     "per_seed_csv": "results/icra_submission/evidence/method_metrics_per_seed.csv",
     "tables": {
-      "gnss_stress": "results/icra_submission/evidence/paper_gnss_stress_table.tex",
-      "main": "results/icra_submission/evidence/paper_main_table.tex",
-      "operational": "results/icra_submission/evidence/paper_operational_table.tex"
+      "gnss_stress": "results/icra_submission/evidence/icra_gnss_stress_table.tex",
+      "main": "results/icra_submission/evidence/icra_main_table.tex",
+      "operational": "results/icra_submission/evidence/icra_operational_table.tex"
     }
+  },
+  "provenance": {
+    "fresh_rerun": false,
+    "notes": [
+      "Fresh six-run CUDA rerun was blocked because torch.cuda.is_available() is false on this host.",
+      "A short CPU smoke completed; the full CPU fallback was incomplete and is not treated as evidence."
+    ],
+    "status": "controlled_matrix_fallback"
   },
   "row_count": 30,
   "schema_version": 1,
