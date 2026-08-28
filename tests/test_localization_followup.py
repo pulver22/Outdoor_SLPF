@@ -173,14 +173,8 @@ def test_next_step_candidate_matrix_freezes_baseline_and_adds_row_identity_ablat
         "row_mixture_delayed_gnss_gating",
     ]
     assert candidates[0]["args"] == [
-        "--pose-backend",
-        "alpha",
-        "--gnss-robust-mode",
-        "huber",
-        "--gnss-outlier-threshold",
-        "3.0",
-        "--semantic-penalty-cap",
-        "50",
+        "--config-yaml",
+        str(followup.BASE_DIR / "configs/icra/alpha_huber3_cap50.yaml"),
     ]
     assert "--row-likelihood-mode" in candidates[1]["args"]
     assert "--row-mixture-top-k" in candidates[1]["args"]

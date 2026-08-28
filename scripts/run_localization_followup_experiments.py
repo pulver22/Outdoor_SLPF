@@ -181,18 +181,20 @@ def candidate_matrix(include_gtsam: bool = False) -> list[dict[str, object]]:
     return candidates
 
 
+def icra_baseline_candidate(config_path: Path | None = None) -> dict[str, object]:
+    """Return the paper-facing baseline without duplicating config values."""
+    resolved_path = config_path or BASE_DIR / "configs/icra/alpha_huber3_cap50.yaml"
+    return {
+        "id": "baseline_alpha_huber3_cap50",
+        "description": "Frozen ICRA baseline loaded from the canonical YAML overlay.",
+        "args": ["--config-yaml", str(resolved_path)],
+    }
+
+
 def next_step_candidate_matrix() -> list[dict[str, object]]:
     """Return the controlled row-identity ambiguity ablation matrix."""
-    baseline_args = [
-        "--pose-backend",
-        "alpha",
-        "--gnss-robust-mode",
-        "huber",
-        "--gnss-outlier-threshold",
-        "3.0",
-        "--semantic-penalty-cap",
-        "50",
-    ]
+    baseline = icra_baseline_candidate()
+    baseline_args = list(baseline["args"])
     row_mixture_args = baseline_args + [
         "--row-likelihood-mode",
         "mixture",
@@ -207,9 +209,7 @@ def next_step_candidate_matrix() -> list[dict[str, object]]:
     ]
     return [
         {
-            "id": "baseline_alpha_huber3_cap50",
-            "description": "Frozen reference baseline: alpha smoother, Huber GNSS threshold 3.0, semantic cap 50.",
-            "args": baseline_args,
+            **baseline,
         },
         {
             "id": "row_mixture",
