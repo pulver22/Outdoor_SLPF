@@ -64,10 +64,12 @@ def _write_csv(path: Path, rows: list[Mapping[str, object]]) -> None:
     fields: list[str] = []
     for row in rows:
         for field_name in row:
+            if str(field_name).startswith("_"):
+                continue
             if field_name not in fields:
                 fields.append(field_name)
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
         writer.writeheader()
         writer.writerows(rows)
 
@@ -191,6 +193,7 @@ def _group_rows(rows: list[dict[str, object]]) -> list[dict[str, object]]:
                 aggregate[f"{metric}_std"] = math.sqrt(
                     sum((float(value) - float(aggregate[f"{metric}_mean"])) ** 2 for value in finite) / len(finite)
                 )
+        aggregate["_values"] = {metric: [row.get(metric) for row in group] for metric in TABLE_METRICS}
         result.append(aggregate)
     return result
 
@@ -206,7 +209,8 @@ def _tex_table(path: Path, rows: list[dict[str, object]], columns: tuple[tuple[s
                 if key in {"method", "traversal"}:
                     cells.append(str(row.get(key, "")).replace("&", r"\&"))
                 else:
-                    cells.append(format_mean_std([row.get(f"{key}_mean")], digits=2))
+                    values = row.get("_values", {}).get(key, [row.get(f"{key}_mean")])
+                    cells.append(format_mean_std(values, digits=2))
             lines.append(" & ".join(cells) + r" \\ ")
     else:
         lines.append(r"\multicolumn{" + str(len(columns)) + r"}{c}{No validated rows available} \\ ")
