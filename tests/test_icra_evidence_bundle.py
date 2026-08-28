@@ -75,3 +75,7 @@ def test_bundle_records_exact_source_hashes(tmp_path: Path) -> None:
     assert (tmp_path / "out/method_metrics_per_seed.csv").exists()
     assert (tmp_path / "out/method_metrics_aggregate.csv").exists()
     assert (tmp_path / "out/claim_checks.json").exists()
+    assert (tmp_path / "out/icra_main_table.tex").exists()
+    assert (tmp_path / "out/icra_gnss_stress_table.tex").exists()
+    assert (tmp_path / "out/icra_operational_table.tex").exists()
+    assert "Headland recovery" in (tmp_path / "out/icra_operational_table.tex").read_text(encoding="utf-8")

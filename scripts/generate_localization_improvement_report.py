@@ -644,6 +644,7 @@ def generate_icra_report(manifest_path: Path, output_dir: Path) -> dict[str, obj
     output_dir.mkdir(parents=True, exist_ok=True)
     report_data: dict[str, object] = {
         "git": dict(manifest.get("git") or {}),
+        "provenance": dict(manifest.get("provenance") or {}),
         "configuration": manifest.get("configuration"),
         "seeds": manifest.get("seeds", [11, 22, 33]),
         "traversals": manifest.get("traversals", ["rh_run1", "rh_run2"]),
@@ -670,6 +671,7 @@ def generate_icra_report(manifest_path: Path, output_dir: Path) -> dict[str, obj
 ## Provenance
 
 Canonical evidence manifest: `{manifest_path}`. Git commit: `{commit}`. Configuration: `{manifest.get('configuration', 'n/a')}`.
+Evidence status: `{(manifest.get('provenance') or {}).get('status', 'unspecified')}`; fresh rerun: `{(manifest.get('provenance') or {}).get('fresh_rerun', 'unspecified')}`.
 
 ## Baseline Evidence
 
@@ -698,56 +700,40 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--evidence-manifest", type=Path, default=BASE_DIR / "results/icra_submission/evidence/manifest.json")
     parser.add_argument("--allow-historical-commit", action="store_true")
-    parser.add_argument("--current-rh2-summary", type=Path, default=DEFAULT_CURRENT_RH2)
-    parser.add_argument("--current-rh1-summary", type=Path, default=DEFAULT_CURRENT_RH1)
-    parser.add_argument("--diagnostics-csv", type=Path, default=DEFAULT_DIAGNOSTICS)
-    parser.add_argument("--followup-csv", type=Path, default=DEFAULT_FOLLOWUP)
-    parser.add_argument("--followup-aggregate-csv", type=Path, default=DEFAULT_FOLLOWUP_AGGREGATE)
-    parser.add_argument("--gtsam-summary", type=Path, default=DEFAULT_GTSAM)
+    parser.add_argument("--current-rh2-summary", type=Path, default=None)
+    parser.add_argument("--current-rh1-summary", type=Path, default=None)
+    parser.add_argument("--diagnostics-csv", type=Path, default=None)
+    parser.add_argument("--followup-csv", type=Path, default=None)
+    parser.add_argument("--followup-aggregate-csv", type=Path, default=None)
+    parser.add_argument("--gtsam-summary", type=Path, default=None)
     parser.add_argument("--command", action="append", default=[])
     args = parser.parse_args()
 
-    legacy_args = any(
-        value is not None
-        for value in (args.current_rh2_summary, args.current_rh1_summary, args.diagnostics_csv, args.followup_csv, args.followup_aggregate_csv, args.gtsam_summary)
+    legacy_values = (
+        args.current_rh2_summary,
+        args.current_rh1_summary,
+        args.diagnostics_csv,
+        args.followup_csv,
+        args.followup_aggregate_csv,
+        args.gtsam_summary,
     )
-    if args.evidence_manifest.exists():
-        manifest = json.loads(args.evidence_manifest.read_text(encoding="utf-8"))
-        manifest_commit = str((manifest.get("git") or {}).get("commit", ""))
-        current_commit = _git_value(["git", "rev-parse", "HEAD"], default="")
-        if manifest_commit and current_commit and manifest_commit != current_commit and not args.allow_historical_commit:
-            raise RuntimeError(
-                f"Evidence manifest commit {manifest_commit} differs from current HEAD {current_commit}; "
-                "pass --allow-historical-commit to inspect historical evidence."
-            )
-        if legacy_args and any(option not in {None, DEFAULT_CURRENT_RH2, DEFAULT_CURRENT_RH1, DEFAULT_DIAGNOSTICS, DEFAULT_FOLLOWUP, DEFAULT_FOLLOWUP_AGGREGATE, DEFAULT_GTSAM} for option in (args.current_rh2_summary, args.current_rh1_summary, args.diagnostics_csv, args.followup_csv, args.followup_aggregate_csv, args.gtsam_summary)):
-            raise RuntimeError("Legacy summary inputs are deprecated; use --evidence-manifest instead.")
-        generate_icra_report(args.evidence_manifest, args.output_dir)
-        print(f"Wrote ICRA report to {args.output_dir / 'report.md'}")
-        return 0
-
-    branch = _git_value(["git", "rev-parse", "--abbrev-ref", "HEAD"])
-    commit = _git_value(["git", "rev-parse", "--short", "HEAD"])
-    commands = args.command or [
-        "python3 scripts/analyze_localization_followup.py",
-        "python3 scripts/run_localization_followup_experiments.py --stage screen --traversals rh_run1 --seeds 11",
-        "python3 scripts/run_localization_followup_experiments.py --stage full --traversals rh_run1,rh_run2 --seeds 11,22,33 --promote-from results/localization_improvement_followup/followup_metrics_per_seed.csv",
-        "python3 scripts/generate_localization_improvement_report.py",
-    ]
-    generate_report(
-        output_markdown=args.output_dir / "report.md",
-        output_json=args.output_dir / "report_data.json",
-        current_rh2_summary=args.current_rh2_summary,
-        current_rh1_summary=args.current_rh1_summary,
-        diagnostics_csv=args.diagnostics_csv,
-        followup_csv=args.followup_csv,
-        branch=branch,
-        commit=commit,
-        commands=commands,
-        gtsam_summary=args.gtsam_summary,
-        followup_aggregate_csv=args.followup_aggregate_csv,
-    )
-    print(f"Wrote report to {args.output_dir / 'report.md'}")
+    if any(value is not None for value in legacy_values):
+        raise RuntimeError("Legacy summary inputs are deprecated; use --evidence-manifest instead.")
+    if not args.evidence_manifest.exists():
+        raise FileNotFoundError(
+            f"Canonical evidence manifest not found: {args.evidence_manifest}. "
+            "Build it with scripts/build_icra_evidence_bundle.py first."
+        )
+    manifest = json.loads(args.evidence_manifest.read_text(encoding="utf-8"))
+    manifest_commit = str((manifest.get("git") or {}).get("commit", ""))
+    current_commit = _git_value(["git", "rev-parse", "HEAD"], default="")
+    if manifest_commit and current_commit and manifest_commit != current_commit and not args.allow_historical_commit:
+        raise RuntimeError(
+            f"Evidence manifest commit {manifest_commit} differs from current HEAD {current_commit}; "
+            "pass --allow-historical-commit to inspect historical evidence."
+        )
+    generate_icra_report(args.evidence_manifest, args.output_dir)
+    print(f"Wrote ICRA report to {args.output_dir / 'report.md'}")
     return 0
 
 
