@@ -1,0 +1,20 @@
+{
+  "detector_accuracy_claim_permitted": false,
+  "notes": [
+    "Raw map-frame APE and aligned APE are retained.",
+    "In-row metrics are used for row identity; headland metrics are used for transition behaviour."
+  ],
+  "passed": true,
+  "required_metrics": [
+    "ape_raw_rmse",
+    "ape_align_rmse",
+    "rpe_2m_align_rmse",
+    "rpe_5m_align_rmse",
+    "rpe_10m_align_rmse",
+    "inrow_cross_track_mean",
+    "inrow_row_correct_fraction",
+    "inrow_wrong_row_duration_sec",
+    "headland_cross_track_mean",
+    "headland_mean_recovery_distance_m"
+  ]
+}

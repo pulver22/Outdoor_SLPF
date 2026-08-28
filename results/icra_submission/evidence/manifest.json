@@ -1,0 +1,66 @@
+{
+  "aggregate_row_count": 10,
+  "claim_checks": {
+    "detector_accuracy_claim_permitted": false,
+    "notes": [
+      "Raw map-frame APE and aligned APE are retained.",
+      "In-row metrics are used for row identity; headland metrics are used for transition behaviour."
+    ],
+    "passed": true,
+    "required_metrics": [
+      "ape_raw_rmse",
+      "ape_align_rmse",
+      "rpe_2m_align_rmse",
+      "rpe_5m_align_rmse",
+      "rpe_10m_align_rmse",
+      "inrow_cross_track_mean",
+      "inrow_row_correct_fraction",
+      "inrow_wrong_row_duration_sec",
+      "headland_cross_track_mean",
+      "headland_mean_recovery_distance_m"
+    ]
+  },
+  "comparison": {
+    "available": false,
+    "deltas": []
+  },
+  "configuration": "configs/icra/alpha_huber3_cap50.yaml",
+  "git": {
+    "commit": "3d21a7e68756d6f90c60a3cd8f6986f6e97669a2"
+  },
+  "inputs": {
+    "followup_metrics": "results/localization_improvement_row_identity/followup_metrics_per_seed.csv",
+    "localization_metrics": null,
+    "protocols": [],
+    "reference_metrics": null,
+    "rtab_metrics": null
+  },
+  "outputs": {
+    "aggregate_csv": "results/icra_submission/evidence/method_metrics_aggregate.csv",
+    "baseline_deltas_csv": "results/icra_submission/evidence/baseline_deltas.csv",
+    "claim_checks": "results/icra_submission/evidence/claim_checks.json",
+    "per_seed_csv": "results/icra_submission/evidence/method_metrics_per_seed.csv",
+    "tables": {
+      "gnss_stress": "results/icra_submission/evidence/paper_gnss_stress_table.tex",
+      "main": "results/icra_submission/evidence/paper_main_table.tex",
+      "operational": "results/icra_submission/evidence/paper_operational_table.tex"
+    }
+  },
+  "row_count": 30,
+  "schema_version": 1,
+  "seeds": [
+    11,
+    22,
+    33
+  ],
+  "sources": [
+    {
+      "path": "results/localization_improvement_row_identity/followup_metrics_per_seed.csv",
+      "sha256": "2eb5409dfc52d9263c0c1005ee9f56803e20ee8f7938eea24c5fc9c3bc3c85d3"
+    }
+  ],
+  "traversals": [
+    "rh_run1",
+    "rh_run2"
+  ]
+}
