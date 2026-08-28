@@ -52,6 +52,50 @@ def _safe_float(value: object, default: float | None = None) -> float | None:
         return default
 
 
+def _first_float(row: dict[str, object], *keys: str) -> float | None:
+    for key in keys:
+        value = _safe_float(row.get(key))
+        if value is not None:
+            return value
+    return None
+
+
+def row_metric_view(row: dict[str, object]) -> dict[str, float | None]:
+    """Expose publication-facing row metrics with explicit region semantics."""
+    return {
+        "inrow_wrong_sec": _first_float(
+            row,
+            "inrow_wrong_row_duration_sec_mean",
+            "inrow_wrong_row_duration_sec",
+        ),
+        "headland_wrong_sec": _first_float(
+            row,
+            "headland_wrong_row_duration_sec_mean",
+            "headland_wrong_row_duration_sec",
+        ),
+        "inrow_row_correct": _first_float(
+            row,
+            "inrow_row_correct_fraction_mean",
+            "inrow_row_correct_fraction",
+        ),
+        "inrow_cross_track": _first_float(
+            row,
+            "inrow_cross_track_mean_mean",
+            "inrow_cross_track_mean",
+        ),
+        "headland_cross_track": _first_float(
+            row,
+            "headland_cross_track_mean_mean",
+            "headland_cross_track_mean",
+        ),
+        "headland_recovery_m": _first_float(
+            row,
+            "headland_mean_recovery_distance_m_mean",
+            "headland_mean_recovery_distance_m",
+        ),
+    }
+
+
 def _format_float(value: object) -> str:
     number = _safe_float(value)
     if number is None:
@@ -95,9 +139,12 @@ def _compact_metric_rows(rows: list[dict[str, object]], limit: int = 40) -> list
                 "candidate_id": row.get("candidate_id", row.get("variant", "")),
                 "seed": row.get("seed", ""),
                 "ape_align_rmse": _format_float(row.get("ape_align_rmse")),
-                "cross_track_mean": _format_float(row.get("cross_track_mean")),
-                "row_correct_fraction": _format_float(row.get("row_correct_fraction")),
-                "wrong_row_duration_sec": _format_float(row.get("wrong_row_duration_sec")),
+                "inrow_cross_track_mean": _format_float(row_metric_view(row)["inrow_cross_track"]),
+                "inrow_row_correct_fraction": _format_float(row_metric_view(row)["inrow_row_correct"]),
+                "inrow_wrong_row_duration_sec": _format_float(row_metric_view(row)["inrow_wrong_sec"]),
+                "all_frame_wrong_row_duration_sec_diagnostic": _format_float(
+                    row.get("wrong_row_duration_sec")
+                ),
             }
         )
     return compact
@@ -113,9 +160,12 @@ def _compact_aggregate_rows(rows: list[dict[str, object]]) -> list[dict[str, obj
                 "candidate_id": row.get("candidate_id", ""),
                 "seed_count": row.get("seed_count", ""),
                 "ape_align_rmse_mean": _format_float(row.get("ape_align_rmse_mean")),
-                "cross_track_mean_mean": _format_float(row.get("cross_track_mean_mean")),
-                "row_correct_fraction_mean": _format_float(row.get("row_correct_fraction_mean")),
-                "wrong_row_duration_sec_mean": _format_float(row.get("wrong_row_duration_sec_mean")),
+                "inrow_cross_track_mean": _format_float(row_metric_view(row)["inrow_cross_track"]),
+                "inrow_row_correct_fraction": _format_float(row_metric_view(row)["inrow_row_correct"]),
+                "inrow_wrong_row_duration_sec": _format_float(row_metric_view(row)["inrow_wrong_sec"]),
+                "all_frame_wrong_row_duration_sec_diagnostic": _format_float(
+                    row.get("wrong_row_duration_sec_mean")
+                ),
             }
         )
     return compact
@@ -160,8 +210,8 @@ def _controlled_ablation_rows(rows: list[dict[str, object]]) -> list[dict[str, o
                 "candidate_id": candidate_id,
                 "seed_count": row.get("seed_count", ""),
                 "ape_align_rmse_mean": _format_float(row.get("ape_align_rmse_mean")),
-                "cross_track_mean_mean": _format_float(row.get("cross_track_mean_mean")),
-                "wrong_row_duration_sec_mean": _format_float(row.get("wrong_row_duration_sec_mean")),
+                "inrow_cross_track_mean": _format_float(row_metric_view(row)["inrow_cross_track"]),
+                "inrow_wrong_row_duration_sec": _format_float(row_metric_view(row)["inrow_wrong_sec"]),
             }
         )
     return compact
@@ -185,10 +235,12 @@ def _acceptance_summary(
     baseline_rh2 = aggregate_by_key.get(("rh_run2", "baseline_alpha_huber3_cap50"), {})
     baseline_rh1_ape = _safe_float(baseline_rh1.get("ape_align_rmse_mean"))
     baseline_rh2_ape = _safe_float(baseline_rh2.get("ape_align_rmse_mean"))
-    baseline_rh1_wrong = _safe_float(baseline_rh1.get("wrong_row_duration_sec_mean"))
-    baseline_rh2_wrong = _safe_float(baseline_rh2.get("wrong_row_duration_sec_mean"))
-    baseline_rh1_ct = _safe_float(baseline_rh1.get("cross_track_mean_mean"))
-    baseline_rh2_ct = _safe_float(baseline_rh2.get("cross_track_mean_mean"))
+    baseline_rh1_view = row_metric_view(baseline_rh1)
+    baseline_rh2_view = row_metric_view(baseline_rh2)
+    baseline_rh1_wrong = baseline_rh1_view["inrow_wrong_sec"]
+    baseline_rh2_wrong = baseline_rh2_view["inrow_wrong_sec"]
+    baseline_rh1_ct = baseline_rh1_view["inrow_cross_track"]
+    baseline_rh2_ct = baseline_rh2_view["inrow_cross_track"]
 
     checks: list[dict[str, object]] = []
     for candidate_id in sorted(ROW_IDENTITY_CANDIDATES):
@@ -198,10 +250,12 @@ def _acceptance_summary(
         rh1_seed11_ape = _safe_float(seed11.get("ape_align_rmse"))
         rh1_ape = _safe_float(rh1.get("ape_align_rmse_mean"))
         rh2_ape = _safe_float(rh2.get("ape_align_rmse_mean"))
-        rh1_wrong = _safe_float(rh1.get("wrong_row_duration_sec_mean"))
-        rh2_wrong = _safe_float(rh2.get("wrong_row_duration_sec_mean"))
-        rh1_ct = _safe_float(rh1.get("cross_track_mean_mean"))
-        rh2_ct = _safe_float(rh2.get("cross_track_mean_mean"))
+        rh1_view = row_metric_view(rh1)
+        rh2_view = row_metric_view(rh2)
+        rh1_wrong = rh1_view["inrow_wrong_sec"]
+        rh2_wrong = rh2_view["inrow_wrong_sec"]
+        rh1_ct = rh1_view["inrow_cross_track"]
+        rh2_ct = rh2_view["inrow_cross_track"]
         check = {
             "candidate_id": candidate_id,
             "rh_run1_seed11_lt_1p2": rh1_seed11_ape is not None and rh1_seed11_ape < 1.2,
@@ -505,22 +559,24 @@ Branch `{branch}` at commit `{commit}`. This report captures the current localis
 {_markdown_table(current_table_rows, ["traversal", "mean_aligned_ape_m", "seed11", "seed22", "seed33"])}
 
 ## Diagnostics
-{_markdown_table(diagnostic_table, ["traversal", "candidate_id", "seed", "ape_align_rmse", "cross_track_mean", "row_correct_fraction", "wrong_row_duration_sec"])}
+{_markdown_table(diagnostic_table, ["traversal", "candidate_id", "seed", "ape_align_rmse", "inrow_cross_track_mean", "inrow_row_correct_fraction", "inrow_wrong_row_duration_sec", "all_frame_wrong_row_duration_sec_diagnostic"])}
 
 ## Row-Identity Diagnostics
 {_markdown_table(row_identity_table, ["traversal", "variant", "seed", "ape_align_rmse", "row_switch_count", "row_entropy_mean", "row_gap_median", "gnss_row_switch_corr", "gnss_gate_scale_median"])}
 
 ## Follow-Up Experiments
-{_markdown_table(followup_table, ["stage", "traversal", "candidate_id", "seed", "ape_align_rmse", "cross_track_mean", "row_correct_fraction", "wrong_row_duration_sec"])}
+{_markdown_table(followup_table, ["stage", "traversal", "candidate_id", "seed", "ape_align_rmse", "inrow_cross_track_mean", "inrow_row_correct_fraction", "inrow_wrong_row_duration_sec", "all_frame_wrong_row_duration_sec_diagnostic"])}
 
 ### Follow-Up Aggregates
-{_markdown_table(followup_aggregate_table, ["stage", "traversal", "candidate_id", "seed_count", "ape_align_rmse_mean", "cross_track_mean_mean", "row_correct_fraction_mean", "wrong_row_duration_sec_mean"])}
+{_markdown_table(followup_aggregate_table, ["stage", "traversal", "candidate_id", "seed_count", "ape_align_rmse_mean", "inrow_cross_track_mean", "inrow_row_correct_fraction", "inrow_wrong_row_duration_sec", "all_frame_wrong_row_duration_sec_diagnostic"])}
 
 ## Controlled Row-Identity Ablation
-{_markdown_table(controlled_ablation_table, ["stage", "traversal", "candidate_id", "seed_count", "ape_align_rmse_mean", "cross_track_mean_mean", "wrong_row_duration_sec_mean"])}
+{_markdown_table(controlled_ablation_table, ["stage", "traversal", "candidate_id", "seed_count", "ape_align_rmse_mean", "inrow_cross_track_mean", "inrow_wrong_row_duration_sec"])}
 
 ## Acceptance Check
 Outcome: `{acceptance["outcome"]}`. Accepted candidate: `{acceptance["accepted_candidate"] or "none"}`.
+
+Row-identity acceptance uses in-row frames. Headland frames are evaluated with cross-track and transition-recovery metrics because nearest-row identity is ambiguous outside a corridor. Total wrong-row duration is retained only as an all-frame diagnostic.
 
 {_markdown_table(acceptance_table, ["candidate_id", "accepted", "rh1_seed11", "rh1_mean", "rh2_mean", "rh1_wrong_s", "rh2_wrong_s", "rh1_ct", "rh2_ct"])}
 

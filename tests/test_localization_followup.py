@@ -183,6 +183,21 @@ def test_next_step_candidate_matrix_freezes_baseline_and_adds_row_identity_ablat
     assert all("gtsam" not in candidate["id"] for candidate in candidates)
 
 
+def test_acceptance_uses_inrow_wrong_duration_not_total_duration() -> None:
+    row = {
+        "wrong_row_duration_sec_mean": "440",
+        "inrow_wrong_row_duration_sec_mean": "180",
+        "headland_wrong_row_duration_sec_mean": "260",
+        "inrow_cross_track_mean_mean": "1.0",
+        "headland_cross_track_mean_mean": "1.5",
+    }
+
+    view = report.row_metric_view(row)
+
+    assert view["inrow_wrong_sec"] == 180.0
+    assert view["headland_wrong_sec"] == 260.0
+
+
 def test_followup_command_contains_dataset_candidate_and_output_paths(tmp_path: Path) -> None:
     candidate = followup.candidate_matrix(include_gtsam=False)[4]
     cmd = followup.build_spf_command(

@@ -59,6 +59,23 @@ KEY_METRICS = [
     "wrong_row_duration_sec",
     "headland_cross_track_mean",
     "inrow_cross_track_mean",
+    *[
+        f"{section}_{metric}"
+        for section in ("headland", "inrow")
+        for metric in (
+            "cross_track_median",
+            "cross_track_max",
+            "row_switch_events",
+            "wrong_row_distance_m",
+            "max_wrong_row_duration_sec",
+            "max_wrong_row_distance_m",
+            "mean_recovery_distance_m",
+            "failure_rate",
+            "xt_below_0p25_fraction",
+            "xt_below_0p5_fraction",
+            "xt_below_1p0_fraction",
+        )
+    ],
 ]
 
 
