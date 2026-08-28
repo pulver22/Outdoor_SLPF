@@ -7,6 +7,7 @@ import csv
 import json
 import subprocess
 from pathlib import Path
+from typing import Mapping
 BASE_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_OUTPUT_DIR = BASE_DIR / "results/localization_improvement_report"
 DEFAULT_CURRENT_RH2 = BASE_DIR / "results/localization_improvement_full/alpha_huber_cap/summary.json"
@@ -609,9 +610,94 @@ Row-identity acceptance uses in-row frames. Headland frames are evaluated with c
     return data
 
 
+def _manifest_rows(manifest: Mapping[str, object]) -> list[dict[str, object]]:
+    for key in ("baseline_rows", "rows"):
+        value = manifest.get(key)
+        if isinstance(value, list):
+            return [dict(row) for row in value if isinstance(row, Mapping)]
+    baseline = manifest.get("baseline")
+    if isinstance(baseline, Mapping):
+        rows = []
+        for traversal in ("rh_run1", "rh_run2"):
+            value = baseline.get(f"{traversal}_ape")
+            if value is None:
+                value = baseline.get(f"{traversal}_ape_align_rmse")
+            if value is not None:
+                rows.append({"traversal": traversal, "ape_align_rmse": value})
+        return rows
+    outputs = manifest.get("outputs")
+    if isinstance(outputs, Mapping):
+        aggregate = outputs.get("aggregate_csv")
+        if aggregate:
+            return _read_csv(Path(str(aggregate)))
+    return []
+
+
+def generate_icra_report(manifest_path: Path, output_dir: Path) -> dict[str, object]:
+    """Generate the shareable report directly from a canonical evidence manifest."""
+    manifest_path = Path(manifest_path)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if not isinstance(manifest, dict):
+        raise ValueError(f"Evidence manifest must contain an object: {manifest_path}")
+    rows = _manifest_rows(manifest)
+    commit = str((manifest.get("git") or {}).get("commit", "unknown"))
+    output_dir.mkdir(parents=True, exist_ok=True)
+    report_data: dict[str, object] = {
+        "git": dict(manifest.get("git") or {}),
+        "configuration": manifest.get("configuration"),
+        "seeds": manifest.get("seeds", [11, 22, 33]),
+        "traversals": manifest.get("traversals", ["rh_run1", "rh_run2"]),
+        "sources": manifest.get("sources", []),
+        "rows": rows,
+        "comparison": manifest.get("comparison", {}),
+        "claim_checks": manifest.get("claim_checks", {}),
+        "manifest": str(manifest_path),
+    }
+    table_rows = []
+    for row in rows:
+        table_rows.append(
+            {
+                "traversal": row.get("traversal", ""),
+                "method": row.get("method", row.get("candidate_id", "")),
+                "ape_align_rmse": _format_float(row.get("ape_align_rmse", row.get("ape_align_rmse_mean"))),
+                "ape_raw_rmse": _format_float(row.get("ape_raw_rmse", row.get("ape_raw_rmse_mean"))),
+                "inrow_cross_track": _format_float(row_metric_view(row).get("inrow_cross_track")),
+                "inrow_wrong_sec": _format_float(row_metric_view(row).get("inrow_wrong_sec")),
+            }
+        )
+    markdown = f"""# Evidence-First ICRA Submission Report
+
+## Provenance
+
+Canonical evidence manifest: `{manifest_path}`. Git commit: `{commit}`. Configuration: `{manifest.get('configuration', 'n/a')}`.
+
+## Baseline Evidence
+
+{_markdown_table(table_rows, ['traversal', 'method', 'ape_raw_rmse', 'ape_align_rmse', 'inrow_cross_track', 'inrow_wrong_sec'])}
+
+Row-identity acceptance uses in-row frames. Headland frames are evaluated with cross-track and transition-recovery metrics because nearest-row identity is ambiguous outside a corridor. Total wrong-row duration is retained only as an all-frame diagnostic.
+
+## Claim Boundary
+
+Detector accuracy is not claimed without a supplied SemanticBLT validation YAML. GTSAM and row-mixture/delayed-correction variants are not promoted as paper-facing methods.
+
+## Source Hashes
+
+{_markdown_table([{'path': item.get('path', ''), 'sha256': item.get('sha256', '')} for item in report_data['sources'] if isinstance(item, Mapping)], ['path', 'sha256'])}
+"""
+    report_data["table_rows"] = table_rows
+    output_json = output_dir / "report_data.json"
+    output_markdown = output_dir / "report.md"
+    output_json.write_text(json.dumps(report_data, indent=2, sort_keys=True), encoding="utf-8")
+    output_markdown.write_text(markdown, encoding="utf-8")
+    return report_data
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument("--evidence-manifest", type=Path, default=BASE_DIR / "results/icra_submission/evidence/manifest.json")
+    parser.add_argument("--allow-historical-commit", action="store_true")
     parser.add_argument("--current-rh2-summary", type=Path, default=DEFAULT_CURRENT_RH2)
     parser.add_argument("--current-rh1-summary", type=Path, default=DEFAULT_CURRENT_RH1)
     parser.add_argument("--diagnostics-csv", type=Path, default=DEFAULT_DIAGNOSTICS)
@@ -620,6 +706,25 @@ def main() -> int:
     parser.add_argument("--gtsam-summary", type=Path, default=DEFAULT_GTSAM)
     parser.add_argument("--command", action="append", default=[])
     args = parser.parse_args()
+
+    legacy_args = any(
+        value is not None
+        for value in (args.current_rh2_summary, args.current_rh1_summary, args.diagnostics_csv, args.followup_csv, args.followup_aggregate_csv, args.gtsam_summary)
+    )
+    if args.evidence_manifest.exists():
+        manifest = json.loads(args.evidence_manifest.read_text(encoding="utf-8"))
+        manifest_commit = str((manifest.get("git") or {}).get("commit", ""))
+        current_commit = _git_value(["git", "rev-parse", "HEAD"], default="")
+        if manifest_commit and current_commit and manifest_commit != current_commit and not args.allow_historical_commit:
+            raise RuntimeError(
+                f"Evidence manifest commit {manifest_commit} differs from current HEAD {current_commit}; "
+                "pass --allow-historical-commit to inspect historical evidence."
+            )
+        if legacy_args and any(option not in {None, DEFAULT_CURRENT_RH2, DEFAULT_CURRENT_RH1, DEFAULT_DIAGNOSTICS, DEFAULT_FOLLOWUP, DEFAULT_FOLLOWUP_AGGREGATE, DEFAULT_GTSAM} for option in (args.current_rh2_summary, args.current_rh1_summary, args.diagnostics_csv, args.followup_csv, args.followup_aggregate_csv, args.gtsam_summary)):
+            raise RuntimeError("Legacy summary inputs are deprecated; use --evidence-manifest instead.")
+        generate_icra_report(args.evidence_manifest, args.output_dir)
+        print(f"Wrote ICRA report to {args.output_dir / 'report.md'}")
+        return 0
 
     branch = _git_value(["git", "rev-parse", "--abbrev-ref", "HEAD"])
     commit = _git_value(["git", "rev-parse", "--short", "HEAD"])

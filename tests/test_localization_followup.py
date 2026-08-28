@@ -198,6 +198,28 @@ def test_acceptance_uses_inrow_wrong_duration_not_total_duration() -> None:
     assert view["headland_wrong_sec"] == 260.0
 
 
+def test_report_uses_manifest_commit_and_baseline_rows(tmp_path: Path) -> None:
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "git": {"commit": "c15803d"},
+                "configuration": "configs/icra/alpha_huber3_cap50.yaml",
+                "baseline": {"rh_run1_ape": 0.970, "rh_run2_ape": 0.875},
+                "sources": [{"path": "baseline.csv", "sha256": "abc"}],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    data = report.generate_icra_report(manifest_path, tmp_path / "report")
+    text = (tmp_path / "report/report.md").read_text()
+
+    assert "c15803d" in text
+    assert "0.970" in text and "0.875" in text
+    assert data["git"]["commit"] == "c15803d"
+
+
 def test_followup_command_contains_dataset_candidate_and_output_paths(tmp_path: Path) -> None:
     candidate = followup.candidate_matrix(include_gtsam=False)[4]
     cmd = followup.build_spf_command(
