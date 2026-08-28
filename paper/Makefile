@@ -2,14 +2,12 @@
 # Change "paper" in the next line to the name of your document.
 TARGET=paper
 SOURCE=$(TARGET).tex
+GENERATED=generated/icra_main_table.tex generated/icra_gnss_stress_table.tex generated/icra_operational_table.tex
 
 all: $(TARGET).pdf
 
-$(TARGET).pdf: $(SOURCE) glorified.bib new.bib stachnisslab-math.tex stachnisslab-latex.tex
-	pdflatex -halt-on-error $(SOURCE)
-	bibtex $(TARGET)
-	pdflatex -halt-on-error $(SOURCE)
-	pdflatex -halt-on-error $(SOURCE)
+$(TARGET).pdf: $(SOURCE) $(GENERATED) glorified.bib new.bib stachnisslab-math.tex stachnisslab-latex.tex
+	latexmk -pdf -halt-on-error $(SOURCE)
 
 nonstop: $(SOURCE) glorified.bib new.bib stachnisslab-math.tex stachnisslab-latex.tex
 	pdflatex -interaction=nonstopmode $(SOURCE)
@@ -18,8 +16,7 @@ nonstop: $(SOURCE) glorified.bib new.bib stachnisslab-math.tex stachnisslab-late
 	pdflatex -interaction=nonstopmode $(SOURCE)
 
 latex:
-	pdflatex -halt-on-error $(SOURCE)
-	pdflatex -halt-on-error $(SOURCE)
+	latexmk -pdf -halt-on-error $(SOURCE)
 
 bibtex:
 	bibtex $(TARGET)
@@ -37,7 +34,7 @@ tiny: $(TARGET).pdf
 	gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$(TARGET)-tiny.pdf $(TARGET).pdf
 
 clean:
-	rm -f $(TARGET).aux $(TARGET).bbl $(TARGET).blg $(TARGET).log
+	latexmk -c $(SOURCE)
 
 distclean:clean
 	rm -f $(TARGET).pdf $(TARGET)-small*.pdf $(TARGET)-tiny.pdf 
@@ -53,4 +50,3 @@ guidelines: guidelines.tex
 		bibtex guidelines
 		pdflatex -halt-on-error guidelines.tex
 		pdflatex -halt-on-error guidelines.tex
-
