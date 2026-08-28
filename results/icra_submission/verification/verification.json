@@ -1,0 +1,27 @@
+{
+  "branch": "codex/evidence-first-icra",
+  "worktree": "/tmp/vineyard_pf_icra_evidence",
+  "packaging_head": "78d8d03",
+  "manifest_source_commit": "3b0a8dc",
+  "status": "conditional",
+  "checks": {
+    "full_pytest": "49 passed",
+    "claim_checker": "passed",
+    "latex_build": "passed",
+    "pdf_pages": 3,
+    "pdf_page_size": "612 x 792 pts (letter)",
+    "pdf_anonymisation_text_scan": "passed",
+    "pdf_metadata_author": "absent",
+    "fresh_six_run_cuda_rerun": "blocked: torch.cuda.is_available() is false",
+    "cpu_fallback": "incomplete and not treated as evidence"
+  },
+  "evidence_policy": {
+    "source_status": "controlled_matrix_fallback",
+    "paper_facing_configuration": "configs/icra/alpha_huber3_cap50.yaml",
+    "traversals": ["rh_run1", "rh_run2"],
+    "seeds": [11, 22, 33],
+    "unsupported_detector_accuracy_claim": false,
+    "promoted_row_mixture_or_delayed_variant": false
+  },
+  "sha256_file": "results/icra_submission/verification/submission_manifest.sha256"
+}
