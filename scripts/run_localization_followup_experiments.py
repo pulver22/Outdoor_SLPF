@@ -65,6 +65,7 @@ KEY_METRICS = [
         for metric in (
             "cross_track_median",
             "cross_track_max",
+            "row_correct_fraction",
             "row_switch_events",
             "wrong_row_distance_m",
             "max_wrong_row_duration_sec",
