@@ -26,6 +26,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from shapely.geometry import Point
 
 from geojson_rows import extract_row_id as extract_geojson_row_id
 from run_ab_validation import (
@@ -48,6 +49,7 @@ DEFAULT_GEOJSON = BASE_DIR / "data" / "riseholme_poles_trunk.geojson"
 DEFAULT_SEEDS = "11,22,33"
 DEFAULT_DROP_RATES = "0.2,0.4"
 DEFAULT_REMOVE_RATES = "0.3,0.5"
+DEFAULT_MAP_NOISE_SIGMAS = "0.25,0.50"
 DEFAULT_SECTION_QMIN = 0.35
 DEFAULT_SECTION_QMAX = 0.65
 
@@ -103,7 +105,11 @@ def write_csv(path: Path, rows: List[Dict[str, object]]) -> None:
     if not rows:
         return
     path.parent.mkdir(parents=True, exist_ok=True)
-    fieldnames = list(rows[0].keys())
+    seen: Dict[str, bool] = {}
+    for r in rows:
+        for k in r.keys():
+            seen[k] = True
+    fieldnames = list(seen.keys())
     with open(path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
@@ -133,14 +139,18 @@ def build_slpf_cmd(
         "--frame-stride", "4",
         "--semantic-sigma", "0.05",
         "--gps-sigma", "1.1",
+        "--gnss-robust-mode", "huber",
+        "--gnss-outlier-threshold", "3.0",
+        "--semantic-penalty-cap", "50",
         "--corridor-weight", "0.30",
         "--corridor-dist-sigma", "1.50",
         "--corridor-heading-sigma", "0.35",
         "--background-class-weight", "0.20",
         "--max-background-obs", "120",
         "--expected-obs-count", "150",
-        "--pose-smooth-alpha-pos", "0.55",
+        "--pose-smooth-alpha-pos", "0.50",
         "--pose-smooth-alpha-theta", "0.50",
+        "--pose-backend", "alpha",
         "--odom-yaw-filter-alpha", "0.90",
         "--particle-count", "100",
         "--segment-chunk", "4096",
@@ -276,6 +286,30 @@ def create_section_removed_map(
         n_in_section=int(section_indices.size),
         section=section_out,
     )
+
+
+def create_noisy_landmark_map(
+    *,
+    src_geojson: Path,
+    dst_geojson: Path,
+    noise_sigma: float,
+    random_seed: int,
+) -> Path:
+    gdf_raw = gpd.read_file(src_geojson)
+    orig_crs = gdf_raw.crs if gdf_raw.crs else "EPSG:4326"
+    utm_crs = gdf_raw.estimate_utm_crs() if (not gdf_raw.crs or not gdf_raw.crs.is_projected) else gdf_raw.crs
+    gdf_proj = gdf_raw.to_crs(utm_crs)
+    if noise_sigma > 1e-6:
+        rng = np.random.default_rng(int(random_seed))
+        for idx, geom in gdf_proj.geometry.items():
+            if geom is not None and geom.geom_type == "Point":
+                dx = float(rng.normal(0.0, noise_sigma))
+                dy = float(rng.normal(0.0, noise_sigma))
+                gdf_proj.at[idx, "geometry"] = Point(geom.x + dx, geom.y + dy)
+    gdf_out = gdf_proj.to_crs(orig_crs)
+    dst_geojson.parent.mkdir(parents=True, exist_ok=True)
+    gdf_out.to_file(dst_geojson, driver="GeoJSON")
+    return dst_geojson
 
 
 def _summarize(values: Iterable[float]) -> Tuple[float, float]:
@@ -587,10 +621,12 @@ def main() -> None:
     parser.add_argument("--seeds", type=str, default=DEFAULT_SEEDS)
     parser.add_argument("--drop-rates", type=str, default=DEFAULT_DROP_RATES)
     parser.add_argument("--remove-rates", type=str, default=DEFAULT_REMOVE_RATES)
+    parser.add_argument("--map-noise-sigmas", type=str, default=DEFAULT_MAP_NOISE_SIGMAS)
     parser.add_argument("--section-qmin", type=float, default=DEFAULT_SECTION_QMIN)
     parser.add_argument("--section-qmax", type=float, default=DEFAULT_SECTION_QMAX)
     parser.add_argument("--map-random-seed", type=int, default=2026)
     parser.add_argument("--reuse-baseline-dir", type=Path, default=None)
+    parser.add_argument("--run-dir", type=Path, default=None)
     parser.add_argument("--max-frames", type=int, default=None)
     parser.add_argument("--cuda-visible-devices", type=str, default="0")
     parser.add_argument("--require-cuda", dest="require_cuda", action="store_true", default=True)
@@ -618,9 +654,13 @@ def main() -> None:
     seeds = parse_int_list(args.seeds)
     drop_rates = [float(x) for x in parse_float_list(args.drop_rates)]
     remove_rates = [float(x) for x in parse_float_list(args.remove_rates)]
+    map_noise_sigmas = [float(x) for x in parse_float_list(args.map_noise_sigmas)]
     for r in [*drop_rates, *remove_rates]:
         if r < 0.0 or r > 1.0:
             raise ValueError("All rates must be in [0, 1].")
+    for s in map_noise_sigmas:
+        if s < 0.0:
+            raise ValueError("Map noise sigmas must be non-negative.")
 
     data_csv = data_path / "data.csv"
     if not data_csv.exists():
@@ -636,9 +676,14 @@ def main() -> None:
     if not evo_ape_bin.exists() or not evo_rpe_bin.exists():
         raise FileNotFoundError("Missing evo_ape/evo_rpe in selected virtualenv bin directory.")
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    hw_tag = "gpu" if args.require_cuda else "cpu"
-    run_dir = args.output_root.resolve() / f"{timestamp}_run1_robustness_{hw_tag}"
+    if args.run_dir is not None:
+        run_dir = args.run_dir.expanduser()
+        if not run_dir.is_absolute():
+            run_dir = (BASE_DIR / run_dir).resolve()
+    else:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        hw_tag = "gpu" if args.require_cuda else "cpu"
+        run_dir = args.output_root.resolve() / f"{timestamp}_run1_robustness_{hw_tag}"
     run_dir.mkdir(parents=True, exist_ok=True)
 
     env = os.environ.copy()
@@ -716,12 +761,15 @@ def main() -> None:
                 require_cuda=args.require_cuda,
                 max_frames=args.max_frames,
             )
-            runtime_sec = run_cmd(cmd, out_dir / "run_baseline.log", cwd=BASE_DIR, env=env)
+            est_tum = out_dir / "trajectory_0.5.tum"
+            gt_tum = out_dir / "gps_pose.tum"
+            if not (est_tum.exists() and gt_tum.exists()):
+                runtime_sec = run_cmd(cmd, out_dir / "run_baseline.log", cwd=BASE_DIR, env=env)
+            else:
+                runtime_sec = 0.0
             protocol["commands"].append(
                 {"option": "baseline", "seed": seed, "command": cmd, "runtime_sec": runtime_sec}
             )
-            est_tum = out_dir / "trajectory_0.5.tum"
-            gt_tum = out_dir / "gps_pose.tum"
 
         if not est_tum.exists() or not gt_tum.exists():
             raise FileNotFoundError(f"Missing baseline outputs for seed {seed}: {est_tum}, {gt_tum}")
@@ -767,7 +815,12 @@ def main() -> None:
                 require_cuda=args.require_cuda,
                 max_frames=args.max_frames,
             )
-            runtime_sec = run_cmd(cmd, out_dir / "run.log", cwd=BASE_DIR, env=env)
+            est_tum = out_dir / "trajectory_0.5.tum"
+            gt_tum = out_dir / "gps_pose.tum"
+            if not (est_tum.exists() and gt_tum.exists()):
+                runtime_sec = run_cmd(cmd, out_dir / "run.log", cwd=BASE_DIR, env=env)
+            else:
+                runtime_sec = 0.0
             protocol["commands"].append(
                 {
                     "option": "option_a_detection_drop",
@@ -778,8 +831,6 @@ def main() -> None:
                 }
             )
 
-            est_tum = out_dir / "trajectory_0.5.tum"
-            gt_tum = out_dir / "gps_pose.tum"
             if not est_tum.exists() or not gt_tum.exists():
                 raise FileNotFoundError(f"Missing Option A outputs for {variant} seed {seed}: {out_dir}")
 
@@ -858,7 +909,12 @@ def main() -> None:
                 require_cuda=args.require_cuda,
                 max_frames=args.max_frames,
             )
-            runtime_sec = run_cmd(cmd, out_dir / "run.log", cwd=BASE_DIR, env=env)
+            est_tum = out_dir / "trajectory_0.5.tum"
+            gt_tum = out_dir / "gps_pose.tum"
+            if not (est_tum.exists() and gt_tum.exists()):
+                runtime_sec = run_cmd(cmd, out_dir / "run.log", cwd=BASE_DIR, env=env)
+            else:
+                runtime_sec = 0.0
             protocol["commands"].append(
                 {
                     "option": "option_b_landmark_removal",
@@ -869,8 +925,6 @@ def main() -> None:
                 }
             )
 
-            est_tum = out_dir / "trajectory_0.5.tum"
-            gt_tum = out_dir / "gps_pose.tum"
             if not est_tum.exists() or not gt_tum.exists():
                 raise FileNotFoundError(f"Missing Option B outputs for {variant_name} seed {seed}: {out_dir}")
 
@@ -914,6 +968,82 @@ def main() -> None:
                     **recovery,
                 }
             )
+
+    # Option C: UAV Map Noise Perturbation
+    for sigma in map_noise_sigmas:
+        variant_name = f"map_noise_{sigma:.2f}m"
+        noisy_geojson = run_dir / "option_c_map_variants" / f"map_noise_{sigma:.2f}m.geojson"
+        create_noisy_landmark_map(
+            src_geojson=geojson,
+            dst_geojson=noisy_geojson,
+            noise_sigma=sigma,
+            random_seed=int(args.map_random_seed),
+        )
+        protocol["map_variants"].append(
+            {
+                "type": "map_noise",
+                "variant": variant_name,
+                "noise_sigma": float(sigma),
+                "path": str(noisy_geojson),
+            }
+        )
+        for seed in seeds:
+            out_dir = run_dir / "option_c_map_noise" / variant_name / f"seed_{seed}"
+            out_dir.mkdir(parents=True, exist_ok=True)
+            cmd = build_slpf_cmd(
+                python_exec=python_exec,
+                out_dir=out_dir,
+                seed=seed,
+                data_path=data_path,
+                geojson=noisy_geojson,
+                detection_drop_rate=0.0,
+                require_cuda=args.require_cuda,
+                max_frames=args.max_frames,
+            )
+            est_tum = out_dir / "trajectory_0.5.tum"
+            gt_tum = out_dir / "gps_pose.tum"
+            if not (est_tum.exists() and gt_tum.exists()):
+                runtime_sec = run_cmd(cmd, out_dir / "run.log", cwd=BASE_DIR, env=env)
+            else:
+                runtime_sec = 0.0
+            protocol["commands"].append(
+                {
+                    "option": "option_c_map_noise",
+                    "variant": variant_name,
+                    "seed": seed,
+                    "command": cmd,
+                    "runtime_sec": runtime_sec,
+                }
+            )
+
+            est_tum = out_dir / "trajectory_0.5.tum"
+            gt_tum = out_dir / "gps_pose.tum"
+            if not est_tum.exists() or not gt_tum.exists():
+                raise FileNotFoundError(f"Missing Option C outputs for {variant_name} seed {seed}: {out_dir}")
+
+            metrics = evaluate_run_safe(
+                name=f"{variant_name}_seed_{seed}",
+                est_tum=est_tum,
+                gt_tum=gt_tum,
+                out_dir=out_dir / "eval",
+                rows=get_rows(noisy_geojson),
+                evo_ape_bin=evo_ape_bin,
+                evo_rpe_bin=evo_rpe_bin,
+                env=env,
+            )
+            metrics.update(
+                {
+                    "option": "option_c_map_noise",
+                    "variant": variant_name,
+                    "seed": seed,
+                    "detection_drop_rate": 0.0,
+                    "map_remove_rate": 0.0,
+                    "map_noise_sigma": float(sigma),
+                    "map_geojson": str(noisy_geojson),
+                    "runtime_sec": runtime_sec,
+                }
+            )
+            all_rows.append(metrics)
 
     all_rows.sort(
         key=lambda r: (

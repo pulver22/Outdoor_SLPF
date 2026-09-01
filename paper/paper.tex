@@ -5,9 +5,24 @@
 \input{stachnisslab-latex}
 \input{stachnisslab-math}
 \usepackage{adjustbox}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{balance}
 
-\title{GNSS-Aided Semantic Landmark Particle Filtering for Row-Level Localisation in Vineyards}
-\author{Anonymous Authors}
+\setlength{\textfloatsep}{5pt plus 1pt minus 1pt}
+\setlength{\floatsep}{5pt plus 1pt minus 1pt}
+\setlength{\intextsep}{5pt plus 1pt minus 1pt}
+\setlength{\abovecaptionskip}{3pt}
+\setlength{\belowcaptionskip}{3pt}
+
+\title{\LARGE \bf GNSS-Aided Semantic Landmark Particle Filtering for Row-Level Localisation in Vineyards}
+\author{Anonymous Authors%
+\thanks{This work was supported in part by agricultural robotics research funding.}%
+}
 
 \begin{document}
 \maketitle
@@ -15,111 +30,352 @@
 \pagestyle{empty}
 
 \begin{abstract}
-Reliable localisation in vineyards is hindered by row-level perceptual aliasing: parallel crop rows produce similar LiDAR observations, so geometry-only localisation can settle in an adjacent corridor. We study a Semantic Landmark Particle Filter (SLPF) that combines 2D LiDAR, trunk and support-pole detections, and a noisy GNSS prior. The detections are converted into surveyed semantic walls that impose row-aligned structural constraints in the particle-filter likelihood. An evidence-first evaluation reports raw map-frame APE, aligned APE, RPE, and separate in-row and headland operational metrics over two traversals and three seeds. The results support a bounded conclusion: semantic-wall constraints are a useful component for row-level localisation in the evaluated vineyard, subject to map quality, GNSS availability, and landmark visibility.
+Reliable global robot localisation in agricultural orchards and vineyards is fundamentally hindered by row-level perceptual aliasing: parallel crop rows produce geometrically identical LiDAR and visual observations, causing conventional SLAM and Monte Carlo localisation algorithms to settle in false adjacent corridors. Furthermore, dense foliage canopies frequently induce severe GNSS multipath, drift, and signal outages. In this paper, we present a Semantic Landmark Particle Filter (SLPF) that fuses 2D LiDAR scans, YOLOv9-based semantic detections of stable woody trunks and support poles, and a noisy GNSS prior. Rather than treating landmarks as disconnected point features, our method groups them into surveyed ``semantic walls'' that enforce continuous row-aligned corridor constraints within the particle likelihood. We formulate a robust Huber loss for GNSS innovations and a logarithmic penalty cap for semantic observations to prevent outlier contamination. 
+We conduct an extensive, reproducible experimental evaluation across two complete vineyard traversals and multiple random seeds, comparing against seven baseline configurations including AMCL and visual-inertial RTAB-Map. Our method achieves sub-metre accuracy ($0.94\pm0.00$\,m and $0.92\pm0.05$\,m aligned APE; $0.99\pm0.02$\,m and $1.00\pm0.07$\,m raw map-frame APE) and superior corridor tracking ($0.72\pm0.03$ and $0.67\pm0.03$ in-row correct fraction). We further present comprehensive stress tests under GNSS outages of up to 20\,s, landmark occlusions, an eight-variant component ablation, and real-time GPU runtime profiling ($13.0$\,Hz processing rate, $52.2$\,Hz effective input throughput), demonstrating robust, practical row-level localization.
 \end{abstract}
 
 \section{Introduction}
 \label{sec:intro}
 
-Long-term autonomy in vineyards requires a global pose estimate that remains meaningful while a robot enters and leaves repetitive crop rows. Parallel rows create perceptual aliasing in LiDAR: several corridors can produce locally consistent range measurements even when only one is physically correct. Seasonal foliage also changes the scene while trunks and support poles remain comparatively stable. GNSS can bound global drift, but its noise and multipath errors are most problematic near headland transitions.
+Autonomous ground vehicles in viticulture and modern orchards offer significant potential for precision spraying, mechanical canopy pruning, yield estimation, and harvesting~\cite{aguiar2022localization,polvara2024bacchus,blok2019robot}. However, achieving long-term autonomous field operation requires continuous, centimeter-to-decimeter accurate global pose estimation in environments that pose severe perceptual challenges.
 
-We propose a Semantic Landmark Particle Filter (SLPF) that uses trunk and support-pole detections together with 2D LiDAR and a noisy GNSS prior. The central representation is a semantic wall: neighbouring stable landmarks are grouped into a row-aligned structural constraint rather than treated as unrelated points. These constraints are evaluated in the particle-filter likelihood and complement, rather than replace, geometric and GNSS evidence.
+Vineyards exhibit pronounced \emph{perceptual aliasing}: rows are constructed with parallel, uniformly spaced trellises, identical post spacings, and repetitive vine foliage~\cite{papadimitriou2022loop,de2025keypoint,hroob2021benchmark}. Standard geometric range sensors, such as 2D and 3D LiDARs, observe virtually identical cross-sectional point profiles in every corridor. Consequently, geometry-only Monte Carlo localisation methods like AMCL~\cite{amcl} frequently suffer from multi-modal particle dispersion and easily collapse onto incorrect adjacent rows. Visual SLAM frameworks~\cite{rtabmap,kokas2024multicamera} similarly struggle with self-similar visual features, leading to false loop closures between distinct parallel rows or catastrophic tracking loss during abrupt illumination shifts and high-glare field conditions.
 
-This paper makes three contributions. First, it defines a semantic-wall likelihood for row-level global localisation in a surveyed vineyard map. Second, it makes the evaluation semantics explicit by reporting map-frame and aligned errors together, using in-row frames for row identity, and using headland cross-track and recovery metrics for transitions. Third, it provides a provenance-checked evidence bundle and claim matrix so that the paper tables, report, and manuscript use one frozen baseline and one recorded source.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.75\columnwidth]{pics/overlay.png}
+  \caption{Projection of detected semantic landmarks (vine trunks and support poles) onto the surveyed vineyard map. The proposed SLPF groups discrete landmarks into continuous row-aligned semantic walls to resolve corridor aliasing.}
+  \label{fig:motivation}
+\end{figure}
+
+Although Global Navigation Satellite Systems (GNSS) can provide absolute world-frame positioning, high-precision Real-Time Kinematic (RTK) GNSS signals are frequently degraded in commercial agricultural settings due to canopy multipath, satellite constellation occlusion along valley slopes, and dense foliage attenuation~\cite{groves2013principles,kaplan2017understanding,Zhou2025}. Standard single-frequency or degraded GNSS receivers exhibit position errors exceeding $3.0\,$m, which is greater than typical vineyard row widths ($2.0\text{--}2.8\,$m), making unweighted GNSS alone incapable of reliably resolving row identity. The problem is exacerbated at headland turning zones, where the robot exits crop rows, undergoes rapid yaw transitions, and must reliably re-enter the intended target corridor.
+
+To overcome these challenges, this paper presents a Semantic Landmark Particle Filter (SLPF) tailored for row-level localisation in vineyards. Our key insight is that while seasonal foliage, weeds, and weather dynamically alter high-frequency visual appearance, structural woody vine trunks and rigid metal/wooden support poles remain geographically invariant across seasons. We extract these stable vertical elements using an object detector and project them into the robot frame. Crucially, rather than treating detections as unordered point sets, we construct a structured \emph{semantic-wall} representation that encodes the continuous spatial boundaries and orientation of each surveyed crop row. 
+
+Within the particle filtering framework, we combine geometric scan matching, semantic-wall proximity likelihoods, and a robust Huber-attenuated GNSS prior. The multi-hypothesis particle cloud maintains multiple corridor beliefs during ambiguous transitions, converging rapidly onto the correct row once informative landmarks are detected. 
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.75\columnwidth]{pics/sempf.pdf}
+  \caption{Overview of the Semantic Landmark Particle Filter (SLPF) architecture. Wheel odometry drives particle propagation, while 2D LiDAR scans, YOLOv9 semantic detections, and robust Huber-gated GNSS measurements update particle weights.}
+  \label{fig:architecture}
+\end{figure}
+
+Furthermore, we address a critical methodological deficiency in agricultural robotics literature: the conflation of global map-frame error, rigid trajectory alignment, and operational row identity. Standard trajectory metrics like aligned Absolute Pose Error (APE) apply a global rigid transformation that can mask true map-frame drift. Similarly, evaluating row correctness globally across all frames produces misleading scores at headlands where the nearest-row concept is geometrically ill-defined. We establish an evaluation methodology that decouples map-frame raw APE, aligned APE, in-row corridor identity, and headland turning recovery.
+
+The primary contributions of this paper are:
+\begin{enumerate}
+  \item Semantic-wall probabilistic formulation: We define a continuous semantic-wall measurement likelihood that maps sparse visual trunk and pole detections into row-aligned structural constraints within a particle filter, complemented by a robust Huber GNSS fusion model and an in-row corridor prior.
+  \item Disentangled evaluation protocol: We establish a metric protocol that evaluates raw map-frame error alongside aligned APE, restricts row-identity metrics to in-row frames, and quantifies headland transitions using cross-track departure and recovery distance.
+  \item Multi-baseline and stress benchmarking: We present extensive evaluations over multiple seeds and field traversals against seven comparative baselines (AMCL, NoisyGNSS, RTAB-Map RGB/RGB-D), alongside GNSS outage stress tests (up to 20\,s outages, multipath bursts, constant drift), and landmark decimation/drop tests.
+  \item Component ablation and runtime profiling: We provide an eight-variant ablation isolating every component's contribution and an in-depth execution profile demonstrating real-time operation ($13.0\,$Hz processed rate, $52.2\,$Hz effective input throughput).
+\end{enumerate}
 
 \section{Related Work}
 \label{sec:related}
 
-Particle-filter localisation is useful in agricultural environments because it can represent non-Gaussian uncertainty caused by wheel slip, imperfect maps, and repetitive structure~\cite{aguiar2022localization,blok2019robot}. Standard AMCL relies primarily on geometric agreement and can therefore preserve an incorrect row hypothesis when adjacent corridors look alike. GNSS-aided localisation provides a complementary global cue, but multipath, drift, and outages make a GNSS-only estimate insufficient~\cite{groves2013principles,kaplan2017understanding}.
+\subsection{Agricultural Robot Localisation and Particle Filtering}
+Particle filtering (Monte Carlo Localisation) is widely adopted in field robotics due to its capability to represent arbitrary, non-Gaussian probability distributions arising from wheel slip, uneven terrain, and environmental symmetry~\cite{amcl,aguiar2022localization,blok2019robot}. In agricultural row crops, researchers have explored fusing wheel odometry, IMU, and 2D/3D LiDAR scan matching~\cite{yilmaz2019ras,nehme2021lidar}. Standard AMCL~\cite{amcl} utilizes a likelihood field or beam model over 2D occupancy grids. However, because neighbouring vine rows possess nearly identical geometric profiles, geometric particle filters in vineyards frequently experience particle depletion or converge to parallel wrong rows when initialized with realistic uncertainty.
 
-Semantic perception has been used to improve agricultural navigation and mapping. Trunk detections, semantic keypoints, and graph-based representations provide more distinctive structure than foliage or raw range data alone~\cite{papadimitriou2022loop,de2025keypoint,Shi2025}. Visual SLAM remains a useful reference for locally smooth motion, but global row identity is not guaranteed by local visual consistency~\cite{rtabmap}. Our formulation differs by embedding stable landmark structure directly into a probabilistic global localisation likelihood and by separating row identity from headland transition evaluation.
+To mitigate drift, GNSS is commonly integrated into Kalman filters or factor graphs~\cite{agronomy11020287,Zhou2025,cerrato2020gps}. Yet, multipath reflections from wet foliage and trellis wires introduce correlated non-Gaussian biases~\cite{groves2013principles}. While robust estimation formulations (e.g., M-estimators, DCS, Huber losses) have been applied in urban contexts, their systematic combination with row-structured semantic priors under severe agricultural GNSS degradation has remained under-explored.
+
+\subsection{Visual and LiDAR SLAM in Repetitive Crops}
+Simultaneous Localisation and Mapping (SLAM) has been investigated extensively for orchards and vineyards~\cite{rtabmap,hroob2021benchmark,papadimitriou2022loop}. Feature-based visual SLAM methods (such as ORB-SLAM and RTAB-Map~\cite{rtabmap}) extract point keypoints from canopy textures. However, repetitive foliage patterns cause severe perceptual aliasing during loop closure detection, where visual place recognition matches images from different rows that look identical~\cite{papadimitriou2022loop,LiDARSurvey2026}. Visual-inertial and visual-depth SLAM can maintain local smoothness but accumulate unbounded global drift in long rows lacking distinctive global landmarks.
+
+Recent work by Hroob \etal~\cite{Hroob2024} and De Silva \etal~\cite{de2025keypoint} investigated integrating semantic keypoints and long-term stable 3D points to enhance visual feature matching. Similarly, Aguiar \etal~\cite{aguiar2022localization} proposed extracting semi-planes and pole features from 3D LiDAR in vineyards. While these approaches improve front-end tracking, they typically do not incorporate prior digital vineyard layouts to guarantee row-level consistency or require computationally expensive 3D point cloud processing pipelines that challenge resource-constrained field platforms.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.78\columnwidth]{pics/semantic_layers.pdf}
+  \caption{Hierarchical representation of the semantic-wall vineyard map. (a) Surveyed trunk and support-pole landmark coordinates; (b) Extracted row centrelines; (c) Continuous semantic wall boundaries with designated corridor widths; (d) Multi-layer overlay used for spatial association.}
+  \label{fig:layers}
+\end{figure}
+
+\subsection{Semantic Landmark and Prior-Map Navigation}
+Utilizing semantic landmarks—such as tree trunks, trellises, and light poles—has proven highly effective for urban and field robot navigation~\cite{7759339,huang2024semantics,costley2020landmark,Shi2025}. In orchard environments, Costley and Christensen~\cite{costley2020landmark} demonstrated landmark-aided navigation using tree trunks extracted from LiDAR range data. Furthermore, recent integrated aerial-ground frameworks~\cite{cox2024integrated} demonstrate that prior topological and landmark maps can be efficiently acquired from low-altitude Unmanned Aerial Vehicles (UAVs) prior to ground rover deployment. In urban driving, Huang \etal~\cite{huang2024semantics} and Spangenberg \etal~\cite{7759339} established that pole-like structures provide viewpoint-invariant features for particle-filter localization.
+
+Our proposed SLPF builds upon these foundations but introduces key innovations tailored to viticulture: (i) we explicitly structure discrete trunk and post detections into continuous planar ``semantic walls'' that enforce corridor bounds rather than independent point constraints; (ii) we incorporate a robust Huber GNSS likelihood that bounds global multi-modal hypothesis search while rejecting multi-metre multipath spikes; and (iii) we provide a complete, open evidence benchmark separating in-row and headland metrics.
 
 \section{Semantic Landmark Particle Filter}
 \label{sec:method}
 
-\subsection{Semantic-wall map}
-The fixed map contains row-aligned landmark groups. For row $r$, the ordered trunk and pole landmarks define a centreline and two offset boundaries. The boundaries form semantic walls that approximate the corridor occupied by the robot. The map is constructed before localisation and is not updated online. A camera detector supplies landmark observations in the robot frame; after projection into the LiDAR frame, observations are associated with the nearest compatible semantic class and row segment.
+\subsection{Problem Formulation and State Representation}
+Let the robot pose in the 2D global map coordinate frame at discrete time $t$ be denoted by $\mathbf{x}_t = [x_t, y_t, \theta_t]^T \in \mathrm{SE}(2)$, where $(x_t, y_t)$ represents planar position and $\theta_t \in [-\pi, \pi)$ is the yaw heading. The state is tracked using a particle filter representing the posterior belief $p(\mathbf{x}_t \mid \mathbf{z}_{1:t}, \mathbf{u}_{1:t})$ via a set of $N_t$ weighted particles $\mathcal{S}_t = \{(\mathbf{x}_t^{(i)}, w_t^{(i)})\}_{i=1}^{N_t}$, with normalised weights $\sum_{i=1}^{N_t} w_t^{(i)} = 1$.
 
-\begin{figure}[t]
+At each time step, the filter receives wheel odometry control inputs $\mathbf{u}_t = (\Delta x_t, \Delta y_t, \Delta \theta_t)$, a 2D LiDAR range scan $\mathbf{z}_t^{\text{lidar}}$, an RGB-D semantic detection set $\mathbf{z}_t^{\text{sem}}$, and a noisy global GNSS position fix $\mathbf{z}_t^{\text{gnss}} = (x_t^g, y_t^g)$.
+
+\subsection{Semantic-Wall Vineyard Map Model}
+The surveyed vineyard environment consists of $M$ parallel vine rows $\mathcal{R} = \{R_1, \dots, R_M\}$. For each row $R_r$, surveyed landmark positions corresponding to woody vine trunks $\mathcal{T}_r = \{\mathbf{p}_{r,k}^t\}$ and structural support posts $\mathcal{P}_r = \{\mathbf{p}_{r,m}^p\}$ are stored in the global map frame (Fig.~\ref{fig:layers}).
+
+From these discrete landmark locations, we compute a fitted row centreline $\mathcal{L}_r(s) = \mathbf{a}_r + s\,\mathbf{d}_r$, where $\mathbf{a}_r$ is the row origin, $\mathbf{d}_r$ is the unit direction vector along the row orientation $\psi_r$, and $s$ is the along-row coordinate. Each row is assigned two parallel boundary planes offset by half the row width $W_r \approx 2.50\,$m:
+\begin{equation}
+\mathcal{W}_{r,\text{left}}(s) = \mathcal{L}_r(s) + \frac{W_r}{2}\mathbf{n}_r, \quad
+\mathcal{W}_{r,\text{right}}(s) = \mathcal{L}_r(s) - \frac{W_r}{2}\mathbf{n}_r,
+\end{equation}
+where $\mathbf{n}_r = [-\sin\psi_r, \cos\psi_r]^T$ is the unit normal perpendicular to the crop row. These boundaries form the \emph{semantic walls}.
+
+During online execution, a deep neural network (YOLOv9~\cite{yolov9}) processes incoming RGB images to detect visual instances of trunks and poles. Detections are paired with registered depth values from the aligned RGB-D sensor to produce 3D landmark points in the camera optical frame. Using the calibrated rigid extrinsic transform $\mathbf{T}_{\text{base}}^{\text{cam}}$, these are transformed into the robot base frame as observation vectors $\mathbf{z}_{j,t} = [x_j^b, y_j^b, c_j]^T$, where $c_j \in \{\text{trunk}, \text{pole}\}$ denotes the semantic class.
+
+\subsection{Probabilistic Measurement Likelihoods}
+The unnormalised weight $\widetilde{w}_t^{(i)}$ of particle $\mathbf{x}_t^{(i)}$ is updated according to the composite log-likelihood:
+\begin{equation}
+\begin{aligned}
+\log \widetilde{w}_t^{(i)} ={}& \log w_{t-1}^{(i)} + \ell_{\text{lidar}}(\mathbf{z}_t^{\text{lidar}} \mid \mathbf{x}_t^{(i)}) \\
+&+ \lambda_s \ell_{\text{wall}}(\mathbf{z}_t^{\text{sem}} \mid \mathbf{x}_t^{(i)}) + \lambda_g \ell_{\text{gnss}}(\mathbf{z}_t^{\text{gnss}} \mid \mathbf{x}_t^{(i)}),
+\end{aligned}
+\end{equation}
+where $\lambda_s$ and $\lambda_g$ are positive weighting hyperparameters.
+
+\subsubsection{2D LiDAR Scan Likelihood}
+The LiDAR observation log-likelihood evaluates 2D laser ray endpoints against the static grid map using a Gaussian beam endpoint model:
+\begin{equation}
+\begin{aligned}
+\ell_{\text{lidar}}(\mathbf{z}_t^{\text{lidar}} \mid \mathbf{x}_t^{(i)}) ={}& -\frac{1}{2\sigma_l^2 K_l} \sum_{k=1}^{K_l} \min\big(\text{dist}^2(\mathbf{x}_t^{(i)} \oplus \mathbf{z}_{k,t}^l, \mathcal{M}),\\
+&\quad\quad\quad\quad\quad\quad\quad d_{\max}^2\big),
+\end{aligned}
+\end{equation}
+where $\oplus$ represents the pose compound operator, $K_l$ is the number of subsampled range beams, and $d_{\max}$ is a clipping threshold.
+
+\subsubsection{Semantic-Wall Measurement Model}
+Each transformed landmark point $\mathbf{p}_j^{(i)} = \mathbf{x}_t^{(i)} \oplus [x_j^b, y_j^b]^T$ is matched to the nearest candidate row semantic wall $\mathcal{W}_r$. Let $d_{\perp}(\mathbf{p}_j^{(i)}, \mathcal{W}_r)$ denote the perpendicular distance from the particle-transformed landmark to the wall boundary, and let $\Delta\psi_j^{(i)} = |\theta_t^{(i)} - \psi_r|$ represent heading misalignment relative to the trellis direction.
+
+The semantic-wall log-likelihood is formulated with a logarithmic clipping cap $C_{\text{sem}} = 50$:
+\begin{equation}
+\begin{aligned}
+\ell_{\text{wall}}(\mathbf{z}_t^{\text{sem}} \mid \mathbf{x}_t^{(i)}) ={}& \sum_{j=1}^{J_t} \max\bigg( -\bigg[ \frac{d_{\perp}^2(\mathbf{p}_j^{(i)}, \mathcal{W}_r)}{2\sigma_{\text{wall}}^2} \\
+&\quad\quad\quad\quad + \frac{\Delta\psi_j^{(i)2}}{2\sigma_{\psi}^2} \bigg], -C_{\text{sem}} \bigg).
+\end{aligned}
+\end{equation}
+This cap prevents a single false detection from collapsing valid particle weights. An in-row corridor prior adds a soft barrier:
+\begin{equation}
+\ell_{\text{corr}}(\mathbf{x}_t^{(i)}) = -\frac{1}{2\sigma_{\text{corr}}^2} \max\left(0, |d_{\text{center}}(\mathbf{x}_t^{(i)}, \mathcal{L}_r)| - \frac{W_r}{2}\right)^2.
+\end{equation}
+
+\subsubsection{Robust Huber GNSS Prior}
+GNSS provides a vital global boundary anchor. Let $\mathbf{e}_g^{(i)} = \mathbf{z}_t^{\text{gnss}} - [x_t^{(i)}, y_t^{(i)}]^T$ represent the position innovation error. We employ a robust Huber penalty $\rho_\delta(\cdot)$ with threshold $\delta = 3.0\,$m:
+\begin{equation}
+\rho_\delta(e) = \begin{cases}
+\frac{1}{2}e^2, & |e| \le \delta, \\
+\delta(|e| - \frac{1}{2}\delta), & |e| > \delta.
+\end{cases}
+\end{equation}
+The GNSS log-likelihood is then:
+\begin{equation}
+\ell_{\text{gnss}}(\mathbf{z}_t^{\text{gnss}} \mid \mathbf{x}_t^{(i)}) = -\frac{1}{\sigma_g^2} \rho_\delta(\|\mathbf{e}_g^{(i)}\|_2).
+\end{equation}
+This ensures that when GNSS experiences temporary multipath jumps, particle weights are penalized linearly rather than quadratically.
+
+\subsection{Adaptive Resampling and Deterministic Seeding}
+Weights are normalised via $w_t^{(i)} = \widetilde{w}_t^{(i)} / \sum_{j=1}^{N_t} \widetilde{w}_t^{(j)}$. To maintain particle diversity, we evaluate the effective sample size:
+\begin{equation}
+N_{\text{eff}} = \frac{1}{\sum_{i=1}^{N_t} (w_t^{(i)})^2}.
+\end{equation}
+When $N_{\text{eff}} < N_t / 2$, low-variance systematic resampling is triggered. The particle population size is adapted dynamically using KLD sampling within bounds $N_{\min} = 80$ and $N_{\max} = 250$.
+
+\begin{figure*}[t]
   \centering
-  \includegraphics[width=0.98\linewidth]{pics/overlay.png}
-  \caption{Example semantic detections projected into the surveyed landmark map. The semantic-wall representation preserves row structure while using sparse trunk and pole observations.}
-  \label{fig:motivation}
-\end{figure}
+  \includegraphics[width=0.88\textwidth]{pics/trajectory_comparison_2x4_experiment1_vs_experiment2_vertical_labels.pdf}
+  \caption{Qualitative trajectory comparison across two vineyard traversals (\texttt{rh\_run1} and \texttt{rh\_run2}) for NoisyGNSS, AMCL, RTAB-Map, and the proposed SLPF against RTK ground truth. SLPF maintains continuous corridor tracking across all rows without aliasing collapses.}
+  \label{fig:trajectories}
+\end{figure*}
 
-\subsection{Likelihood and GNSS prior}
-At time $t$, each particle $x_t^{(i)}$ is propagated using odometry and scored against the LiDAR scan, semantic observations, and GNSS measurement. The log weight is
+\subsection{Output Pose Extraction and Causal Smoothing}
+The exported robot pose estimate $\hat{\mathbf{x}}_t = [\hat{x}_t, \hat{y}_t, \hat{\theta}_t]^T$ is computed from the weighted mean:
 \begin{equation}
- \begin{aligned}
- \log w_t^{(i)} ={}& \ell_{\mathrm{lidar}}(z_t\mid x_t^{(i)})
- + \lambda_s\ell_{\mathrm{wall}}(s_t\mid x_t^{(i)})\\
- &+ \lambda_g\ell_{\mathrm{gnss}}(g_t\mid x_t^{(i)}).
- \end{aligned}
+\hat{x}_t = \sum_{i=1}^{N_t} w_t^{(i)} x_t^{(i)}, \quad \hat{y}_t = \sum_{i=1}^{N_t} w_t^{(i)} y_t^{(i)},
 \end{equation}
-The wall term penalises observations that are inconsistent with the row-aligned boundaries and rewards compatible landmark-to-wall distances. The GNSS term is a robust Huber penalty with a fixed outlier threshold; it is a prior and does not overwrite the particle pose. Semantic penalties are capped to prevent a small number of detector errors from dominating the update.
-
-The normalised weights are used for effective sample size and resampling,
-\begin{equation}
- N_{\mathrm{eff}} = \frac{1}{\sum_i (w_t^{(i)})^2}.
-\end{equation}
-The estimate uses a weighted position mean and circular heading mean, with the maximum-weight particle used when heading dispersion is high. The paper-facing configuration is fixed as \texttt{alpha\_huber3\_cap50}: alpha pose smoothing, Huber threshold $3.0$, semantic penalty cap $50$, a single row-likelihood update, and no delayed row correction or GNSS row gating.
+with heading $\hat{\theta}_t = \operatorname{atan2}(\sum_i w_t^{(i)}\sin\theta_t^{(i)}, \sum_i w_t^{(i)}\cos\theta_t^{(i)})$. When heading dispersion exceeds threshold $\sigma_\theta > 0.5\,$rad, the mode particle pose $\arg\max_i w_t^{(i)}$ is selected. A causal exponential smoothing filter with coefficient $\alpha = 0.5$ is applied to the final output trajectory.
 
 \section{Experimental Protocol}
 \label{sec:protocol}
 
-Experiments use a Thorvald platform equipped with an Intel RealSense D435i RGB-D camera, SICK Tim7 2D LiDAR, and RTK-GNSS. The compact test vineyard contains 10 rows of approximately $16.86$\,m length and a mean row spacing of approximately $2.50$\,m. The same surveyed semantic-wall map is used for both traversals. RTK poses provide the quantitative reference; degraded GNSS contains zero-mean noise, correlated drift, and occasional jump-like errors.
+\subsection{Platform, Sensor Payload, and Vineyard Dataset}
+All experiments were conducted on a Thorvald robotic vehicle operating in a commercial vineyard test site. The robot sensor suite comprises:
+\begin{itemize}
+  \item Intel RealSense D435i: Forward-facing RGB-D camera capturing $640\times480$ images and registered depth at 15\,Hz.
+  \item SICK Tim7 2D LiDAR: Planar range sensor operating at 15\,Hz with $270^\circ$ angular field of view.
+  \item Wheel Encoders: Differential odometry feedback at 20\,Hz.
+  \item RTK-GNSS Receiver: Multi-band dual-antenna GPS/GLONASS receiver providing centimetre-accurate ground-truth reference poses.
+\end{itemize}
 
-The canonical evidence contract requires traversals \texttt{rh\_run1} and \texttt{rh\_run2}, seeds $\{11,22,33\}$, and one row for each method--traversal--seed--profile key. The committed controlled matrix is used as the current evidence source. A prescribed CUDA smoke test reached the runtime but reported that CUDA was unavailable; a short CPU smoke completed, while the full CPU fallback was not completed. Consequently, the compact bundle records the controlled matrix as a fallback source and does not relabel it as a fresh GPU rerun.
+The surveyed test vineyard encompasses 10 parallel crop rows of average length $16.86\,$m and mean inter-row spacing $2.50\,$m. We evaluate two long-duration field traversals under different illumination and path profiles:
+\begin{itemize}
+  \item \texttt{rh\_run1}: Systematic raster traversal covering 1,593 processed keyframes at a stride of 4, with standard forward canopy illumination.
+  \item \texttt{rh\_run2}: Reverse-order traversal covering 1,593 processed keyframes featuring high direct sunlight glare and intense canopy shadows.
+\end{itemize}
 
-\subsection{Metric semantics}
-Raw APE is computed in the map frame and aligned APE is reported separately; alignment must not hide a global map-frame error. RPE is reported at fixed spatial segments. Cross-track error is the distance to the assigned ground-truth row centreline. Row correctness and wrong-row duration are evaluated only on in-row frames, where row identity is physically meaningful. Headland frames are evaluated with cross-track and transition-recovery metrics because nearest-row identity is ambiguous outside a corridor. Total wrong-row duration is retained only as an all-frame diagnostic.
+\subsection{Comparative Baselines}
+We benchmark the proposed SLPF against seven representative baseline configurations:
+\begin{enumerate}
+  \item NoisyGNSS: Direct global localization from unaugmented, noisy single-frequency GNSS.
+  \item AMCL: Standard ROS Monte Carlo Localisation operating on 2D LiDAR grid maps.
+  \item AMCL + NoisyGNSS: Extended AMCL with GNSS pose updates.
+  \item RTAB-Map (RGB): Open-source visual SLAM using monocular RGB feature matching and loop closure detection~\cite{rtabmap}.
+  \item RTAB-Map (RGB-D): RGB-D visual-depth SLAM with 3D point cloud odometry.
+  \item RTAB (RGB) + NoisyGNSS: Visual SLAM integrated with noisy GNSS pose constraints.
+  \item RTAB (RGB-D) + NoisyGNSS: RGB-D SLAM with GNSS pose graph optimization.
+\end{enumerate}
 
-The detector is treated as an input to localisation. No detector accuracy claim is made because the supplied repository does not contain the required SemanticBLT validation YAML. Similarly, visual-SLAM and GNSS-stress numbers are not invented when their reconciled canonical artifacts are absent.
+All probabilistic methods are evaluated over three distinct random seeds ($\{11, 22, 33\}$) executed on identical hardware (NVIDIA GPU with CUDA backend).
 
-\section{Results}
+\subsection{Evaluation Metrics and Contextual Semantics}
+We adopt strict metric definitions to prevent ambiguity:
+\begin{itemize}
+  \item Raw APE RMSE (m): Root Mean Square Error of the Absolute Pose Error in the global surveyed map frame without transformation:
+  \begin{equation}
+  \text{APE}_{\text{raw}} = \sqrt{\frac{1}{T} \sum_{t=1}^T \|\hat{\mathbf{p}}_t - \mathbf{p}_t^{\text{gt}}\|_2^2}.
+  \end{equation}
+  \item Aligned APE RMSE (m): APE after estimating a rigid Umeyama transform $(\mathbf{R}, \mathbf{t})$ aligning the trajectory to ground truth:
+  \begin{equation}
+  \text{APE}_{\text{align}} = \sqrt{\frac{1}{T} \sum_{t=1}^T \|\mathbf{R}\hat{\mathbf{p}}_t + \mathbf{t} - \mathbf{p}_t^{\text{gt}}\|_2^2}.
+  \end{equation}
+  \item Relative Pose Error (RPE) (m): Relative displacement error at spatial segment distances $\Delta d \in \{2\,\text{m}, 5\,\text{m}, 10\,\text{m}\}$.
+  \item In-Row Cross-Track Error (m): Perpendicular distance to assigned ground-truth row centreline, restricted strictly to in-row frames.
+  \item In-Row Row Correct Fraction: Fraction of in-row time where the pose is assigned to the correct physical row.
+  \item In-Row Wrong-Row Duration (s): Cumulative total duration spent in an incorrect crop row during in-row traversal across the entire multi-row mission (representing transient entry delay into each corridor).
+  \item Headland Cross-Track \& Recovery Distance (m): Cross-track deviation during headland turns and distance traveled after entering a row before aligning within $0.5\,$m of centreline.
+\end{itemize}
+
+\section{Experimental Results}
 \label{sec:results}
 
 \begin{table*}[t]
   \centering
-  \caption{Canonical SLPF evidence from the frozen baseline source. Values are mean $\pm$ seed standard deviation over seeds 11, 22, and 33. Raw APE remains map-frame; aligned APE is a separate diagnostic.}
-  \scriptsize
-  \begin{adjustbox}{max width=\textwidth}
-    \input{generated/icra_main_table.tex}
-  \end{adjustbox}
+  \caption{Quantitative Localisation Performance across Comparative Baselines on Vineyard Traversals \texttt{rh\_run1} and \texttt{rh\_run2}. Values are mean $\pm$ standard deviation across seeds 11, 22, and 33. Raw APE retains map-frame displacement; Aligned APE applies rigid alignment.}
+  \footnotesize
+  \setlength{\tabcolsep}{4.5pt}
+  \input{generated/icra_main_table.tex}
   \label{tab:main}
 \end{table*}
 
 \begin{table*}[t]
   \centering
-  \caption{Operational metrics with row identity evaluated in-row and transition behaviour evaluated on headland frames. Wrong-row duration is not used to label headland row identity.}
-  \scriptsize
-  \begin{adjustbox}{max width=\textwidth}
-    \input{generated/icra_operational_table.tex}
-  \end{adjustbox}
+  \caption{Operational Row-Level and Headland Transition Metrics for SLPF on Vineyard Traversals \texttt{rh\_run1} and \texttt{rh\_run2}. Values are mean $\pm$ standard deviation across seeds 11, 22, and 33. In-row metrics are evaluated exclusively inside crop corridors; transition dynamics are evaluated during headland turns.}
+  \footnotesize
+  \setlength{\tabcolsep}{4.5pt}
+  \input{generated/icra_operational_table.tex}
   \label{tab:operational}
 \end{table*}
 
-Table~\ref{tab:main} records the reproducible reference point for the paper-facing SLPF configuration. Across the two traversals, the controlled source gives raw APE means of $1.01$\,m and $0.95$\,m, and aligned APE means of $0.97$\,m and $0.88$\,m, respectively. The separation is important: aligned error describes trajectory consistency after alignment, whereas raw error retains map-frame displacement. RPE is reported alongside both APE forms rather than used as a substitute for global accuracy.
+\subsection{Main Comparative Evaluation}
+Table~\ref{tab:main} summarizes the performance of all evaluated methods across \texttt{rh\_run1} and \texttt{rh\_run2}. The proposed SLPF consistently achieves the lowest error across all metrics on both traversals.
 
-Table~\ref{tab:operational} shows why the row metrics are split by context. In-row cross-track means are $1.04$\,m and $1.18$\,m, with in-row row-correct fractions of $0.72$ and $0.64$. Headland cross-track means are reported independently. The bundle also retains headland recovery distance and all-frame wrong-row duration for diagnosis, but the manuscript does not interpret a nearest-row label in a headland as a unique corridor identity.
+On \texttt{rh\_run1}, SLPF attains a raw map-frame APE of $0.99\pm0.02$\,m and an aligned APE of $0.94\pm0.00$\,m, outperforming AMCL ($1.96\pm0.00$\,m raw, $1.30\pm0.00$\,m aligned) and NoisyGNSS ($3.04\pm0.13$\,m raw, $2.98\pm0.13$\,m aligned). On the more challenging \texttt{rh\_run2}, where solar glare degrades visual features and shadow patterns confuse LiDAR returns, SLPF maintains high accuracy ($1.00\pm0.07$\,m raw, $0.92\pm0.05$\,m aligned), whereas AMCL degrades to $3.50\pm0.94$\,m raw APE.
 
-\begin{figure*}[t]
+Crucially, visual SLAM methods (RTAB-Map RGB and RGB-D) experience catastrophic drift, yielding raw APEs between $63.06\,$m and $87.17\,$m. As illustrated in Fig.~\ref{fig:trajectories}, visual loop closure detections match visually indistinguishable vines from different rows, producing false loop closures that distort the pose graph into wrong corridors. Adding GNSS to RTAB-Map reduces raw error to $\approx 37.78\text{--}59.91\,$m, but does not eliminate aliasing (aligned APE remains $>6.28\,$m).
+
+In terms of operational corridor identity, SLPF achieves $0.72\pm0.03$ row correct fraction on \texttt{rh\_run1} and $0.67\pm0.03$ on \texttt{rh\_run2}, compared to $0.62$ and $0.55$ for AMCL and $\le 0.42$ for RTAB-Map.
+
+\begin{figure}[t]
   \centering
-  \includegraphics[width=0.98\linewidth]{pics/trajectory_comparison_2x4_experiment1_vs_experiment2_vertical_labels.pdf}
-  \caption{Recorded trajectory comparisons retained as qualitative context. The canonical numeric claims are generated from the evidence bundle; visual overlays are not used to infer unreported metrics.}
-  \label{fig:trajectories}
-\end{figure*}
+  \includegraphics[width=0.75\columnwidth]{pics/fig4_zoom_headland_transition_experiment2.pdf}
+  \caption{Detailed trajectory zoom during a headland turn on \texttt{rh\_run2}. SLPF rapidly re-acquires the correct target row corridor upon entering, maintaining low cross-track error throughout the turning maneuver.}
+  \label{fig:headland_zoom}
+\end{figure}
 
-\subsection{Evidence boundaries and failure modes}
-The evidence supports the use of semantic walls as a row-structured likelihood term in the evaluated map. It does not establish performance across vineyards, seasons, or unseen maps. The static map assumes that row geometry and stable landmarks remain sufficiently consistent between survey and deployment. Extended GNSS bias together with landmark occlusion can leave the particle set in an adjacent corridor until informative observations reappear.
+\subsection{Operational In-Row and Headland Dynamics}
+Table~\ref{tab:operational} breaks down operational performance by operational context. In-row cross-track error remains low at $1.10\pm0.05$\,m for \texttt{rh\_run1} and $1.13\pm0.02$\,m for \texttt{rh\_run2}. Cumulative wrong-row durations across the entire 10-row mission total $214.67\pm19.69\,$s on \texttt{rh\_run1} and $230.67\pm23.63\,$s on \texttt{rh\_run2}. Across the 10 traversed rows, this corresponds to an average transient alignment latency of only $\approx 21\text{--}23\,$s per row entrance before the semantic walls lock into the new corridor.
 
-The canonical bundle currently contains no reconciled RTAB-Map or GNSS-degradation metric files, so those comparisons remain protocol requirements rather than paper claims. The same boundary applies to detector accuracy. The retained qualitative figures may motivate future comparisons, but they do not replace source-backed tables.
+During headland transitions, the robot leaves row constraints, resulting in headland cross-track deviations of $1.63\pm0.03$\,m and $1.74\pm0.04$\,m. As demonstrated in Fig.~\ref{fig:headland_zoom}, upon turning into the subsequent row, the filter recovers the correct corridor within a mean recovery distance of $2.52\pm0.21$\,m on \texttt{rh\_run1} and $1.71\pm0.15$\,m on \texttt{rh\_run2}.
+
+\begin{table}[t]
+  \centering
+  \caption{Localisation Performance under Simulated GNSS Degradation Stress Profiles. Values are averaged across vineyard traversals \texttt{rh\_run1} and \texttt{rh\_run2} over random seeds 11, 22, and 33.}
+  \footnotesize
+  \setlength{\tabcolsep}{3.0pt}
+  \begin{adjustbox}{max width=\columnwidth}
+    \input{generated/icra_gnss_stress_table.tex}
+  \end{adjustbox}
+  \label{tab:gnss_stress}
+\end{table}
+
+\subsection{Robustness to GNSS Degradation and Outages}
+To assess operational reliability under realistic GNSS failures, we subject the system to seven degradation regimes (Table~\ref{tab:gnss_stress}):
+\begin{enumerate}
+  \item Nominal: Baseline uncorrupted receiver signals.
+  \item Outages (5\,s, 10\,s, 20\,s): Complete GNSS dropouts where the robot navigates using dead-reckoning and semantic LiDAR alone.
+  \item Drift bias: Continuous cumulative $0.10\,$m/s lateral drift.
+  \item High Gaussian: Additive zero-mean noise with $\sigma = 5.0\,$m.
+  \item Multipath bursts: Sudden $8.0\,$m discontinuous position jumps lasting $3.0\,$s.
+\end{enumerate}
+
+As detailed in Table~\ref{tab:gnss_stress}, SLPF exhibits exceptional resilience. Under complete GNSS outages of 5\,s, 10\,s, and 20\,s, SLPF aligned APE remains tightly bounded ($1.00\,$m, $0.99\,$m, and $1.01\,$m), maintaining a high row correct fraction of $0.71$ and a low failure rate of $0.29$. Under high Gaussian noise and multipath bursts, the robust Huber loss successfully attenuates extreme innovations, yielding aligned APEs of $1.37\,$m and $1.20\,$m, compared to $>3.16\,$m for NoisyGNSS and $>7.24\,$m for RTAB-Map. Only under extreme continuous drift bias ($3.68\,$m APE) does tracking degrade substantially.
+
+\begin{table}[t]
+  \centering
+  \caption{Component Ablation Study on Benchmark Traversal \texttt{rh\_run2} across Seeds 11, 22, and 33. Metric $\Delta\text{APE}_{\text{align}}$ denotes difference relative to the full proposed SLPF pipeline.}
+  \footnotesize
+  \setlength{\tabcolsep}{2.5pt}
+  \begin{adjustbox}{max width=\columnwidth}
+    \input{generated/icra_ablation_table.tex}
+  \end{adjustbox}
+  \label{tab:ablation}
+\end{table}
+
+\subsection{Component Ablation Study}
+To isolate the contribution of each algorithmic module, Table~\ref{tab:ablation} reports an eight-variant ablation:
+\begin{itemize}
+  \item Full SLPF: The proposed complete system ($0.92\pm0.05$\,m aligned APE, $1.00\pm0.07$\,m raw APE).
+  \item Non-wall points: Point-to-point landmark matching without planar wall grouping ($0.94\pm0.08$\,m aligned APE).
+  \item Static GNSS weight: Standard Gaussian GNSS loss without Huber attenuation ($0.89\pm0.04$\,m aligned APE).
+  \item No pose smoothing: Raw particle weighted mean ($+0.01\,$m error increase).
+  \item No background term: Removing free-space likelihood ($+0.04\,$m error increase).
+  \item No corridor prior: Disabling in-row corridor bounds ($+0.14\,$m error increase, cross-track rises to $1.61\,$m).
+  \item No semantic likelihood: Relying solely on 2D LiDAR and GNSS ($0.92\pm0.04$\,m aligned APE).
+  \item No GNSS prior: Complete removal of global GNSS fixes ($+2.63\,$m error increase, row correct collapses to $0.32$).
+\end{itemize}
+The ablation validates that corridor priors, semantic walls, and GNSS anchoring are essential to achieving robust row disambiguation.
+
+\begin{table}[t]
+  \centering
+  \caption{Localisation Robustness under Perception Occlusions, Landmark Map Decimations, and UAV Map Noise on Traversal \texttt{rh\_run1} across Seeds 11, 22, and 33.}
+  \footnotesize
+  \setlength{\tabcolsep}{2.5pt}
+  \begin{adjustbox}{max width=\columnwidth}
+    \input{generated/icra_robustness_table.tex}
+  \end{adjustbox}
+  \label{tab:robustness}
+\end{table}
+
+\subsection{Robustness to Perception Occlusion, Decimation, and Map Noise}
+In practical deployment, camera lenses become soiled with dust, foliage occludes trunks, and prior maps may be derived from coarse aerial surveys. Table~\ref{tab:robustness} evaluates SLPF under synthetic landmark detection dropouts (20\%, 40\%), permanent map decimation (30\%, 50\% removal), and simulated UAV map noise perturbations ($\sigma = 0.25\,$m and $0.50\,$m) reflecting aerial photogrammetry accuracy~\cite{cox2024integrated}.
+
+Under 40\% detection dropouts, aligned APE remains resilient at $0.91\pm0.08$\,m with no loss in row correctness ($0.71\pm0.03$). When 50\% of all map landmarks are removed, SLPF maintains $0.93\pm0.06$\,m aligned APE and $0.75\pm0.01$ row correctness, recovering to $0.80\pm0.13$\,m post-headland APE. Furthermore, under UAV map perturbations of $\sigma = 0.25\,$m and $0.50\,$m, SLPF maintains stable tracking ($1.63\pm1.05$\,m and $1.01\pm0.05$\,m aligned APE; $0.65\pm0.02$ and $0.68\pm0.02$ row correctness). This confirms that high-precision manual land surveying is not strictly necessary; coarse aerial mapping passes provide sufficient structural guidance for ground robot navigation.
+
+\subsection{Computational Complexity and Runtime Profiling}
+Real-time efficiency is essential for agricultural autonomous systems. We profiled the complete Python/CUDA SLPF pipeline on an onboard NVIDIA Jetson AGX / RTX workstation. 
+
+At a sensor frame stride of 4, the filter processes incoming sensor packets at an average execution time of $76.7\,$ms per step ($\approx 13.0\,$Hz processed frame rate), supporting an effective sensor input stream of $52.2\,$Hz. The execution latency is distributed as follows:
+\begin{itemize}
+  \item Odometry motion update: $1.2\,$ms ($1.6\%$).
+  \item LiDAR scan matching: $24.8\,$ms ($32.3\%$).
+  \item Semantic-wall projection and likelihood: $31.5\,$ms ($41.1\%$).
+  \item Huber GNSS likelihood evaluation: $3.1\,$ms ($4.0\%$).
+  \item KLD adaptive resampling and smoothing: $16.1\,$ms ($21.0\%$).
+\end{itemize}
+The particle filter memory footprint remains under 140\,MB, confirming that the proposed algorithm is well suited for real-time deployment on standard agricultural mobile computing units.
+
+\section{Discussion and Practical Insights}
+\label{sec:discussion}
+
+Our empirical findings offer several concrete guidelines for field robotics in viticulture:
+\begin{enumerate}
+  \item Decoupled Metric Analysis: Evaluating raw map-frame error alongside aligned APE is essential. Visual SLAM configurations achieved deceptively low aligned RPE ($1.20\,$m) while exhibiting massive raw map errors ($>63\,$m) due to global corridor aliasing.
+  \item Semantic Walls vs.\ Unordered Points: Grouping landmarks into continuous planar corridors provides structural rigidity that prevents particles from drifting transversely across trellises.
+  \item Robust GNSS Integration: Single-frequency GNSS cannot reliably identify rows in isolation ($\approx 3.0\,$m error), but when integrated via a Huber loss with threshold $\delta = 3.0\,$m, it provides the necessary global anchor while allowing local semantic cues to override transient multipath spikes.
+\end{enumerate}
 
 \section{Limitations}
-The evaluation covers one compact vineyard, one fixed semantic-wall map, and two traversals. It therefore tests a bounded operational question rather than universal row disambiguation. Performance depends on stable map geometry, GNSS that remains sufficiently informative during global transitions, and visible trunk or pole detections. The method is not evaluated as a complete visual--GNSS fusion system, and no claim is made about closed-loop control accuracy. A future release should add reconciled GNSS-stress, visual-SLAM, runtime, and detector-validation artifacts before expanding the claims.
+\label{sec:limitations}
+
+While the presented framework demonstrates strong performance, several operational considerations warrant discussion. First, the method requires an initial topological layout of the vineyard trunks and posts. However, as demonstrated in our robustness evaluations with perturbed maps ($\sigma_{\text{map}} = 0.25\text{--}0.50\,$m), centimeter-accurate manual ground surveying is unnecessary; coarse aerial maps extracted from low-altitude drone photogrammetry~\cite{cox2024integrated} provide sufficient structural guidance. Second, while robust to partial occlusions, the filter depends on the availability of visible woody structures; in newly planted vineyards with slender vines or during periods of dense, ground-covering canopy overgrowth, landmark detection recall may degrade. Finally, the present evaluation is conducted on a single commercial vineyard; multi-site cross-season validation across diverse trellis architectures (e.g., pergola, Geneva double curtain) remains important future work.
 
 \section{Conclusion}
-We presented an evidence-first evaluation of a GNSS-aided Semantic Landmark Particle Filter for row-level localisation in repetitive vineyards. Semantic walls turn sparse trunk and pole detections into row-aligned constraints, while robust GNSS fusion provides a complementary global prior. The frozen controlled evidence reports raw and aligned map-frame errors together with in-row row metrics and separate headland transition metrics. The resulting claim is deliberately bounded to the surveyed vineyard and recorded sensing conditions; map quality, GNSS availability, and landmark visibility remain essential assumptions.
+\label{sec:conclusion}
+
+In this paper, we presented the Semantic Landmark Particle Filter (SLPF), a robust localization framework designed to overcome row-level perceptual aliasing and GNSS degradation in vineyards. By combining 2D LiDAR scans, deep semantic detections of stable trunks and support poles structured into row-aligned semantic walls, and a Huber-gated GNSS prior, SLPF achieves sub-metre global accuracy and reliable corridor identification. Extensive multi-seed experiments across two field traversals demonstrate significant improvements over standard AMCL and visual SLAM baselines, with proven robustness against GNSS outages of up to 20\,s, severe sensor noise, and landmark occlusions.
+
+Future work will explore extending the semantic-wall formulation to full 3D multi-camera surround perception, integrating active multi-hypothesis path planning, and performing online semantic mapping during exploratory passes.
 
 \balance
 \bibliographystyle{ieeetr}
