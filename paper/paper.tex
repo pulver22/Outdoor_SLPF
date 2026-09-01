@@ -208,15 +208,14 @@ The surveyed test vineyard encompasses 10 parallel crop rows of average length $
 We benchmark the proposed SLPF against seven representative baseline configurations:
 \begin{enumerate}
   \item NoisyGNSS: Direct global localization from unaugmented, noisy single-frequency GNSS.
-  \item AMCL: Standard ROS Monte Carlo Localisation operating on 2D LiDAR grid maps.
-  \item AMCL + NoisyGNSS: Extended AMCL with GNSS pose updates.
+  \item AMCL: Standard ROS Monte Carlo Localisation operating on 2D LiDAR grid maps~\cite{amcl}.
+  \item AMCL + NoisyGNSS: AMCL fused with noisy GNSS via the ROS \texttt{robot\_localization} Kalman filter framework~\cite{moore2014generalized}.
   \item RTAB-Map (RGB): Open-source visual SLAM using monocular RGB feature matching and loop closure detection~\cite{rtabmap}.
-  \item RTAB-Map (RGB-D): RGB-D visual-depth SLAM with 3D point cloud odometry.
-  \item RTAB (RGB) + NoisyGNSS: Visual SLAM integrated with noisy GNSS pose constraints.
-  \item RTAB (RGB-D) + NoisyGNSS: RGB-D SLAM with GNSS pose graph optimization.
+  \item RTAB-Map (RGB-D): RGB-D visual-depth SLAM with 3D point cloud odometry~\cite{rtabmap}.
+  \item RTAB (RGB) + NoisyGNSS: Monocular visual SLAM fused with noisy GNSS via the ROS \texttt{robot\_localization} Kalman filter~\cite{moore2014generalized}.
+  \item RTAB (RGB-D) + NoisyGNSS: RGB-D visual SLAM fused with noisy GNSS via the ROS \texttt{robot\_localization} Kalman filter~\cite{moore2014generalized}.
 \end{enumerate}
-
-All probabilistic methods are evaluated over three distinct random seeds ($\{11, 22, 33\}$) executed on identical hardware (NVIDIA GPU with CUDA backend).
+For all baselines fused with GNSS, fusion is performed using a continuous-discrete Kalman filter as implemented in the standard ROS \texttt{robot\_localization} package~\cite{moore2014generalized}. All probabilistic methods are evaluated over three distinct random seeds ($\{11, 22, 33\}$) executed on identical hardware (NVIDIA GPU with CUDA backend).
 
 \subsection{Evaluation Metrics and Contextual Semantics}
 We adopt strict metric definitions to prevent ambiguity:
