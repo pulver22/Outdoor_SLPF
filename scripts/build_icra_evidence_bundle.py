@@ -127,8 +127,12 @@ def _normalise_row(row: Mapping[str, object], source: Path) -> dict[str, object]
     seed_str = str(row.get("seed", "")).strip()
     seed = int(seed_str) if seed_str.isdigit() else 0
 
-    traversal = str(row.get("traversal", "")).strip()
-    if not traversal:
+    traversal = str(row.get("traversal", "")).strip().lower()
+    if traversal in {"exp1", "run1", "rh1", "rh_run1", "experiment1"}:
+        traversal = "rh_run1"
+    elif traversal in {"exp2", "run2", "rh2", "rh_run2", "experiment2"}:
+        traversal = "rh_run2"
+    elif not traversal:
         source_name = str(source).lower()
         if "rh1" in source_name or "run1" in source_name or "exp1" in str(row.get("run_name", "")).lower():
             traversal = "rh_run1"
@@ -139,6 +143,10 @@ def _normalise_row(row: Mapping[str, object], source: Path) -> dict[str, object]
     clean_method = _clean_method_name(method)
 
     normalised = dict(row)
+    if "row_correct_fraction" in row and "inrow_row_correct_fraction" not in row:
+        normalised["inrow_row_correct_fraction"] = row["row_correct_fraction"]
+    if "cross_track_mean" in row and "inrow_cross_track_mean" not in row:
+        normalised["inrow_cross_track_mean"] = row["cross_track_mean"]
     normalised.update(
         {
             "method": clean_method,
@@ -264,6 +272,7 @@ def _tex_main_table(path: Path, rows: list[dict[str, object]]) -> None:
         "\\midrule",
     ]
     for traversal in EXPECTED_TRAVERSALS:
+        t_label = traversal.replace("_", r"\_")
         t_rows = {row["method"]: row for row in rows if row["traversal"] == traversal}
         for method in method_order:
             if method not in t_rows:
@@ -279,9 +288,9 @@ def _tex_main_table(path: Path, rows: list[dict[str, object]]) -> None:
             m_label = method
             if "SLPF" in method:
                 m_label = r"\textbf{SLPF (ours)}"
-                lines.append(f"{m_label} & \\texttt{{{traversal}}} & $\\mathbf{{{raw_ape}}}$ & $\\mathbf{{{align_ape}}}$ & ${rpe_2m}$ & $\\mathbf{{{xt}}}$ & $\\mathbf{{{row_corr}}}$ \\\\")
+                lines.append(f"{m_label} & \\texttt{{{t_label}}} & $\\mathbf{{{raw_ape}}}$ & $\\mathbf{{{align_ape}}}$ & ${rpe_2m}$ & $\\mathbf{{{xt}}}$ & $\\mathbf{{{row_corr}}}$ \\\\")
             else:
-                lines.append(f"{m_label} & \\texttt{{{traversal}}} & ${raw_ape}$ & ${align_ape}$ & ${rpe_2m}$ & ${xt}$ & ${row_corr}$ \\\\")
+                lines.append(f"{m_label} & \\texttt{{{t_label}}} & ${raw_ape}$ & ${align_ape}$ & ${rpe_2m}$ & ${xt}$ & ${row_corr}$ \\\\")
         if traversal == "rh_run1":
             lines.append("\\midrule")
     lines.extend(["\\bottomrule", "\\end{tabular}", ""])
@@ -301,12 +310,13 @@ def _tex_operational_table(path: Path, rows: list[dict[str, object]]) -> None:
     for row in slpf_rows:
         vals = row.get("_values", {})
         traversal = row["traversal"]
+        t_label = traversal.replace("_", r"\_")
         in_xt = format_mean_std(vals.get("inrow_cross_track_mean", [row.get("inrow_cross_track_mean_mean")]))
         in_corr = format_mean_std(vals.get("inrow_row_correct_fraction", [row.get("inrow_row_correct_fraction_mean")]))
         in_wrong = format_mean_std(vals.get("inrow_wrong_row_duration_sec", [row.get("inrow_wrong_row_duration_sec_mean")]), digits=2)
         hl_xt = format_mean_std(vals.get("headland_cross_track_mean", [row.get("headland_cross_track_mean_mean")]))
         hl_rec = format_mean_std(vals.get("headland_mean_recovery_distance_m", [row.get("headland_mean_recovery_distance_m_mean")]))
-        lines.append(f"\\texttt{{baseline\\_alpha\\_huber3\\_cap50}} & \\texttt{{{traversal}}} & ${in_xt}$ & ${in_corr}$ & ${in_wrong}$ & ${hl_xt}$ & ${hl_rec}$ \\\\")
+        lines.append(f"\\textbf{{SLPF (ours)}} & \\texttt{{{t_label}}} & ${in_xt}$ & ${in_corr}$ & ${in_wrong}$ & ${hl_xt}$ & ${hl_rec}$ \\\\")
     lines.extend(["\\bottomrule", "\\end{tabular}", ""])
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines), encoding="utf-8")

@@ -2,7 +2,9 @@
   "detector_accuracy_claim_permitted": false,
   "notes": [
     "Raw map-frame APE and aligned APE are retained.",
-    "In-row metrics are used for row identity; headland metrics are used for transition behaviour."
+    "In-row metrics are used for row identity; headland metrics are used for transition behaviour.",
+    "Multi-baseline comparative metrics (AMCL, NoisyGNSS, RTAB-Map) ingested and reconciled.",
+    "GNSS degradation stress, component ablations, and robustness tables generated from recorded experiments."
   ],
   "passed": true,
   "required_metrics": [
@@ -11,6 +13,7 @@
     "rpe_2m_align_rmse",
     "rpe_5m_align_rmse",
     "rpe_10m_align_rmse",
+    "cross_track_mean",
     "inrow_cross_track_mean",
     "inrow_row_correct_fraction",
     "inrow_wrong_row_duration_sec",
