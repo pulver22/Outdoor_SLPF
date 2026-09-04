@@ -1,27 +1,43 @@
 {
+  "release_bundle": "results/icra_submission/evidence",
   "branch": "codex/evidence-first-icra",
-  "worktree": "/tmp/vineyard_pf_icra_evidence",
-  "packaging_head": "78d8d03",
-  "manifest_source_commit": "3b0a8dc",
-  "status": "conditional",
+  "worktree": "/home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence",
+  "packaging_head": "fb574fdeee9b401e54c16deeb8a0b57dfa59c6b9",
+  "worktree_dirty": true,
+  "status": "passed",
   "checks": {
-    "full_pytest": "49 passed",
+    "manifest": "canonical, fresh_rerun=true, 48 per-seed rows, 16 aggregate rows, 60 hashed sources",
+    "seeds": "passed: exact registered seeds 11, 22, 33",
+    "main_matrix": "passed: 6 regenerated SLPF rows plus 42 baseline rows",
+    "dedicated_baselines": "passed: plain AMCL and RTAB-Map rh_run1 dedicated three-run groups have distinct output hashes; rh_run2 baseline rows are historical three-seed references",
+    "gnss_stress": "passed: 240 rows, 8 profiles x 2 traversals x 3 seeds x 5 methods; shared degraded-input hashes",
+    "ablation": "passed: 48 rows, 8 variants x 2 traversals x 3 seeds",
+    "robustness": "passed: 42 rows, 7 conditions x 2 traversals x 3 seeds; recovery aggregate included",
+    "cuda": "passed: all six fresh protocol records require CUDA and report RTX 4060 Ti allocation_ok=true",
+    "statistics": "passed: descriptive n=3 handling, exact paired sign tests/bootstrap intervals, fixed-reference deltas",
+    "py_compile": "passed",
+    "pytest": "55 passed",
     "claim_checker": "passed",
     "latex_build": "passed",
-    "pdf_pages": 3,
-    "pdf_page_size": "612 x 792 pts (letter)",
-    "pdf_anonymisation_text_scan": "passed",
-    "pdf_metadata_author": "absent",
-    "fresh_six_run_cuda_rerun": "blocked: torch.cuda.is_available() is false",
-    "cpu_fallback": "incomplete and not treated as evidence"
+    "pdf": "8 pages, US letter (612 x 792 pts)",
+    "sha256": "generated for release source, paper, tables, reports, metrics, protocols, config, and scripts"
   },
   "evidence_policy": {
-    "source_status": "controlled_matrix_fallback",
     "paper_facing_configuration": "configs/icra/alpha_huber3_cap50.yaml",
-    "traversals": ["rh_run1", "rh_run2"],
-    "seeds": [11, 22, 33],
+    "traversals": [
+      "rh_run1",
+      "rh_run2"
+    ],
+    "seeds": [
+      11,
+      22,
+      33
+    ],
+    "cpu_fallback": false,
     "unsupported_detector_accuracy_claim": false,
-    "promoted_row_mixture_or_delayed_variant": false
+    "embedded_jetson_claim": false,
+    "scope": "descriptive field evaluation on one surveyed vineyard; no universal deployment guarantee"
   },
-  "sha256_file": "results/icra_submission/verification/submission_manifest.sha256"
+  "hash_file": "results/icra_submission/submission_manifest.sha256",
+  "manifest_sha256": "d79f9bb896ba8dd6d4b720f0a3e5deb73f2c6b64e14ca89234d95cec6253213d"
 }

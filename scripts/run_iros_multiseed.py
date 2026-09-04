@@ -51,10 +51,16 @@ except ModuleNotFoundError:
         start_pose_anchored_trajectory,
     )
 
+try:
+    from scripts.experiment_runtime import build_experiment_env, require_cuda_preflight
+except ModuleNotFoundError:
+    from experiment_runtime import build_experiment_env, require_cuda_preflight
+
 
 DEFAULT_OUTPUT_ROOT = BASE_DIR / "results" / "iros"
 DEFAULT_GEOJSON = BASE_DIR / "data" / "riseholme_poles_trunk.geojson"
 DEFAULT_SEEDS = "11,22,33"
+EXPECTED_SEEDS = (11, 22, 33)
 DEFAULT_AMCL_NGPS_AMCL_STD = 0.35
 DEFAULT_AMCL_NGPS_GPS_STD = 1.8
 DEFAULT_AMCL_NGPS_PROCESS_STD = 0.8
@@ -83,6 +89,11 @@ NOISY_GPS_SCRIPT = BASE_DIR / "scripts" / "degrade_gps_vineyard.py"
 
 def parse_int_list(text: str) -> List[int]:
     return [int(x.strip()) for x in text.split(",") if x.strip()]
+
+
+def validate_experiment_seeds(seeds: List[int]) -> None:
+    if tuple(sorted(seeds)) != EXPECTED_SEEDS:
+        raise ValueError(f"Paper-facing experiments require exactly seeds {EXPECTED_SEEDS}; received {seeds}")
 
 
 def safe_float(v, default=float("nan")) -> float:
@@ -422,7 +433,9 @@ def main():
 
     python_exec = args.python_exec.expanduser()
     if not python_exec.is_absolute():
-        python_exec = (BASE_DIR / python_exec).resolve()
+        # Preserve the venv path lexically: its python is often a symlink to
+        # the system interpreter, and resolving it drops the venv packages.
+        python_exec = (BASE_DIR / python_exec).absolute()
 
     amcl_ngps_amcl_std = float(max(1e-6, args.amcl_ngps_amcl_std))
     amcl_ngps_gps_std = float(max(1e-6, args.amcl_ngps_gps_std))
@@ -431,11 +444,12 @@ def main():
     rtab_ngps_gps_std = float(max(1e-6, args.rtab_ngps_gps_std))
     rtab_ngps_process_std = float(max(1e-6, args.rtab_ngps_process_std))
     seeds = parse_int_list(args.seeds)
-    if not seeds:
-        raise ValueError("At least one seed is required.")
+    validate_experiment_seeds(seeds)
 
-    if args.require_cuda and not check_cuda_available(python_exec):
-        raise RuntimeError("CUDA is required but not visible in the selected Python runtime.")
+    probe_env = build_experiment_env(BASE_DIR, cuda_visible_devices=args.cuda_visible_devices)
+    cuda_probe = None
+    if args.require_cuda:
+        cuda_probe = require_cuda_preflight(python_exec, env=probe_env, cwd=BASE_DIR)
 
     evo_ape_bin = python_exec.parent / "evo_ape"
     evo_rpe_bin = python_exec.parent / "evo_rpe"
@@ -457,11 +471,7 @@ def main():
     run_dir = args.output_root.resolve() / f"{timestamp}_multiseed_main"
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    env = os.environ.copy()
-    env["CUDA_VISIBLE_DEVICES"] = args.cuda_visible_devices
-    env["MPLBACKEND"] = "Agg"
-    env["MPLCONFIGDIR"] = str(BASE_DIR / ".tmp_mpl")
-    (BASE_DIR / ".tmp_mpl").mkdir(parents=True, exist_ok=True)
+    env = probe_env
 
     scripts_dir = BASE_DIR / "scripts"
     spf_script = scripts_dir / "spf_lidar.py"
@@ -472,6 +482,7 @@ def main():
         "seeds": seeds,
         "require_cuda": bool(args.require_cuda),
         "cuda_visible_devices": args.cuda_visible_devices,
+        "cuda_probe": cuda_probe,
         "amcl_ngps": {
             "amcl_std_m": amcl_ngps_amcl_std,
             "gps_std_m": amcl_ngps_gps_std,

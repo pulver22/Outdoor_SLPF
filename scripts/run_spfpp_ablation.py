@@ -48,6 +48,8 @@ DEFAULT_OUTPUT_ROOT = BASE_DIR / "results" / "iros_ablation"
 DEFAULT_GEOJSON = BASE_DIR / "data" / "riseholme_poles_trunk.geojson"
 DEFAULT_DATA_PATH = BASE_DIR / "data" / "2025" / "rh_run2"
 DEFAULT_SEEDS = "11,22,33"
+DEFAULT_CONFIG_YAML = BASE_DIR / "configs" / "icra" / "alpha_huber3_cap50.yaml"
+EXPECTED_SEEDS = (11, 22, 33)
 REQUIRED_DATA_ENTRIES = ("data.csv", "rgb", "depth", "lidar")
 
 VARIANT_ORDER = [
@@ -65,6 +67,29 @@ VARIANT_ORDER = [
     "pf_fixed_lag_smoother",
 ]
 
+# ``VARIANT_ORDER`` is a long-standing public ordering used by the existing
+# tests and exploratory reports.  Keep it stable while including the new
+# paper-facing ``no_semantic`` variant in generated outputs.
+VARIANT_OUTPUT_ORDER = [
+    *VARIANT_ORDER[:7],
+    "no_semantic",
+    *VARIANT_ORDER[7:],
+]
+
+# Paper-facing confirmatory matrix frozen by the ICRA plan. The remaining
+# exploratory variants stay available through --variants but are not silently
+# included in the release table.
+PAPER_VARIANT_ORDER = [
+    "full",
+    "no_semantic_walls",
+    "static_gnss_weight",
+    "no_pose_smoothing",
+    "no_background",
+    "no_corridor",
+    "no_semantic",
+    "no_gnss",
+]
+
 VARIANT_ARGS = {
     "full": [],
     "no_semantic_walls": ["--semantic-model", "point"],
@@ -73,6 +98,7 @@ VARIANT_ARGS = {
     "poles_only": ["--semantic-classes", "poles"],
     "no_background": ["--disable-background"],
     "no_corridor": ["--disable-corridor"],
+    "no_semantic": ["--disable-semantic"],
     "no_gnss": ["--disable-gps"],
     "static_gnss_weight": ["--disable-dynamic-gps-weight"],
     "no_pose_smoothing": ["--disable-pose-smoothing"],
@@ -93,6 +119,7 @@ def build_spf_command(args, python_exec: Path, spf_script: Path, seed_dir: Path,
     cmd = [
         str(python_exec),
         str(spf_script),
+        "--config-yaml", str(DEFAULT_CONFIG_YAML),
         "--miss-penalty", str(args.miss_penalty),
         "--wrong-hit-penalty", str(args.wrong_hit_penalty),
         "--gps-weight", str(args.gps_weight),
@@ -172,6 +199,11 @@ def parse_int_list(text: str) -> List[int]:
     return [int(x.strip()) for x in text.split(",") if x.strip()]
 
 
+def validate_experiment_seeds(seeds: List[int]) -> None:
+    if tuple(sorted(seeds)) != EXPECTED_SEEDS:
+        raise ValueError(f"Paper-facing experiments require exactly seeds {EXPECTED_SEEDS}; received {seeds}")
+
+
 def safe_float(v, default=float("nan")) -> float:
     try:
         out = float(v)
@@ -215,7 +247,7 @@ def aggregate_by_variant(rows: List[Dict[str, object]]) -> List[Dict[str, object
         by_variant.setdefault(str(r["variant"]), []).append(r)
 
     agg_rows: List[Dict[str, object]] = []
-    for variant in VARIANT_ORDER:
+    for variant in VARIANT_OUTPUT_ORDER:
         if variant not in by_variant:
             continue
         group = by_variant[variant]
@@ -376,7 +408,7 @@ def plot_overlay_seed22(per_seed_rows: List[Dict[str, object]], out_path: Path):
 
     colors = plt.rcParams["axes.prop_cycle"].by_key().get("color", [])
     cidx = 0
-    for variant in VARIANT_ORDER:
+    for variant in VARIANT_OUTPUT_ORDER:
         row = seed_by_variant.get(variant)
         if row is None:
             continue
@@ -428,11 +460,14 @@ The per-particle semantic score is averaged across rays and fused with GPS and c
 def main():
     parser = argparse.ArgumentParser(description="Run SPF++ ablation study (IROS protocol).")
     parser.add_argument("--python-exec", type=Path, default=BASE_DIR / ".venv" / "bin" / "python")
+    parser.add_argument("--traversal", choices=["rh_run1", "rh_run2"], default="rh_run2")
     parser.add_argument("--data-path", type=Path, default=DEFAULT_DATA_PATH)
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     parser.add_argument("--geojson", type=Path, default=DEFAULT_GEOJSON)
+    parser.add_argument("--resume-run-dir", type=Path, default=None,
+                        help="Resume export/evaluation from an existing complete run directory without rerunning trajectories.")
     parser.add_argument("--seeds", type=str, default=DEFAULT_SEEDS)
-    parser.add_argument("--variants", type=str, default=",".join(VARIANT_ORDER))
+    parser.add_argument("--variants", type=str, default=",".join(PAPER_VARIANT_ORDER))
     parser.add_argument("--cuda-visible-devices", type=str, default="0")
     parser.add_argument("--require-cuda", dest="require_cuda", action="store_true", default=True)
     parser.add_argument("--allow-cpu", dest="require_cuda", action="store_false")
@@ -459,7 +494,7 @@ def main():
     parser.add_argument("--fixed-lag-window", type=int, default=8)
     parser.add_argument("--gnss-robust-mode", choices=["off", "huber", "cauchy", "gate"], default="huber")
     parser.add_argument("--gnss-outlier-threshold", type=float, default=3.0)
-    parser.add_argument("--semantic-penalty-cap", type=float, default=20.0)
+    parser.add_argument("--semantic-penalty-cap", type=float, default=50.0)
     parser.add_argument("--log-particle-cloud-every", type=int, default=0)
     parser.add_argument("--diagnostics-level", choices=["minimal", "standard", "full"], default="standard")
 
@@ -473,7 +508,9 @@ def main():
 
     python_exec = args.python_exec.expanduser()
     if not python_exec.is_absolute():
-        python_exec = (BASE_DIR / python_exec).resolve()
+        # Keep the venv path lexical; resolving its python symlink can drop
+        # the CUDA-enabled Torch installation.
+        python_exec = (BASE_DIR / python_exec).absolute()
 
     output_root = args.output_root.resolve()
     geojson = args.geojson.resolve()
@@ -483,8 +520,7 @@ def main():
     args.data_path = data_path
     args.geojson = geojson
     seeds = parse_int_list(args.seeds)
-    if not seeds:
-        raise ValueError("At least one seed is required.")
+    validate_experiment_seeds(seeds)
 
     variants = [x.strip() for x in args.variants.split(",") if x.strip()]
     if not variants:
@@ -493,8 +529,16 @@ def main():
     if unknown:
         raise ValueError(f"Unknown variants: {unknown}")
 
-    if args.require_cuda and not check_cuda_available(python_exec):
-        raise RuntimeError("CUDA is required but not visible in the selected Python runtime.")
+    probe_env = os.environ.copy()
+    probe_env["CUDA_VISIBLE_DEVICES"] = args.cuda_visible_devices
+    if args.require_cuda:
+        try:
+            from scripts.experiment_runtime import require_cuda_preflight
+        except ModuleNotFoundError:
+            from experiment_runtime import require_cuda_preflight
+        cuda_probe = require_cuda_preflight(python_exec, env=probe_env, cwd=BASE_DIR)
+    else:
+        cuda_probe = None
     validate_data_path(data_path)
 
     evo_ape_bin = python_exec.parent / "evo_ape"
@@ -504,15 +548,20 @@ def main():
 
     rows_map = load_rows_from_geojson(geojson)
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    run_name = f"{timestamp}_ablation"
-    if args.max_frames is not None:
-        run_name += "_smoke"
-    run_dir = output_root / run_name
+    if args.resume_run_dir is not None:
+        run_dir = args.resume_run_dir.expanduser()
+        if not run_dir.is_absolute():
+            run_dir = (BASE_DIR / run_dir).absolute()
+        timestamp = run_dir.name.split("_ablation", 1)[0]
+    else:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        run_name = f"{timestamp}_ablation"
+        if args.max_frames is not None:
+            run_name += "_smoke"
+        run_dir = output_root / run_name
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    env = os.environ.copy()
-    env["CUDA_VISIBLE_DEVICES"] = args.cuda_visible_devices
+    env = probe_env
     env["MPLBACKEND"] = "Agg"
     env["MPLCONFIGDIR"] = str(BASE_DIR / ".tmp_mpl")
     (BASE_DIR / ".tmp_mpl").mkdir(parents=True, exist_ok=True)
@@ -520,10 +569,12 @@ def main():
     protocol = {
         "run_dir": str(run_dir),
         "timestamp": timestamp,
+        "traversal": args.traversal,
         "seeds": seeds,
         "variants": variants,
         "require_cuda": bool(args.require_cuda),
         "cuda_visible_devices": args.cuda_visible_devices,
+        "cuda_probe": cuda_probe,
         "frozen_config": {
             "miss_penalty": args.miss_penalty,
             "wrong_hit_penalty": args.wrong_hit_penalty,
@@ -571,10 +622,10 @@ def main():
             cmd = build_spf_command(args, python_exec, spf_script, seed_dir, seed, variant)
 
             run_log = seed_dir / "run_spf_lidar.log"
-            runtime = run_cmd(cmd, run_log, cwd=BASE_DIR, env=env)
-
             est_tum = seed_dir / f"trajectory_{args.gps_weight}.tum"
             gt_tum = seed_dir / "gps_pose.tum"
+            reused_existing = bool(args.resume_run_dir is not None and est_tum.exists() and gt_tum.exists())
+            runtime = 0.0 if reused_existing else run_cmd(cmd, run_log, cwd=BASE_DIR, env=env)
             if not est_tum.exists() or not gt_tum.exists():
                 raise FileNotFoundError(f"Missing trajectory outputs for {variant} seed {seed}: {seed_dir}")
 
@@ -590,6 +641,7 @@ def main():
             )
 
             metrics["variant"] = variant
+            metrics["traversal"] = args.traversal
             metrics["seed"] = seed
             metrics["runtime_sec"] = runtime
             metrics["command"] = " ".join(cmd)
@@ -601,9 +653,10 @@ def main():
                 "command": cmd,
                 "runtime_sec": runtime,
                 "output_dir": str(seed_dir),
+                "reused_existing": reused_existing,
             })
 
-    per_seed_rows.sort(key=lambda r: (VARIANT_ORDER.index(str(r["variant"])), int(r["seed"])))
+    per_seed_rows.sort(key=lambda r: (VARIANT_OUTPUT_ORDER.index(str(r["variant"])), int(r["seed"])))
     write_csv(run_dir / "ablation_metrics_per_seed.csv", per_seed_rows)
 
     agg_rows = aggregate_by_variant(per_seed_rows)

@@ -641,6 +641,8 @@ def generate_icra_report(manifest_path: Path, output_dir: Path) -> dict[str, obj
         raise ValueError(f"Evidence manifest must contain an object: {manifest_path}")
     rows = _manifest_rows(manifest)
     commit = str((manifest.get("git") or {}).get("commit", "unknown"))
+    statistics_path = ((manifest.get("outputs") or {}).get("statistics_summary"))
+    statistics = _read_json(Path(str(statistics_path))) if statistics_path else {}
     output_dir.mkdir(parents=True, exist_ok=True)
     report_data: dict[str, object] = {
         "git": dict(manifest.get("git") or {}),
@@ -652,6 +654,7 @@ def generate_icra_report(manifest_path: Path, output_dir: Path) -> dict[str, obj
         "rows": rows,
         "comparison": manifest.get("comparison", {}),
         "claim_checks": manifest.get("claim_checks", {}),
+        "statistics": statistics,
         "manifest": str(manifest_path),
     }
     table_rows = []
@@ -682,6 +685,10 @@ Row-identity acceptance uses in-row frames. Headland frames are evaluated with c
 ## Claim Boundary
 
 Detector accuracy is not claimed without a supplied SemanticBLT validation YAML. GTSAM and row-mixture/delayed-correction variants are not promoted as paper-facing methods.
+
+## Statistical Summary
+
+The machine-readable summary uses seed-level paired effects only for genuinely rerun methods. Dedicated AMCL/RTAB-Map rows are treated as fixed references without p-values. Paired comparison records: `{len(statistics.get('paired_comparisons', []))}`; fixed-reference records: `{len(statistics.get('fixed_reference_deltas', []))}`; all `n=3` results are descriptive.
 
 ## Source Hashes
 

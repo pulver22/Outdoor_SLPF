@@ -79,3 +79,33 @@ def test_bundle_records_exact_source_hashes(tmp_path: Path) -> None:
     assert (tmp_path / "out/icra_gnss_stress_table.tex").exists()
     assert (tmp_path / "out/icra_operational_table.tex").exists()
     assert "Headland recovery" in (tmp_path / "out/icra_operational_table.tex").read_text(encoding="utf-8")
+
+
+def test_bundle_rejects_unexpected_seed_in_baseline(tmp_path: Path) -> None:
+    inputs = write_inputs(tmp_path)
+    extra = make_rows(traversals=["rh_run1"], seeds=[44])
+    baseline = _write_csv(tmp_path / "extra.csv", extra)
+    inputs = EvidenceInputs(followup_metrics=inputs.followup_metrics, baseline_metrics=(baseline,), protocols=inputs.protocols)
+
+    with pytest.raises(ValueError, match="unexpected seed 44"):
+        build_bundle(inputs, tmp_path / "out")
+
+
+def test_bundle_rejects_reused_dedicated_output_hash(tmp_path: Path) -> None:
+    inputs = write_inputs(tmp_path)
+    rows = []
+    for seed in [11, 22, 33]:
+        row = make_rows(traversals=["rh_run1"], seeds=[seed])[0]
+        row.update(
+            {
+                "method": "AMCL",
+                "replicate_kind": "dedicated_run",
+                "source_output_sha256": "same-output",
+            }
+        )
+        rows.append(row)
+    baseline = _write_csv(tmp_path / "dedicated.csv", rows)
+    inputs = EvidenceInputs(followup_metrics=inputs.followup_metrics, baseline_metrics=(baseline,), protocols=inputs.protocols)
+
+    with pytest.raises(ValueError, match="reuses an output hash"):
+        build_bundle(inputs, tmp_path / "out")

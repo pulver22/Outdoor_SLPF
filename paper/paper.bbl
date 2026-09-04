@@ -135,9 +135,9 @@ C.-Y. Wang, I.-H. Yeh, and H.-Y. Mark~Liao, ``Yolov9: Learning what you want
   to learn using programmable gradient information,'' in {\em Proc.~of the
   Europ.~Conf.~on Computer Vision (ECCV)}, 2025.
 
-\bibitem{moore2014generalized}
-T.~Moore and D.~Stouch, ``A generalized extended kalman filter implementation
-  for the robot operating system,'' in {\em Proc. of the Conf. on Field and
-  Service Robotics (FSR)}, pp.~335--348, 2014.
+\bibitem{semanticblt_dataset}
+GAIA, ``Semanticblt dataset.'' \url{
+  https://universe.roboflow.com/gaia-hse8w/semanticblt }, jun 2024.
+\newblock visited on 2026-09-04.
 
 \end{thebibliography}

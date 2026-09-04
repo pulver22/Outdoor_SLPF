@@ -1,0 +1,51 @@
+{
+  "candidate_ids": [
+    "baseline_alpha_huber3_cap50"
+  ],
+  "candidates": [
+    {
+      "args": [
+        "--config-yaml",
+        "/home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/configs/icra/alpha_huber3_cap50.yaml"
+      ],
+      "description": "Frozen ICRA baseline loaded from the canonical YAML overlay.",
+      "id": "baseline_alpha_huber3_cap50"
+    }
+  ],
+  "commands": [
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/scripts/spf_lidar.py --seed 11 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/data/riseholme_poles_trunk.geojson --output-folder /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/results/icra_submission/reruns/localization/full/rh_run1/baseline_alpha_huber3_cap50/seed_11 --no-visualization --config-yaml /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/configs/icra/alpha_huber3_cap50.yaml --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/scripts/spf_lidar.py --seed 22 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/data/riseholme_poles_trunk.geojson --output-folder /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/results/icra_submission/reruns/localization/full/rh_run1/baseline_alpha_huber3_cap50/seed_22 --no-visualization --config-yaml /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/configs/icra/alpha_huber3_cap50.yaml --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/scripts/spf_lidar.py --seed 33 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/data/riseholme_poles_trunk.geojson --output-folder /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/results/icra_submission/reruns/localization/full/rh_run1/baseline_alpha_huber3_cap50/seed_33 --no-visualization --config-yaml /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/configs/icra/alpha_huber3_cap50.yaml --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/scripts/spf_lidar.py --seed 11 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/data/riseholme_poles_trunk.geojson --output-folder /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/results/icra_submission/reruns/localization/full/rh_run2/baseline_alpha_huber3_cap50/seed_11 --no-visualization --config-yaml /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/configs/icra/alpha_huber3_cap50.yaml --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/scripts/spf_lidar.py --seed 22 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/data/riseholme_poles_trunk.geojson --output-folder /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/results/icra_submission/reruns/localization/full/rh_run2/baseline_alpha_huber3_cap50/seed_22 --no-visualization --config-yaml /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/configs/icra/alpha_huber3_cap50.yaml --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/scripts/spf_lidar.py --seed 33 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/data/riseholme_poles_trunk.geojson --output-folder /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/results/icra_submission/reruns/localization/full/rh_run2/baseline_alpha_huber3_cap50/seed_33 --no-visualization --config-yaml /home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence/configs/icra/alpha_huber3_cap50.yaml --require-cuda"
+  ],
+  "cuda_probe": {
+    "allocation_ok": true,
+    "cuda_available_flag": true,
+    "cuda_visible_devices": "0",
+    "device_count_flag": 1,
+    "devices": [
+      "NVIDIA GeForce RTX 4060 Ti"
+    ],
+    "error": null,
+    "executable": "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python",
+    "python": "3.12.3",
+    "raw_output": "{\"python\": \"3.12.3\", \"executable\": \"/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python\", \"cuda_visible_devices\": \"0\", \"torch_version\": \"2.12.0+cu130\", \"torch_cuda_build\": \"13.0\", \"cuda_available_flag\": true, \"device_count_flag\": 1, \"allocation_ok\": true, \"devices\": [\"NVIDIA GeForce RTX 4060 Ti\"], \"error\": null}\n",
+    "returncode": 0,
+    "torch_cuda_build": "13.0",
+    "torch_version": "2.12.0+cu130"
+  },
+  "max_frames": null,
+  "require_cuda": true,
+  "seeds": [
+    11,
+    22,
+    33
+  ],
+  "stage": "full",
+  "traversals": [
+    "rh_run1",
+    "rh_run2"
+  ]
+}

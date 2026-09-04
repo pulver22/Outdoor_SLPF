@@ -2,6 +2,8 @@
 
 | ID | Manuscript location | Supporting evidence | Permitted wording | Prohibited extension | Limitation |
 | --- | --- | --- | --- | --- | --- |
+| C6b | Component ablation | Generated ablation table and six-run-per-variant protocol | Describe measured changes for the registered variants, with exact seeds and traversals. | Calling every component essential or claiming statistical significance | The ablation is single-site, descriptive, and does not isolate detector accuracy. |
+| C6c | Robustness and runtime | Generated robustness/stress tables; CUDA protocol records | Describe behaviour under the registered synthetic profiles and the recorded CUDA host execution. | Claiming arbitrary GNSS-denial robustness, embedded real-time performance, or Jetson throughput | No embedded timing trace or universal-failure evaluation is included. |
 | C1 | Introduction; method | Semantic-wall map and generated main table | Semantic walls provide row-aligned constraints for the evaluated map. | Claims of universal aliasing resolution | One surveyed vineyard map and fixed landmark classes. |
 | C2 | Experiments | Raw and aligned APE plus RPE in `results/icra_submission/evidence/` | Report map-frame and aligned localisation errors together. | Treating aligned APE as proof of map-frame accuracy | Alignment removes global transform differences. |
 | C3 | Operational results | In-row row correctness, cross-track, and wrong-row duration | State row-level behaviour on in-row frames. | Using nearest-row headland labels as unique identity | Headland identity is ambiguous. |

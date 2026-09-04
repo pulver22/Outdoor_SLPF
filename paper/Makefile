@@ -2,7 +2,7 @@
 # Change "paper" in the next line to the name of your document.
 TARGET=paper
 SOURCE=$(TARGET).tex
-GENERATED=generated/icra_main_table.tex generated/icra_gnss_stress_table.tex generated/icra_operational_table.tex
+GENERATED=generated/icra_main_table.tex generated/icra_gnss_stress_table.tex generated/icra_operational_table.tex generated/icra_ablation_table.tex generated/icra_robustness_table.tex
 
 all: $(TARGET).pdf
 

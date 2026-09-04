@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import os
 import shutil
@@ -41,6 +42,7 @@ try:
         build_kalman_ngps_fused_tum,
         write_csv,
     )
+
 except ModuleNotFoundError:
     from scripts.run_ab_validation import (
         BASE_DIR,
@@ -65,10 +67,32 @@ except ModuleNotFoundError:
         write_csv,
     )
 
+try:
+    from scripts.experiment_runtime import build_experiment_env, require_cuda_preflight
+except ModuleNotFoundError:
+    from experiment_runtime import build_experiment_env, require_cuda_preflight
+
 
 DEFAULT_OUTPUT_ROOT = BASE_DIR / "results" / "iros_revision" / "gnss_degradation"
 DEFAULT_GEOJSON = BASE_DIR / "data" / "riseholme_poles_trunk.geojson"
+DEFAULT_BASELINE_METRICS = BASE_DIR / "results" / "icra_submission" / "evidence" / "canonical_baseline_metrics_per_seed.csv"
+DEFAULT_CONFIG_YAML = BASE_DIR / "configs" / "icra" / "alpha_huber3_cap50.yaml"
 DEFAULT_SEEDS = "11,22,33"
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def git_commit_hash(base_dir: Path) -> str:
+    try:
+        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=base_dir, text=True).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return "unknown"
 
 
 @dataclass(frozen=True)
@@ -134,10 +158,110 @@ def run_cmd(cmd: list[str], log_path: Path, cwd: Path, env: dict[str, str]) -> f
     return duration
 
 
-def tum_for_method(config: TraversalConfig, method: str, seed: int) -> tuple[Path, Path]:
+def load_canonical_baseline_sources(path: Path | None) -> dict[tuple[str, str, int], Path]:
+    """Load validated per-seed baseline TUMs for stress-test primary methods.
+
+    The March rh1 baseline directory contains copied placeholder outputs.  The
+    canonical baseline table is therefore the source of truth for dedicated
+    AMCL/RTAB replicates, while methods without a dedicated source continue to
+    use the historical traversal directory below.
+    """
+    if path is None:
+        return {}
+    path = path.expanduser()
+    if not path.is_absolute():
+        path = (BASE_DIR / path).absolute()
+    if not path.exists():
+        raise FileNotFoundError(f"Canonical baseline metrics not found: {path}")
+    sources: dict[tuple[str, str, int], Path] = {}
+    traversal_map = {"rh1": "rh_run1", "rh2": "rh_run2"}
+    with path.open(newline="", encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            method = str(row.get("method", "")).strip()
+            if method not in {"amcl", "rtab_rgb", "rtab_rgbd"}:
+                continue
+            traversal = traversal_map.get(str(row.get("traversal", "")).strip(), str(row.get("traversal", "")).strip())
+            try:
+                seed = int(row["seed"])
+            except (KeyError, TypeError, ValueError) as exc:
+                raise ValueError(f"Invalid canonical baseline seed in {path}: {row}") from exc
+            source = Path(str(row.get("source_output", "")).strip())
+            if not source.is_absolute():
+                source = (BASE_DIR / source).absolute()
+            if not source.exists():
+                raise FileNotFoundError(f"Canonical baseline source does not exist: {source}")
+            key = (traversal, method, seed)
+            if key in sources:
+                raise ValueError(f"Duplicate canonical baseline source key: {key}")
+            sources[key] = source
+    return sources
+
+
+def gt_for_method(config: TraversalConfig, method: str, seed: int) -> Path:
+    """Return the ground-truth stream paired with a baseline trajectory."""
+    if config.name == "rh1":
+        if method == "amcl":
+            dedicated = BASE_DIR / "data" / "2025" / "amcl" / "amcl_3runs_metrics" / "gps_pose_clean.tum"
+            if dedicated.exists():
+                return dedicated
+        if method in {"rtab_rgb", "rtab_rgbd"}:
+            sensor = "rgb" if method == "rtab_rgb" else "rgbd"
+            dedicated = BASE_DIR / "data" / "2025" / "rtabmap" / sensor / "tum1" / "gps_pose.tum"
+            if dedicated.exists():
+                return dedicated
+    root = config.baseline_root
+    return root / method / f"seed_{seed}" / "gps_pose.tum"
+
+
+def make_degraded_gnss_for_gt(
+    gt_path: Path,
+    profile: DegradationProfile,
+    seed: int,
+    dropout_mode: str,
+    headland_fraction: float,
+    out_path: Path,
+) -> Path:
+    gt_data = read_tum_file(gt_path)
+    gt_array = np.column_stack([gt_data.timestamps, gt_data.positions, gt_data.quaternions])
+    degraded, _, _ = apply_profile(
+        gt_array,
+        profile,
+        seed,
+        dropout_mode=dropout_mode,
+        headland_fraction=headland_fraction,
+    )
+    write_tum(str(out_path), degraded)
+    return out_path
+
+
+def tum_for_method(
+    config: TraversalConfig,
+    method: str,
+    seed: int,
+    baseline_sources: dict[tuple[str, str, int], Path] | None = None,
+) -> tuple[Path, Path]:
     root = config.baseline_root
     seed_dir = root / method / f"seed_{seed}"
-    gt = seed_dir / "gps_pose.tum"
+    gt = gt_for_method(config, method, seed)
+    if method == "slpf":
+        c_name = "rh_run1" if config.name == "rh1" else "rh_run2"
+        canonical_slpf = (
+            BASE_DIR
+            / "results"
+            / "icra_submission"
+            / "reruns"
+            / "localization"
+            / "full"
+            / c_name
+            / "baseline_alpha_huber3_cap50"
+            / f"seed_{seed}"
+            / "trajectory_0.5.tum"
+        )
+        if canonical_slpf.exists():
+            return canonical_slpf, gt
+    dedicated = (baseline_sources or {}).get((config.name, method, seed))
+    if dedicated is not None:
+        return dedicated, gt
     if method == "rtab_rgb":
         est = seed_dir / "rtabmap_rgb_filtered.tum"
         if not est.exists():
@@ -163,6 +287,7 @@ def build_slpf_degraded_cmd(
     cmd = [
         str(python_exec),
         str(BASE_DIR / "scripts" / "spf_lidar.py"),
+        "--config-yaml", str(DEFAULT_CONFIG_YAML),
         "--miss-penalty", "4.0",
         "--wrong-hit-penalty", "4.0",
         "--gps-weight", "0.5",
@@ -171,6 +296,9 @@ def build_slpf_degraded_cmd(
         "--frame-stride", "4",
         "--semantic-sigma", "0.05",
         "--gps-sigma", "1.1",
+        "--gnss-robust-mode", "huber",
+        "--gnss-outlier-threshold", "3.0",
+        "--semantic-penalty-cap", "50",
         "--corridor-weight", "0.30",
         "--corridor-dist-sigma", "1.50",
         "--corridor-heading-sigma", "0.35",
@@ -179,11 +307,13 @@ def build_slpf_degraded_cmd(
         "--expected-obs-count", "150",
         "--pose-smooth-alpha-pos", "0.55",
         "--pose-smooth-alpha-theta", "0.50",
+        "--pose-backend", "alpha",
         "--odom-yaw-filter-alpha", "0.90",
         "--particle-count", "100",
         "--data-path", str(data_path),
         "--external-noisy-gnss-tum", str(degraded_gnss_tum),
         "--no-visualization",
+        "--diagnostics-level", "full",
     ]
     if max_frames is not None:
         cmd.extend(["--max-frames", str(max_frames)])
@@ -288,8 +418,10 @@ def compact_summary(agg_rows: list[dict[str, object]]) -> list[dict[str, object]
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
-    parser.add_argument("--python-exec", type=Path, default=Path("python3"))
+    parser.add_argument("--python-exec", type=Path, default=BASE_DIR.parent / "Outdoor_SLPF" / ".venv" / "bin" / "python")
     parser.add_argument("--geojson", type=Path, default=DEFAULT_GEOJSON)
+    parser.add_argument("--baseline-metrics", type=Path, default=DEFAULT_BASELINE_METRICS,
+                        help="Canonical per-seed baseline CSV used for dedicated rh1 AMCL/RTAB trajectories.")
     parser.add_argument("--traversals", default="rh1,rh2")
     parser.add_argument("--rh1-data-path", type=Path, default=None)
     parser.add_argument("--rh2-data-path", type=Path, default=None)
@@ -299,14 +431,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--dropout-mode", choices=["nan", "hold", "remove"], default="nan")
     parser.add_argument("--headland-fraction", type=float, default=0.15)
     parser.add_argument("--max-frames", type=int, default=None)
-    parser.add_argument("--require-cuda", action="store_true")
+    parser.add_argument("--require-cuda", dest="require_cuda", action="store_true", default=True)
+    parser.add_argument("--allow-cpu", dest="require_cuda", action="store_false")
     parser.add_argument("--allow-existing-slpf", action="store_true", help="Use existing SLPF TUM if a live degraded-GNSS SLPF run cannot be executed.")
-    parser.add_argument("--amcl-ngps-amcl-std", type=float, default=DEFAULT_AMCL_NGPS_AMCL_STD)
-    parser.add_argument("--amcl-ngps-gps-std", type=float, default=DEFAULT_AMCL_NGPS_GPS_STD)
-    parser.add_argument("--amcl-ngps-process-std", type=float, default=DEFAULT_AMCL_NGPS_PROCESS_STD)
-    parser.add_argument("--rtab-ngps-rtab-std", type=float, default=DEFAULT_RTAB_NGPS_RTAB_STD)
-    parser.add_argument("--rtab-ngps-gps-std", type=float, default=DEFAULT_RTAB_NGPS_GPS_STD)
-    parser.add_argument("--rtab-ngps-process-std", type=float, default=DEFAULT_RTAB_NGPS_PROCESS_STD)
+    parser.add_argument("--amcl-ngps-amcl-std", type=float, default=0.8)
+    parser.add_argument("--amcl-ngps-gps-std", type=float, default=1.2)
+    parser.add_argument("--amcl-ngps-process-std", type=float, default=0.8)
+    parser.add_argument("--rtab-ngps-rtab-std", type=float, default=0.8)
+    parser.add_argument("--rtab-ngps-gps-std", type=float, default=1.2)
+    parser.add_argument("--rtab-ngps-process-std", type=float, default=0.8)
     return parser.parse_args(argv)
 
 
@@ -317,40 +450,39 @@ def traversal_config_from_args(name: str, args: argparse.Namespace) -> Traversal
         return config
     override = override.expanduser()
     if not override.is_absolute():
-        override = (BASE_DIR / override).resolve()
-    return TraversalConfig(name=config.name, data_path=override, baseline_root=config.baseline_root)
+        override = (BASE_DIR / override).absolute()
+    return TraversalConfig(name=config.name, baseline_root=config.baseline_root, data_path=override)
 
 
-def validate_slpf_inputs(config: TraversalConfig) -> None:
-    missing = []
-    for path in [config.data_path / "data.csv", config.data_path / "rgb", config.data_path / "depth", config.data_path / "lidar"]:
-        if not path.exists():
-            missing.append(str(path))
-    if missing:
-        raise FileNotFoundError("Missing SLPF dataset inputs: " + ", ".join(missing))
-
-
-def main(argv: list[str] | None = None) -> None:
+def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    seeds = parse_int_list(args.seeds)
-    traversals = parse_name_list(args.traversals, TRAVERSALS.keys())
-    profiles = selected_profiles(args.profiles)
-    methods = parse_name_list(args.methods, METHOD_LABELS.keys())
-    rows_map = load_rows_from_geojson(args.geojson.resolve())
-    output_root = args.output_root.resolve()
+    output_root = args.output_root.expanduser()
+    if not output_root.is_absolute():
+        output_root = (BASE_DIR / output_root).absolute()
     output_root.mkdir(parents=True, exist_ok=True)
+
+    traversals = [item.strip() for item in args.traversals.split(",") if item.strip()]
+    profiles = selected_profiles(args.profiles)
+    seeds = parse_int_list(args.seeds)
+    methods = [item.strip() for item in args.methods.split(",") if item.strip()]
+    rows_map = load_rows_from_geojson(args.geojson)
+    baseline_sources = load_canonical_baseline_sources(args.baseline_metrics)
 
     env = os.environ.copy()
     env["MPLBACKEND"] = "Agg"
     env["MPLCONFIGDIR"] = str(BASE_DIR / ".tmp_mpl")
     (BASE_DIR / ".tmp_mpl").mkdir(parents=True, exist_ok=True)
+    python_exec = args.python_exec
+    cuda_probe = {"status": "skipped", "device_count": 0}
 
     per_seed_rows: list[dict[str, object]] = []
     protocol: dict[str, object] = {
-        "output_root": str(output_root),
-        "seeds": seeds,
+        "commit": git_commit_hash(BASE_DIR),
         "traversals": traversals,
         "methods": methods,
+        "python_exec": str(python_exec),
+        "require_cuda": bool(args.require_cuda),
+        "cuda_probe": cuda_probe,
         "dropout_mode": args.dropout_mode,
         "headland_fraction": args.headland_fraction,
         "profiles": [
@@ -369,7 +501,7 @@ def main(argv: list[str] | None = None) -> None:
         config = traversal_config_from_args(traversal_name, args)
         if "slpf" in methods and not args.allow_existing_slpf:
             validate_slpf_inputs(config)
-        _, gt_source = tum_for_method(config, "slpf", seeds[0])
+        _, gt_source = tum_for_method(config, "slpf", seeds[0], baseline_sources)
         gt_data = read_tum_file(gt_source)
         gt_array = np.column_stack([gt_data.timestamps, gt_data.positions, gt_data.quaternions])
 
@@ -390,6 +522,8 @@ def main(argv: list[str] | None = None) -> None:
                     degraded,
                     header=f"generated by run_gnss_degradation_localization_eval.py traversal={traversal_name} profile={profile.name} seed={seed}",
                 )
+                affected_mask_path = work_dir / "affected_mask.npy"
+                np.save(affected_mask_path, affected_mask.astype(np.uint8))
 
                 method_inputs: dict[str, tuple[Path, Path, str]] = {}
                 if "ngps" in methods:
@@ -400,38 +534,47 @@ def main(argv: list[str] | None = None) -> None:
                     slpf_est = slpf_dir / "trajectory_0.5.tum"
                     slpf_gt = slpf_dir / "gps_pose.tum"
                     slpf_source = "live_external_degraded_gnss"
-                    cmd = build_slpf_degraded_cmd(
-                        args.python_exec,
-                        slpf_dir,
-                        seed,
-                        config.data_path,
-                        degraded_tum,
-                        args.max_frames,
-                        bool(args.require_cuda),
-                    )
-                    try:
-                        runtime = run_cmd(cmd, slpf_dir / "run_slpf_degraded.log", cwd=BASE_DIR, env=env)
-                        protocol["commands"].append({"method": "SLPF", "traversal": traversal_name, "profile": profile.name, "seed": seed, "command": cmd, "runtime_sec": runtime})
-                    except Exception:
-                        if not args.allow_existing_slpf:
-                            raise
-                        existing_est, existing_gt = tum_for_method(config, "slpf", seed)
+                    if profile.name == "nominal":
+                        canonical_est, canonical_gt = tum_for_method(config, "slpf", seed, baseline_sources)
                         slpf_dir.mkdir(parents=True, exist_ok=True)
-                        shutil.copy2(existing_est, slpf_est)
-                        shutil.copy2(existing_gt, slpf_gt)
-                        slpf_source = "existing_clean_gnss_fallback"
+                        shutil.copy2(canonical_est, slpf_est)
+                        shutil.copy2(canonical_gt, slpf_gt)
+                        slpf_source = "canonical_slpf_baseline"
+                    elif not slpf_est.exists():
+                        cmd = build_slpf_degraded_cmd(
+                            python_exec,
+                            slpf_dir,
+                            seed,
+                            config.data_path,
+                            degraded_tum,
+                            args.max_frames,
+                            bool(args.require_cuda),
+                        )
+                        try:
+                            runtime = run_cmd(cmd, slpf_dir / "run_slpf_degraded.log", cwd=BASE_DIR, env=env)
+                            protocol["commands"].append({"method": "SLPF", "traversal": traversal_name, "profile": profile.name, "seed": seed, "command": cmd, "runtime_sec": runtime})
+                        except Exception:
+                            if not args.allow_existing_slpf:
+                                raise
+                            existing_est, existing_gt = tum_for_method(config, "slpf", seed, baseline_sources)
+                            slpf_dir.mkdir(parents=True, exist_ok=True)
+                            shutil.copy2(existing_est, slpf_est)
+                            shutil.copy2(existing_gt, slpf_gt)
+                            slpf_source = "existing_clean_gnss_fallback"
                     method_inputs["slpf"] = (slpf_est, slpf_gt if slpf_gt.exists() else gt_source, slpf_source)
 
                 if "amcl_ngps" in methods:
-                    amcl_est, amcl_gt = tum_for_method(config, "amcl", seed)
+                    amcl_est, amcl_gt = tum_for_method(config, "amcl", seed, baseline_sources)
                     out_dir = work_dir / "amcl_ngps"
                     out_est = out_dir / "trajectory_0.5.tum"
                     out_gt = out_dir / "gps_pose.tum"
                     out_dir.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(amcl_gt, out_gt)
+                    amcl_deg_tum = out_dir / "degraded_gnss.tum"
+                    make_degraded_gnss_for_gt(amcl_gt, profile, seed, args.dropout_mode, args.headland_fraction, amcl_deg_tum)
                     build_kalman_ngps_fused_tum(
                         primary_est=amcl_est,
-                        ngps_est=degraded_tum,
+                        ngps_est=amcl_deg_tum,
                         out_est=out_est,
                         primary_pos_std=args.amcl_ngps_amcl_std,
                         gps_pos_std=args.amcl_ngps_gps_std,
@@ -442,15 +585,17 @@ def main(argv: list[str] | None = None) -> None:
                 for rtab_key, primary_method in (("rtab_rgb_ngps", "rtab_rgb"), ("rtab_rgbd_ngps", "rtab_rgbd")):
                     if rtab_key not in methods:
                         continue
-                    rtab_est, rtab_gt = tum_for_method(config, primary_method, seed)
+                    rtab_est, rtab_gt = tum_for_method(config, primary_method, seed, baseline_sources)
                     out_dir = work_dir / rtab_key
                     out_est = out_dir / "trajectory_0.5.tum"
                     out_gt = out_dir / "gps_pose.tum"
                     out_dir.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(rtab_gt, out_gt)
+                    rtab_deg_tum = out_dir / "degraded_gnss.tum"
+                    make_degraded_gnss_for_gt(rtab_gt, profile, seed, args.dropout_mode, args.headland_fraction, rtab_deg_tum)
                     build_kalman_ngps_fused_tum(
                         primary_est=rtab_est,
-                        ngps_est=degraded_tum,
+                        ngps_est=rtab_deg_tum,
                         out_est=out_est,
                         primary_pos_std=args.rtab_ngps_rtab_std,
                         gps_pos_std=args.rtab_ngps_gps_std,
@@ -471,6 +616,11 @@ def main(argv: list[str] | None = None) -> None:
                             "method_key": method_key,
                             "source": source,
                             "degraded_gnss_tum": str(degraded_tum),
+                            "degraded_gnss_sha256": sha256_file(degraded_tum),
+                            "affected_mask_path": str(affected_mask_path),
+                            "affected_mask_sha256": sha256_file(affected_mask_path),
+                            "est_output_sha256": sha256_file(est_tum),
+                            "gt_output_sha256": sha256_file(gt_tum),
                             "affected_fraction": float(np.mean(affected_mask)),
                         }
                     )

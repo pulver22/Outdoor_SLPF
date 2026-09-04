@@ -4,7 +4,8 @@
     "Raw map-frame APE and aligned APE are retained.",
     "In-row metrics are used for row identity; headland metrics are used for transition behaviour.",
     "Multi-baseline comparative metrics (AMCL, NoisyGNSS, RTAB-Map) ingested and reconciled.",
-    "GNSS degradation stress, component ablations, and robustness tables generated from recorded experiments."
+    "GNSS degradation stress, component ablations, and robustness tables generated from recorded experiments.",
+    "SemanticBLT metadata is external model/dataset provenance only; it does not permit current-field, per-class, or confusion-matrix detector claims."
   ],
   "passed": true,
   "required_metrics": [

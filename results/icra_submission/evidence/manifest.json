@@ -1,12 +1,13 @@
 {
-  "aggregate_row_count": 25,
+  "aggregate_row_count": 16,
   "claim_checks": {
     "detector_accuracy_claim_permitted": false,
     "notes": [
       "Raw map-frame APE and aligned APE are retained.",
       "In-row metrics are used for row identity; headland metrics are used for transition behaviour.",
       "Multi-baseline comparative metrics (AMCL, NoisyGNSS, RTAB-Map) ingested and reconciled.",
-      "GNSS degradation stress, component ablations, and robustness tables generated from recorded experiments."
+      "GNSS degradation stress, component ablations, and robustness tables generated from recorded experiments.",
+      "SemanticBLT metadata is external model/dataset provenance only; it does not permit current-field, per-class, or confusion-matrix detector claims."
     ],
     "passed": true,
     "required_metrics": [
@@ -29,27 +30,34 @@
   },
   "configuration": "configs/icra/alpha_huber3_cap50.yaml",
   "git": {
-    "commit": "5ffae4a9bd7dad1e828a10c886e08bfe3dcbe9e6"
+    "commit": "fb574fdeee9b401e54c16deeb8a0b57dfa59c6b9"
   },
   "inputs": {
-    "ablation_metrics": "results/iros_ablation/20260217_085404_ablation/ablation_metrics_aggregate.csv",
+    "ablation_metrics": "results/icra_submission/reruns/ablation/rh_run1/20260902_125857_ablation/ablation_metrics_aggregate.csv",
+    "additional_sources": [],
     "baseline_metrics": [
-      "results/iros_rh1/final_20260217/trajectory_metrics_multiseed_per_seed.csv",
-      "results/iros_rh2/20260225_105822_multiseed_all_methods/trajectory_metrics_multiseed_per_seed.csv",
-      "results/iros_revision/rtab_ngps_main_table/rtab_ngps_main_table_per_seed.csv"
+      "results/icra_submission/evidence/canonical_baseline_metrics_per_seed.csv"
     ],
-    "followup_metrics": "results/localization_improvement_row_identity/followup_metrics_per_seed.csv",
-    "gnss_stress_metrics": "results/iros_revision/gnss_degradation/localization_metrics_aggregate.csv",
-    "protocols": [],
+    "followup_metrics": "results/icra_submission/reruns/localization/followup_metrics_per_seed.csv",
+    "gnss_stress_metrics": "results/icra_submission/reruns/gnss_stress_full_v2/localization_metrics_aggregate.csv",
+    "protocols": [
+      "results/icra_submission/reruns/localization/followup_protocol_full.json",
+      "results/icra_submission/reruns/ablation/rh_run1/20260902_125857_ablation/ablation_protocol.json",
+      "results/icra_submission/reruns/ablation/rh_run2/20260902_131924_ablation/ablation_protocol.json",
+      "results/icra_submission/reruns/robustness/rh_run1/20260902_134037_run1_robustness_gpu/run_protocol.json",
+      "results/icra_submission/reruns/robustness/rh_run2/20260902_135644_run1_robustness_gpu/run_protocol.json"
+    ],
     "reference_metrics": null,
-    "robustness_metrics": "results/iros_rh1_robustness/20260225_151229_run1_robustness_gpu/run1_robustness_aggregate.csv",
-    "rtab_metrics": null
+    "robustness_metrics": "results/icra_submission/reruns/robustness/robustness_metrics_aggregate.csv",
+    "rtab_metrics": null,
+    "statistics_summary": "results/icra_submission/reruns/statistics/icra_statistics_summary.json"
   },
   "outputs": {
     "aggregate_csv": "results/icra_submission/evidence/method_metrics_aggregate.csv",
     "baseline_deltas_csv": "results/icra_submission/evidence/baseline_deltas.csv",
     "claim_checks": "results/icra_submission/evidence/claim_checks.json",
     "per_seed_csv": "results/icra_submission/evidence/method_metrics_per_seed.csv",
+    "statistics_summary": "results/icra_submission/reruns/statistics/icra_statistics_summary.json",
     "tables": {
       "ablation": "results/icra_submission/evidence/icra_ablation_table.tex",
       "gnss_stress": "results/icra_submission/evidence/icra_gnss_stress_table.tex",
@@ -63,7 +71,7 @@
     "notes": [],
     "status": "canonical"
   },
-  "row_count": 75,
+  "row_count": 48,
   "schema_version": 2,
   "seeds": [
     11,
@@ -72,34 +80,88 @@
   ],
   "sources": [
     {
-      "path": "results/localization_improvement_row_identity/followup_metrics_per_seed.csv",
-      "sha256": "2eb5409dfc52d9263c0c1005ee9f56803e20ee8f7938eea24c5fc9c3bc3c85d3"
+      "path": "results/icra_submission/reruns/localization/followup_metrics_per_seed.csv",
+      "sha256": "e80122a6cd4f93983e3a73dc92685465b9fffd3e19ea0dc526e0e0483ee5f633"
     },
     {
-      "path": "results/iros_rh1/final_20260217/trajectory_metrics_multiseed_per_seed.csv",
-      "sha256": "0eac5ae96c1fcf41283417bc66a44d2e08e5e533782bf581486307c298920797"
+      "path": "results/icra_submission/evidence/canonical_baseline_metrics_per_seed.csv",
+      "sha256": "36ba9dd10660818fe1bf47dccf94e0ccc9fff683ae7e1d63fe0b83d0e6209a40"
     },
     {
-      "path": "results/iros_rh2/20260225_105822_multiseed_all_methods/trajectory_metrics_multiseed_per_seed.csv",
-      "sha256": "c1da74b1ca4643a78c06b73405154b120f0f4892e3df066c38b050e962620325"
+      "path": "results/icra_submission/reruns/gnss_stress_full_v2/localization_metrics_aggregate.csv",
+      "sha256": "cb7df24be4f698e99e78fde35546d4708e2610ef958d92b47b3367500e0bf040"
     },
     {
-      "path": "results/iros_revision/rtab_ngps_main_table/rtab_ngps_main_table_per_seed.csv",
-      "sha256": "876e135857f7f8d222abbbf263d69036a60049bced8416c4df49d8cf8cc56d56"
+      "path": "results/icra_submission/reruns/ablation/rh_run1/20260902_125857_ablation/ablation_metrics_aggregate.csv",
+      "sha256": "ef11a24fe5ce867fdaf8f88d8dbfb3ca66a2d2ce183436a7f1320970937827df"
     },
     {
-      "path": "results/iros_revision/gnss_degradation/localization_metrics_aggregate.csv",
-      "sha256": "e6c46ed7c7edd6709c62488f857cbbdbc45d656b8dd25febd0bba15d69019a92"
+      "path": "results/icra_submission/reruns/robustness/robustness_metrics_aggregate.csv",
+      "sha256": "6b46e9a21c4b9e35e3aad2cf1ac8fa126755d5df2b3610f51cceb9ccbe6e13b0"
     },
     {
-      "path": "results/iros_ablation/20260217_085404_ablation/ablation_metrics_aggregate.csv",
-      "sha256": "94bf2117ce2556fde418ef2f2d1b55e13fa1468e65552f6b9ea3ababd59e3456"
+      "path": "results/icra_submission/reruns/localization/followup_protocol_full.json",
+      "sha256": "96c9a11443913a8564874365f71d75e87e9aaf71144e559724634db23be37243"
     },
     {
-      "path": "results/iros_rh1_robustness/20260225_151229_run1_robustness_gpu/run1_robustness_aggregate.csv",
-      "sha256": "c7e4871aab0e8503c0ef597678948c4e9b81c0bcf5f937d3a5581d96ce93b88d"
+      "path": "results/icra_submission/reruns/ablation/rh_run1/20260902_125857_ablation/ablation_protocol.json",
+      "sha256": "1a4eaf3e64ff2a980d96dfc2359a62472b4ed58f17825a697ac009ab402d7447"
+    },
+    {
+      "path": "results/icra_submission/reruns/ablation/rh_run2/20260902_131924_ablation/ablation_protocol.json",
+      "sha256": "b762e6bee9e1c103e79c6a37171e6062cb24922da3588cfeb9cf89d27e37201a"
+    },
+    {
+      "path": "results/icra_submission/reruns/robustness/rh_run1/20260902_134037_run1_robustness_gpu/run_protocol.json",
+      "sha256": "93296fb0ef153a2d1b98e14e1c91318c862b4e02ab5017550d86464a3471f1f5"
+    },
+    {
+      "path": "results/icra_submission/reruns/robustness/rh_run2/20260902_135644_run1_robustness_gpu/run_protocol.json",
+      "sha256": "e9ba4c228ea5733cf2e01d9bd3c35e05c8578b3b64ffb04f7c125110c166865e"
+    },
+    {
+      "path": "results/icra_submission/reruns/statistics/icra_statistics_summary.json",
+      "sha256": "36b144169b18bbb98fb5fdbac55162c110dee5758dbbc6099181400711ed7dc2"
     }
   ],
+  "table_registry": {
+    "ablation": {
+      "generated": "results/icra_submission/evidence/icra_ablation_table.tex",
+      "row_key": "variant,traversal,seed",
+      "source_csv": [
+        "results/icra_submission/reruns/ablation/rh_run1/20260902_125857_ablation/ablation_metrics_aggregate.csv"
+      ]
+    },
+    "gnss_stress": {
+      "generated": "results/icra_submission/evidence/icra_gnss_stress_table.tex",
+      "row_key": "method,traversal,profile,seed",
+      "source_csv": [
+        "results/icra_submission/reruns/gnss_stress_full_v2/localization_metrics_aggregate.csv"
+      ]
+    },
+    "main": {
+      "generated": "results/icra_submission/evidence/icra_main_table.tex",
+      "row_key": "method,traversal,seed,profile",
+      "source_csv": [
+        "results/icra_submission/reruns/localization/followup_metrics_per_seed.csv",
+        "results/icra_submission/evidence/canonical_baseline_metrics_per_seed.csv"
+      ]
+    },
+    "operational": {
+      "generated": "results/icra_submission/evidence/icra_operational_table.tex",
+      "row_key": "method,traversal,seed,profile",
+      "source_csv": [
+        "results/icra_submission/reruns/localization/followup_metrics_per_seed.csv"
+      ]
+    },
+    "robustness": {
+      "generated": "results/icra_submission/evidence/icra_robustness_table.tex",
+      "row_key": "option,variant,traversal,seed",
+      "source_csv": [
+        "results/icra_submission/reruns/robustness/robustness_metrics_aggregate.csv"
+      ]
+    }
+  },
   "traversals": [
     "rh_run1",
     "rh_run2"

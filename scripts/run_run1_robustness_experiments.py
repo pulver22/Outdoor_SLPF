@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import math
 import os
@@ -46,12 +47,22 @@ from run_ab_validation import (
 DEFAULT_OUTPUT_ROOT = BASE_DIR / "results" / "iros_rh1_robustness"
 DEFAULT_DATA_PATH = BASE_DIR / "data" / "2025" / "rh_run1"
 DEFAULT_GEOJSON = BASE_DIR / "data" / "riseholme_poles_trunk.geojson"
+DEFAULT_CONFIG_YAML = BASE_DIR / "configs" / "icra" / "alpha_huber3_cap50.yaml"
 DEFAULT_SEEDS = "11,22,33"
+EXPECTED_SEEDS = (11, 22, 33)
 DEFAULT_DROP_RATES = "0.2,0.4"
 DEFAULT_REMOVE_RATES = "0.3,0.5"
 DEFAULT_MAP_NOISE_SIGMAS = "0.25,0.50"
 DEFAULT_SECTION_QMIN = 0.35
 DEFAULT_SECTION_QMAX = 0.65
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 @dataclass
@@ -82,6 +93,11 @@ def parse_int_list(text: str) -> List[int]:
     if not out:
         raise ValueError("Expected at least one integer.")
     return out
+
+
+def validate_experiment_seeds(seeds: List[int]) -> None:
+    if tuple(sorted(seeds)) != EXPECTED_SEEDS:
+        raise ValueError(f"Paper-facing experiments require exactly seeds {EXPECTED_SEEDS}; received {seeds}")
 
 
 def parse_float_list(text: str) -> List[float]:
@@ -131,6 +147,7 @@ def build_slpf_cmd(
     cmd = [
         str(python_exec),
         str(BASE_DIR / "scripts" / "spf_lidar.py"),
+        "--config-yaml", str(DEFAULT_CONFIG_YAML),
         "--miss-penalty", "4.0",
         "--wrong-hit-penalty", "4.0",
         "--gps-weight", "0.5",
@@ -616,7 +633,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run run1 robustness experiments (Option A + Option B).")
     parser.add_argument("--python-exec", type=Path, default=BASE_DIR / ".venv" / "bin" / "python")
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
-    parser.add_argument("--data-path", type=Path, default=DEFAULT_DATA_PATH)
+    parser.add_argument("--traversal", choices=["rh_run1", "rh_run2"], default="rh_run1")
+    parser.add_argument("--data-path", type=Path, default=None)
     parser.add_argument("--geojson", type=Path, default=DEFAULT_GEOJSON)
     parser.add_argument("--seeds", type=str, default=DEFAULT_SEEDS)
     parser.add_argument("--drop-rates", type=str, default=DEFAULT_DROP_RATES)
@@ -635,8 +653,13 @@ def main() -> None:
 
     python_exec = args.python_exec.expanduser()
     if not python_exec.is_absolute():
-        python_exec = (BASE_DIR / python_exec).resolve()
-    data_path = args.data_path.expanduser()
+        # Keep the venv path lexical; resolving its python symlink can drop
+        # the CUDA-enabled Torch installation.
+        python_exec = (BASE_DIR / python_exec).absolute()
+    if args.data_path is None:
+        data_path = BASE_DIR / "data" / "2025" / args.traversal
+    else:
+        data_path = args.data_path.expanduser()
     if not data_path.is_absolute():
         data_path = (BASE_DIR / data_path).resolve()
     geojson = args.geojson.expanduser()
@@ -652,6 +675,7 @@ def main() -> None:
         raise ValueError("Section quantiles must satisfy 0 <= qmin < qmax <= 1.")
 
     seeds = parse_int_list(args.seeds)
+    validate_experiment_seeds(seeds)
     drop_rates = [float(x) for x in parse_float_list(args.drop_rates)]
     remove_rates = [float(x) for x in parse_float_list(args.remove_rates)]
     map_noise_sigmas = [float(x) for x in parse_float_list(args.map_noise_sigmas)]
@@ -668,8 +692,16 @@ def main() -> None:
     if not geojson.exists():
         raise FileNotFoundError(f"Missing map geojson: {geojson}")
 
-    if args.require_cuda and not check_cuda_available(python_exec):
-        raise RuntimeError("CUDA is required but not visible in the selected Python runtime.")
+    probe_env = os.environ.copy()
+    probe_env["CUDA_VISIBLE_DEVICES"] = args.cuda_visible_devices
+    if args.require_cuda:
+        try:
+            from scripts.experiment_runtime import require_cuda_preflight
+        except ModuleNotFoundError:
+            from experiment_runtime import require_cuda_preflight
+        cuda_probe = require_cuda_preflight(python_exec, env=probe_env, cwd=BASE_DIR)
+    else:
+        cuda_probe = None
 
     evo_ape_bin = python_exec.parent / "evo_ape"
     evo_rpe_bin = python_exec.parent / "evo_rpe"
@@ -686,8 +718,7 @@ def main() -> None:
         run_dir = args.output_root.resolve() / f"{timestamp}_run1_robustness_{hw_tag}"
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    env = os.environ.copy()
-    env["CUDA_VISIBLE_DEVICES"] = args.cuda_visible_devices
+    env = probe_env
     env["MPLBACKEND"] = "Agg"
     env["MPLCONFIGDIR"] = str(BASE_DIR / ".tmp_mpl")
     (BASE_DIR / ".tmp_mpl").mkdir(parents=True, exist_ok=True)
@@ -709,9 +740,11 @@ def main() -> None:
 
     protocol: Dict[str, object] = {
         "run_dir": str(run_dir),
+        "traversal": args.traversal,
         "data_path": str(data_path),
         "geojson": str(geojson),
         "seeds": seeds,
+        "cuda_probe": cuda_probe,
         "drop_rates": drop_rates,
         "remove_rates": remove_rates,
         "section_qmin": float(args.section_qmin),
@@ -1044,6 +1077,17 @@ def main() -> None:
                 }
             )
             all_rows.append(metrics)
+
+    for row in all_rows:
+        row["traversal"] = args.traversal
+        est_path = Path(str(row["est_tum"]))
+        gt_path = Path(str(row["gt_tum"]))
+        row["est_output_sha256"] = sha256_file(est_path)
+        row["gt_output_sha256"] = sha256_file(gt_path)
+        map_path = Path(str(row["map_geojson"]))
+        row["map_geojson_sha256"] = sha256_file(map_path)
+    for row in recovery_rows:
+        row["traversal"] = args.traversal
 
     all_rows.sort(
         key=lambda r: (

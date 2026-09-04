@@ -27,7 +27,7 @@ try:
         load_rows_from_geojson,
         read_tum_file,
     )
-    from scripts.experiment_runtime import build_experiment_env
+    from scripts.experiment_runtime import build_experiment_env, require_cuda_preflight
 except ModuleNotFoundError:  # pragma: no cover - supports direct script execution.
     from run_ab_validation import (
         DEFAULT_GEOJSON,
@@ -40,7 +40,7 @@ except ModuleNotFoundError:  # pragma: no cover - supports direct script executi
         load_rows_from_geojson,
         read_tum_file,
     )
-    from experiment_runtime import build_experiment_env
+    from experiment_runtime import build_experiment_env, require_cuda_preflight
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -78,6 +78,7 @@ KEY_METRICS = [
         )
     ],
 ]
+EXPECTED_SEEDS = (11, 22, 33)
 
 
 @dataclass(frozen=True)
@@ -256,6 +257,11 @@ def next_step_candidate_matrix() -> list[dict[str, object]]:
 
 def parse_csv_list(value: str, cast=str) -> list:
     return [cast(part.strip()) for part in value.split(",") if part.strip()]
+
+
+def validate_experiment_seeds(seeds: list[int]) -> None:
+    if tuple(sorted(seeds)) != EXPECTED_SEEDS:
+        raise ValueError(f"Paper-facing experiments require exactly seeds {EXPECTED_SEEDS}; received {seeds}")
 
 
 def build_spf_command(
@@ -561,6 +567,7 @@ def write_protocol(
     commands: list[str],
     max_frames: int | None,
     require_cuda: bool,
+    cuda_probe: dict[str, object] | None,
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -574,6 +581,7 @@ def write_protocol(
                 "commands": commands,
                 "max_frames": max_frames,
                 "require_cuda": require_cuda,
+                "cuda_probe": cuda_probe,
             },
             indent=2,
             sort_keys=True,
@@ -590,7 +598,7 @@ def main() -> int:
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     parser.add_argument("--stage", choices=["screen", "full"], default="screen")
     parser.add_argument("--traversals", type=str, default="rh_run1")
-    parser.add_argument("--seeds", type=str, default="11")
+    parser.add_argument("--seeds", type=str, default="11,22,33")
     parser.add_argument("--candidate-ids", type=str, default="")
     parser.add_argument("--matrix", choices=["followup", "row-identity"], default="followup")
     parser.add_argument("--include-gtsam", action="store_true")
@@ -604,6 +612,17 @@ def main() -> int:
 
     traversals = parse_csv_list(args.traversals, str)
     seeds = parse_csv_list(args.seeds, int)
+    validate_experiment_seeds(seeds)
+    # Do not call Path.resolve() here: the venv's python is commonly a symlink
+    # to the system interpreter, and resolving it silently drops the venv's
+    # Torch/CUDA installation.
+    python_exec = args.python_exec.expanduser()
+    if not python_exec.is_absolute():
+        python_exec = (BASE_DIR / python_exec).absolute()
+    cuda_probe = None
+    if args.require_cuda:
+        probe_env = build_experiment_env(BASE_DIR, cuda_visible_devices=args.cuda_visible_devices)
+        cuda_probe = require_cuda_preflight(python_exec, env=probe_env, cwd=BASE_DIR)
     candidates = (
         next_step_candidate_matrix()
         if args.matrix == "row-identity"
@@ -622,7 +641,7 @@ def main() -> int:
         traversals=traversals,
         seeds=seeds,
         candidates=candidates,
-        python_exec=args.python_exec,
+        python_exec=python_exec,
         data_root=args.data_root,
         geojson=args.geojson,
         output_root=args.output_root,
@@ -639,6 +658,7 @@ def main() -> int:
         commands=commands,
         max_frames=args.max_frames,
         require_cuda=args.require_cuda,
+        cuda_probe=cuda_probe,
     )
     print(f"Wrote {len(rows)} evaluated runs to {args.output_root}")
     return 0
