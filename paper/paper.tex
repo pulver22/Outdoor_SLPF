@@ -41,7 +41,14 @@ Autonomous ground vehicles in viticulture enable precision spraying, mechanical 
 
 Vineyards exhibit pronounced \emph{perceptual aliasing}: rows feature parallel, uniformly spaced trellises, identical post spacings, and repetitive vine foliage~\cite{papadimitriou2022loop,de2025keypoint,hroob2021benchmark}. Standard 2D and 3D LiDARs observe nearly identical cross-sectional point profiles in every corridor. Consequently, geometry-only Monte Carlo localisation methods like AMCL~\cite{amcl} suffer from multi-modal dispersion and can collapse onto incorrect adjacent rows. Visual SLAM frameworks~\cite{rtabmap,kokas2024multicamera} similarly produce false loop closures between distinct parallel rows or lose tracking during lighting shifts and direct solar glare.
 
-Although Global Navigation Satellite Systems (GNSS) provide absolute world-frame positioning, high-precision Real-Time Kinematic (RTK) signals are frequently degraded by canopy multipath, satellite occlusion along valley slopes, and foliage attenuation~\cite{groves2013principles,kaplan2017understanding,Zhou2025}. Standard GNSS receivers exhibit position errors exceeding $3.0\,$m, larger than typical vineyard row widths ($2.0\text{--}2.8\,$m), making raw GNSS alone incapable of resolving row identity. This limitation is acute at headland turning zones, where the robot exits crop rows, executes rapid yaw transitions, and must enter the correct target corridor.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.75\columnwidth]{pics/overlay.png}
+  \caption{Projection of detected semantic landmarks (vine trunks and support poles) onto the surveyed vineyard map. The proposed SLPF groups discrete landmarks into continuous row-aligned semantic walls to resolve corridor aliasing.}
+  \label{fig:motivation}
+\end{figure}
+
+Although Global Navigation Satellite Systems (GNSS) provide absolute world-frame positioning, high-precision Real-Time Kinematic (RTK) signals are frequently degraded by canopy multipath, satellite occlusion along valley slopes, and foliage attenuation~\cite{groves2013principles,kaplan2017understanding,Zhou2025}. Standard GNSS receivers exhibit position errors exceeding $3.0\,$m, larger than typical vineyard row widths ($2.0\text{--}2.8\,$m), making raw GNSS alone incapable of resolving row identity (Fig.~\ref{fig:motivation}). This limitation is acute at headland turning zones, where the robot exits crop rows, executes rapid yaw transitions, and must enter the correct target corridor.
 
 We address these challenges with the Semantic Landmark Particle Filter (SLPF). While seasonal foliage and weather alter visual appearance, structural woody vine trunks and rigid support poles remain stationary across seasons. We extract these vertical elements using an object detector and project them into the robot frame. Rather than treating detections as unordered points, we construct a structured \emph{semantic-wall} representation encoding the continuous spatial boundaries and orientation of each surveyed row.
 
@@ -345,7 +352,6 @@ In this paper, we presented the Semantic Landmark Particle Filter (SLPF), a loca
 
 Future extensions include 3D semantic-wall formulations, active multi-hypothesis planning during headland turns, and online map refinement.
 
-\clearpage
 \balance
 \bibliographystyle{ieeetr}
 \bibliography{glorified,new}
