@@ -1,0 +1,89 @@
+{
+  "source": {
+    "dataset_url": "https://universe.roboflow.com/gaia-hse8w/semanticblt",
+    "model_url": "https://universe.roboflow.com/gaia-hse8w/semanticblt/model/1",
+    "dataset_version_url": "https://universe.roboflow.com/gaia-hse8w/semanticblt/dataset/1",
+    "access_date": "2026-09-04",
+    "publisher": "Roboflow Universe",
+    "workspace": "GAIA",
+    "license": "CC BY 4.0"
+  },
+  "dataset": {
+    "name": "SemanticBLT",
+    "identifier": "gaia-hse8w/semanticblt",
+    "version": "v1",
+    "version_date": "2024-June",
+    "generated_on": "2024-06-03",
+    "task": "instance segmentation",
+    "image_count": 1035,
+    "splits": {
+      "train": {
+        "percent": 93,
+        "images": 966
+      },
+      "valid": {
+        "percent": 5,
+        "images": 46
+      },
+      "test": {
+        "percent": 2,
+        "images": 23
+      }
+    },
+    "classes": [
+      "vehicle",
+      "building",
+      "pole",
+      "pipe",
+      "robot",
+      "trunk"
+    ],
+    "preprocessing": {
+      "auto_orient": "applied",
+      "resize": "stretch to 640x640"
+    },
+    "augmentations": {
+      "outputs_per_training_example": 6,
+      "hue_degrees": {
+        "min": -18,
+        "max": 18
+      },
+      "saturation_percent": {
+        "min": -30,
+        "max": 30
+      },
+      "brightness_percent": {
+        "min": -15,
+        "max": 15
+      },
+      "exposure_percent": {
+        "min": -15,
+        "max": 15
+      },
+      "blur_px": {
+        "max": 1
+      }
+    }
+  },
+  "model": {
+    "identifier": "semanticblt/1",
+    "version": "1",
+    "type": "Roboflow 3.0 Instance Segmentation (Fast)",
+    "checkpoint": "COCO",
+    "date": "2024-06-03",
+    "reported_aggregate_metrics": {
+      "precision_percent": 76.8,
+      "recall_percent": 71.4,
+      "map50_percent": 74.1
+    }
+  },
+  "claim_boundaries": {
+    "permitted": "Report these as Roboflow model/dataset-level aggregate benchmark metrics for SemanticBLT v1.",
+    "prohibited": "Do not treat these metrics as independent current-field detector validation, current-traversal recall, per-class pole/trunk validation, or a confusion matrix.",
+    "missing_evidence": [
+      "per-class pole/trunk metrics",
+      "confusion matrix",
+      "labelled current-traversal validation"
+    ]
+  }
+}
