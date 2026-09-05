@@ -30,11 +30,13 @@
   },
   "configuration": "configs/icra/alpha_huber3_cap50.yaml",
   "git": {
-    "commit": "fb574fdeee9b401e54c16deeb8a0b57dfa59c6b9"
+    "commit": "fb76bafc82399bb5b10e6a60a1d4ad16659b2676"
   },
   "inputs": {
     "ablation_metrics": "results/icra_submission/reruns/ablation/rh_run1/20260902_125857_ablation/ablation_metrics_aggregate.csv",
-    "additional_sources": [],
+    "additional_sources": [
+      "results/icra_submission/evidence/semanticblt_roboflow_metadata.json"
+    ],
     "baseline_metrics": [
       "results/icra_submission/evidence/canonical_baseline_metrics_per_seed.csv"
     ],
@@ -68,7 +70,9 @@
   },
   "provenance": {
     "fresh_rerun": true,
-    "notes": [],
+    "notes": [
+      "Baseline matrix mixes dedicated rh_run1 references with historical reference rows; comparisons are descriptive."
+    ],
     "status": "canonical"
   },
   "row_count": 48,
@@ -118,6 +122,10 @@
     {
       "path": "results/icra_submission/reruns/robustness/rh_run2/20260902_135644_run1_robustness_gpu/run_protocol.json",
       "sha256": "e9ba4c228ea5733cf2e01d9bd3c35e05c8578b3b64ffb04f7c125110c166865e"
+    },
+    {
+      "path": "results/icra_submission/evidence/semanticblt_roboflow_metadata.json",
+      "sha256": "bb3ae8c9c8b50c811e8b18e1cc26cceaa5dff5a14bdb1a872a1904a1d8415259"
     },
     {
       "path": "results/icra_submission/reruns/statistics/icra_statistics_summary.json",

@@ -361,18 +361,24 @@ def _tex_gnss_stress_table(path: Path, gnss_stress_csv: Path | None) -> None:
             }
             for prof in profiles:
                 p_rows = [r for r in c_rows if r["profile"] == prof]
+                best_ape = min(float(r["ape_align_rmse_across_traversals_mean"]) for r in p_rows) if p_rows else None
+                best_corr = max(float(r["row_correct_fraction_across_traversals_mean"]) for r in p_rows) if p_rows else None
+                best_fail = min(float(r["failure_rate_across_traversals_mean"]) for r in p_rows) if p_rows else None
                 for r in p_rows:
                     m = r["method"]
-                    if m == "SLPF":
-                        m_str = r"\textbf{SLPF (ours)}"
-                        ape = f"\\mathbf{{{float(r['ape_align_rmse_across_traversals_mean']):.2f}}}"
-                        corr = f"\\mathbf{{{float(r['row_correct_fraction_across_traversals_mean']):.2f}}}"
-                        fail = f"\\mathbf{{{float(r['failure_rate_across_traversals_mean']):.2f}}}"
-                    else:
-                        m_str = m.replace("+", " + ")
-                        ape = f"{float(r['ape_align_rmse_across_traversals_mean']):.2f}"
-                        corr = f"{float(r['row_correct_fraction_across_traversals_mean']):.2f}"
-                        fail = f"{float(r['failure_rate_across_traversals_mean']):.2f}"
+                    m_str = r"\textbf{SLPF (ours)}" if m == "SLPF" else m.replace("+", " + ")
+                    ape_value = float(r["ape_align_rmse_across_traversals_mean"])
+                    corr_value = float(r["row_correct_fraction_across_traversals_mean"])
+                    fail_value = float(r["failure_rate_across_traversals_mean"])
+                    ape = f"{ape_value:.2f}"
+                    corr = f"{corr_value:.2f}"
+                    fail = f"{fail_value:.2f}"
+                    if math.isclose(ape_value, best_ape, rel_tol=0.0, abs_tol=1e-12):
+                        ape = f"\\mathbf{{{ape}}}"
+                    if math.isclose(corr_value, best_corr, rel_tol=0.0, abs_tol=1e-12):
+                        corr = f"\\mathbf{{{corr}}}"
+                    if math.isclose(fail_value, best_fail, rel_tol=0.0, abs_tol=1e-12):
+                        fail = f"\\mathbf{{{fail}}}"
                     lines.append(f"{profile_labels[prof]} & {m_str} & ${ape}$ & ${corr}$ & ${fail}$ \\\\")
                 if prof in {"nominal", "outage_20s"}:
                     lines.append("\\midrule")
@@ -430,7 +436,7 @@ def _tex_ablation_table(path: Path, ablation_csv: Path | None) -> None:
             delta_val = float(r.get("delta_vs_full_ape_align_rmse", 0.0))
             delta_str = f"{delta_val:+.2f}" if abs(delta_val) > 1e-4 else "0.00"
             if v == "full":
-                lines.append(f"\\textbf{{{label}}} & $\\mathbf{{{raw}}}$ & $\\mathbf{{{align}}}$ & $\\mathbf{{{xt}}}$ & $\\mathbf{{{corr}}}$ & ${delta_str}$ \\\\")
+                lines.append(f"\\textbf{{{label}}} & ${raw}$ & ${align}$ & ${xt}$ & ${corr}$ & ${delta_str}$ \\\\")
             else:
                 lines.append(f"{label} & ${raw}$ & ${align}$ & ${xt}$ & ${corr}$ & ${delta_str}$ \\\\")
     else:
@@ -480,7 +486,7 @@ def _tex_robustness_table(path: Path, robustness_csv: Path | None) -> None:
             xt = f"{float(r['cross_track_mean_mean']):.2f} \\pm {float(r['cross_track_mean_std']):.2f}"
             rec = f"${rec_map[v]}$" if v in rec_map else "--"
             if v == "full_map":
-                lines.append(f"\\textbf{{{label}}} & $\\mathbf{{{align}}}$ & $\\mathbf{{{corr}}}$ & $\\mathbf{{{xt}}}$ & {rec} \\\\")
+                lines.append(f"\\textbf{{{label}}} & ${align}$ & ${corr}$ & ${xt}$ & {rec} \\\\")
             else:
                 lines.append(f"{label} & ${align}$ & ${corr}$ & ${xt}$ & {rec} \\\\")
     else:

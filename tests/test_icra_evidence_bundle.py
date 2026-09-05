@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from scripts.build_icra_evidence_bundle import EvidenceInputs, build_bundle
+from scripts.build_icra_evidence_bundle import EvidenceInputs, _tex_gnss_stress_table, build_bundle
 
 
 def _write_csv(path: Path, rows: list[dict[str, object]]) -> Path:
@@ -79,6 +79,36 @@ def test_bundle_records_exact_source_hashes(tmp_path: Path) -> None:
     assert (tmp_path / "out/icra_gnss_stress_table.tex").exists()
     assert (tmp_path / "out/icra_operational_table.tex").exists()
     assert "Headland recovery" in (tmp_path / "out/icra_operational_table.tex").read_text(encoding="utf-8")
+
+
+def test_gnss_stress_table_highlights_metric_winners_independently(tmp_path: Path) -> None:
+    stress_csv = _write_csv(tmp_path / "stress.csv", [{"placeholder": "1"}])
+    _write_csv(
+        tmp_path / "compact_summary.csv",
+        [
+            {
+                "profile": "nominal",
+                "method": "AMCL",
+                "ape_align_rmse_across_traversals_mean": 0.50,
+                "row_correct_fraction_across_traversals_mean": 0.70,
+                "failure_rate_across_traversals_mean": 0.20,
+            },
+            {
+                "profile": "nominal",
+                "method": "SLPF",
+                "ape_align_rmse_across_traversals_mean": 0.90,
+                "row_correct_fraction_across_traversals_mean": 0.80,
+                "failure_rate_across_traversals_mean": 0.30,
+            },
+        ],
+    )
+
+    output = tmp_path / "stress_table.tex"
+    _tex_gnss_stress_table(output, stress_csv)
+    rendered = output.read_text(encoding="utf-8")
+
+    assert "Nominal & AMCL & $\\mathbf{0.50}$ & $0.70$ & $\\mathbf{0.20}$ \\\\" in rendered
+    assert "Nominal & \\textbf{SLPF (ours)} & $0.90$ & $\\mathbf{0.80}$ & $0.30$ \\\\" in rendered
 
 
 def test_bundle_rejects_unexpected_seed_in_baseline(tmp_path: Path) -> None:

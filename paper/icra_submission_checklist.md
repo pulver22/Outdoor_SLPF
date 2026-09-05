@@ -13,9 +13,10 @@ This checklist is the release gate for the evidence-first manuscript. It is inte
 - [x] Complete PDF, including references, is at most eight pages: verify with `pdfinfo paper/paper.pdf`.
 - [x] PDF compliance checks pass: no author, affiliation, funder, repository, or contact identifiers in extracted text.
 - [x] Title and abstract match the bounded evidence-first claim.
+- [x] Baseline provenance is disclosed: dedicated `rh_run1` AMCL/RTAB-Map references are distinguished from historical reference rows.
 - [x] AI-use disclosure decision: omit from the anonymous manuscript and retain the decision here for camera-ready review.
 - [x] Video decision: no video claim or supplementary video is required for this evidence-first release; decide separately if the submission portal requests one.
-- [ ] Fresh six-run CUDA rerun is still blocked on this host because CUDA is unavailable; the committed controlled matrix is clearly labelled as the fallback evidence source.
+- [x] Fresh six-run CUDA rerun is represented by the canonical verification record; the baseline matrix remains mixed-provenance and is labelled as descriptive.
 - [ ] Final upload package must be rechecked against the official ICRA call immediately before submission.
 
 ## Release artifacts
@@ -24,4 +25,4 @@ This checklist is the release gate for the evidence-first manuscript. It is inte
 - Shareable report: `results/icra_submission/report/report.md`
 - Generated paper tables: `paper/generated/icra_*.tex`
 - PDF: `paper/paper.pdf`
-- SHA256 file: `results/icra_submission/verification/submission_manifest.sha256`
+- SHA256 file: `results/icra_submission/submission_manifest.sha256` (authoritative; the verification-directory copy is deprecated)
