@@ -1,0 +1,14 @@
+{
+  "output_root": "/home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/results/iros_revision/rtab_ngps_main_table",
+  "seeds": [
+    11,
+    22,
+    33
+  ],
+  "rtab_ngps": {
+    "rtab_std_m": 0.35,
+    "gps_std_m": 1.8,
+    "process_accel_std_mps2": 0.8,
+    "anchor_primary_start_pose": true
+  }
+}

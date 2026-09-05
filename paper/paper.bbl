@@ -1,0 +1,143 @@
+\begin{thebibliography}{10}
+
+\bibitem{aguiar2022localization}
+A.~S. Aguiar, F.~Neves~dos Santos, H.~Sobreira, J.~Boaventura-Cunha, and A.~J.
+  Sousa, ``Localization and mapping on agriculture based on point-feature
+  extraction and semiplanes segmentation from 3d lidar data,'' {\em Frontiers
+  in Robotics and AI}, vol.~9, p.~832165, 2022.
+
+\bibitem{polvara2024bacchus}
+R.~Polvara, S.~Molina, I.~Hroob, A.~Papadimitriou, K.~Tsiolis, D.~Giakoumis,
+  S.~Likothanassis, D.~Tzovaras, G.~Cielniak, and M.~Hanheide, ``Bacchus
+  long-term (blt) data set: Acquisition of the agricultural multimodal blt data
+  set with automated robot deployment,'' {\em Journal of Field Robotics},
+  vol.~41, no.~7, pp.~2280--2298, 2024.
+
+\bibitem{blok2019robot}
+P.~M. Blok, K.~van Boheemen, F.~K. van Evert, J.~IJsselmuiden, and G.-H. Kim,
+  ``Robot navigation in orchards with localization based on particle filter and
+  kalman filter,'' {\em Computers and electronics in agriculture}, vol.~157,
+  pp.~261--269, 2019.
+
+\bibitem{papadimitriou2022loop}
+A.~Papadimitriou, I.~Kleitsiotis, I.~Kostavelis, I.~Mariolis, D.~Giakoumis,
+  S.~Likothanassis, and D.~Tzovaras, ``Loop closure detection and slam in
+  vineyards with deep semantic cues,'' in {\em 2022 International Conference on
+  Robotics and Automation (ICRA)}, pp.~2251--2258, IEEE, 2022.
+
+\bibitem{de2025keypoint}
+R.~De~Silva, J.~Swindell, J.~Cox, M.~Popovi{\'c}, C.~Cadena, C.~Stachniss, and
+  R.~Polvara, ``Keypoint semantic integration for improved feature matching in
+  outdoor agricultural environments,'' {\em IEEE Robotics and Automation
+  Letters}, vol.~10, no.~12, pp.~13383--13390, 2025.
+
+\bibitem{hroob2021benchmark}
+I.~Hroob, R.~Polvara, S.~Molina, G.~Cielniak, and M.~Hanheide, ``Benchmark of
+  visual and 3d lidar slam systems in simulation environment for vineyards,''
+  in {\em Towards Autonomous Robotic Systems: 22nd Annual Conference, TAROS
+  2021, Lincoln, UK, September 8--10, 2021, Proceedings 22}, pp.~168--177,
+  Springer, 2021.
+
+\bibitem{amcl}
+F.~Dellaert, D.~Fox, W.~Burgard, and S.~Thrun, ``Monte carlo localization for
+  mobile robots,'' in {\em Proceedings 1999 IEEE International Conference on
+  Robotics and Automation (Cat. No.99CH36288C)}, vol.~2, pp.~1322--1328 vol.2,
+  1999.
+
+\bibitem{rtabmap}
+M.~Labb{\'e} and F.~Michaud, ``Rtab-map as an open-source lidar and visual
+  simultaneous localization and mapping library for large-scale and long-term
+  online operation,'' {\em Journal of field robotics}, vol.~36, no.~2,
+  pp.~416--446, 2019.
+
+\bibitem{kokas2024multicamera}
+C.~Kokas, A.~Mastrogeorgiou, K.~Machairas, K.~Koutsoukis, and E.~Papadopoulos,
+  ``Multicamera visual slam for vineyard inspection,'' in {\em 2024 32nd
+  Mediterranean Conference on Control and Automation (MED)}, pp.~75--80, IEEE,
+  2024.
+
+\bibitem{groves2013principles}
+P.~D. GROVES, ``Navigation systems,'' {\em Principes of GNSS, Inertial and
+  Multisensor Integrated}, pp.~1--17, 2008.
+
+\bibitem{kaplan2017understanding}
+E.~D. Kaplan and C.~Hegarty, {\em Understanding GPS/GNSS: principles and
+  applications}.
+\newblock Artech house, 2017.
+
+\bibitem{Zhou2025}
+H.~Zhou, J.~Wang, Y.~Chen, L.~Hu, Z.~Li, F.~Xie, J.~He, and P.~Wang, ``Neural
+  network-based slam/gnss fusion localization algorithm for agricultural robots
+  in orchard gnss-degraded or denied environments,'' {\em Agriculture},
+  vol.~15, no.~15, p.~1612, 2025.
+
+\bibitem{yilmaz2019ras}
+A.~Yilmaz and H.~Temeltas, ``{Self-adaptive Monte Carlo method for indoor
+  localization of smart AGVs using LIDAR data},'' {\em Journal on Robotics and
+  Autonomous Systems (RAS)}, vol.~122, p.~103285, 2019.
+
+\bibitem{nehme2021lidar}
+H.~Nehme, C.~Aubry, T.~Solatges, X.~Savatier, R.~Rossi, and R.~Boutteau,
+  ``Lidar-based structure tracking for agricultural robots: Application to
+  autonomous navigation in vineyards,'' {\em Journal of Intelligent \& Robotic
+  Systems}, vol.~103, no.~4, p.~61, 2021.
+
+\bibitem{agronomy11020287}
+M.~Corno, S.~Furioli, P.~Cesana, and S.~M. Savaresi, ``Adaptive
+  ultrasound-based tractor localization for semi-autonomous vineyard
+  operations,'' {\em Agronomy}, vol.~11, no.~2, 2021.
+
+\bibitem{cerrato2020gps}
+S.~Cerrato, {\em Gps-based autonomous navigation of unmanned ground vehicles in
+  precision agriculture applications}.
+\newblock PhD thesis, Politecnico di Torino, 2020.
+
+\bibitem{LiDARSurvey2026}
+J.~Vilella-Cantos, M.~Ballesta, D.~Valiente, M.~Flores, and L.~Pay{\'a},
+  ``Advanced techniques and applications of lidar place recognition in
+  agricultural environments: A comprehensive survey,'' {\em arXiv preprint
+  arXiv:2601.22198}, 2026.
+
+\bibitem{Hroob2024}
+I.~Hroob, S.~Molina, R.~Polvara, G.~Cielniak, and M.~Hanheide, ``Adaptive robot
+  localization in dynamic environments through self-learnt long-term 3d stable
+  points segmentation,'' {\em Robotics and Autonomous Systems}, vol.~181,
+  p.~104786, 2024.
+
+\bibitem{7759339}
+R.~Spangenberg, D.~Goehring, and R.~Rojas, ``Pole-based localization for
+  autonomous vehicles in urban scenarios,'' in {\em 2016 IEEE/RSJ International
+  Conference on Intelligent Robots and Systems (IROS)}, pp.~2161--2166, 2016.
+
+\bibitem{huang2024semantics}
+Y.~Huang, Y.~Gu, C.~Xu, and H.~Kong, ``Why semantics matters: A deep study on
+  semantic particle-filtering localization in a lidar semantic pole-map,'' {\em
+  IEEE Transactions on Field Robotics}, 2024.
+
+\bibitem{costley2020landmark}
+A.~Costley and R.~Christensen, ``Landmark aided gps-denied navigation for
+  orchards and vineyards,'' in {\em 2020 IEEE/ION Position, Location and
+  Navigation Symposium (PLANS)}, pp.~987--995, 2020.
+
+\bibitem{Shi2025}
+Z.~Shi, Z.~Bai, K.~Yi, B.~Qiu, X.~Dong, Q.~Wang, C.~Jiang, X.~Zhang, and
+  X.~Huang, ``Vision and 2d lidar fusion-based navigation line extraction for
+  autonomous agricultural robots in dense pomegranate orchards,'' {\em
+  Sensors}, vol.~25, no.~17, p.~5432, 2025.
+
+\bibitem{cox2024integrated}
+J.~Cox, J.~R. Heselden, R.~De~Silva, M.~Hanheide, and R.~Polvara, ``An
+  integrated aerial-ground system for vineyard mapping and robotic
+  navigation,'' {\em SSRN Electronic Journal}, 2024.
+
+\bibitem{yolov9}
+C.-Y. Wang, I.-H. Yeh, and H.-Y. Mark~Liao, ``Yolov9: Learning what you want
+  to learn using programmable gradient information,'' in {\em Proc.~of the
+  Europ.~Conf.~on Computer Vision (ECCV)}, 2025.
+
+\bibitem{semanticblt_dataset}
+GAIA, ``Semanticblt dataset.'' \url{
+  https://universe.roboflow.com/gaia-hse8w/semanticblt }, jun 2024.
+\newblock visited on 2026-09-04.
+
+\end{thebibliography}

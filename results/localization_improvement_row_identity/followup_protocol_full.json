@@ -1,0 +1,141 @@
+{
+  "candidate_ids": [
+    "baseline_alpha_huber3_cap50",
+    "row_mixture",
+    "delayed_correction",
+    "row_mixture_delayed",
+    "row_mixture_delayed_gnss_gating"
+  ],
+  "candidates": [
+    {
+      "args": [
+        "--pose-backend",
+        "alpha",
+        "--gnss-robust-mode",
+        "huber",
+        "--gnss-outlier-threshold",
+        "3.0",
+        "--semantic-penalty-cap",
+        "50"
+      ],
+      "description": "Frozen reference baseline: alpha smoother, Huber GNSS threshold 3.0, semantic cap 50.",
+      "id": "baseline_alpha_huber3_cap50"
+    },
+    {
+      "args": [
+        "--pose-backend",
+        "alpha",
+        "--gnss-robust-mode",
+        "huber",
+        "--gnss-outlier-threshold",
+        "3.0",
+        "--semantic-penalty-cap",
+        "50",
+        "--row-likelihood-mode",
+        "mixture",
+        "--row-mixture-top-k",
+        "3"
+      ],
+      "description": "Baseline plus top-k row-mixture corridor likelihood.",
+      "id": "row_mixture"
+    },
+    {
+      "args": [
+        "--pose-backend",
+        "alpha",
+        "--gnss-robust-mode",
+        "huber",
+        "--gnss-outlier-threshold",
+        "3.0",
+        "--semantic-penalty-cap",
+        "50",
+        "--delayed-row-correction"
+      ],
+      "description": "Baseline plus lightweight delayed row-identity correction.",
+      "id": "delayed_correction"
+    },
+    {
+      "args": [
+        "--pose-backend",
+        "alpha",
+        "--gnss-robust-mode",
+        "huber",
+        "--gnss-outlier-threshold",
+        "3.0",
+        "--semantic-penalty-cap",
+        "50",
+        "--row-likelihood-mode",
+        "mixture",
+        "--row-mixture-top-k",
+        "3",
+        "--delayed-row-correction"
+      ],
+      "description": "Baseline plus row-mixture likelihood and delayed correction.",
+      "id": "row_mixture_delayed"
+    },
+    {
+      "args": [
+        "--pose-backend",
+        "alpha",
+        "--gnss-robust-mode",
+        "huber",
+        "--gnss-outlier-threshold",
+        "3.0",
+        "--semantic-penalty-cap",
+        "50",
+        "--row-likelihood-mode",
+        "mixture",
+        "--row-mixture-top-k",
+        "3",
+        "--delayed-row-correction",
+        "--gnss-row-gating"
+      ],
+      "description": "Baseline plus row mixture, delayed correction, and adaptive GNSS row gating.",
+      "id": "row_mixture_delayed_gnss_gating"
+    }
+  ],
+  "commands": [
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 11 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run1/baseline_alpha_huber3_cap50/seed_11 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 22 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run1/baseline_alpha_huber3_cap50/seed_22 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 33 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run1/baseline_alpha_huber3_cap50/seed_33 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 11 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run1/row_mixture/seed_11 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 22 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run1/row_mixture/seed_22 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 33 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run1/row_mixture/seed_33 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 11 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run1/delayed_correction/seed_11 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --delayed-row-correction --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 22 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run1/delayed_correction/seed_22 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --delayed-row-correction --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 33 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run1/delayed_correction/seed_33 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --delayed-row-correction --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 11 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run1/row_mixture_delayed/seed_11 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --delayed-row-correction --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 22 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run1/row_mixture_delayed/seed_22 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --delayed-row-correction --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 33 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run1/row_mixture_delayed/seed_33 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --delayed-row-correction --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 11 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run1/row_mixture_delayed_gnss_gating/seed_11 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --delayed-row-correction --gnss-row-gating --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 22 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run1/row_mixture_delayed_gnss_gating/seed_22 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --delayed-row-correction --gnss-row-gating --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 33 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run1 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run1/row_mixture_delayed_gnss_gating/seed_33 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --delayed-row-correction --gnss-row-gating --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 11 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run2/baseline_alpha_huber3_cap50/seed_11 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 22 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run2/baseline_alpha_huber3_cap50/seed_22 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 33 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run2/baseline_alpha_huber3_cap50/seed_33 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 11 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run2/row_mixture/seed_11 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 22 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run2/row_mixture/seed_22 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 33 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run2/row_mixture/seed_33 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 11 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run2/delayed_correction/seed_11 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --delayed-row-correction --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 22 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run2/delayed_correction/seed_22 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --delayed-row-correction --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 33 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run2/delayed_correction/seed_33 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --delayed-row-correction --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 11 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run2/row_mixture_delayed/seed_11 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --delayed-row-correction --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 22 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run2/row_mixture_delayed/seed_22 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --delayed-row-correction --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 33 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run2/row_mixture_delayed/seed_33 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --delayed-row-correction --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 11 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run2/row_mixture_delayed_gnss_gating/seed_11 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --delayed-row-correction --gnss-row-gating --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 22 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run2/row_mixture_delayed_gnss_gating/seed_22 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --delayed-row-correction --gnss-row-gating --require-cuda",
+    "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/scripts/spf_lidar.py --seed 33 --data-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF/data/2025/rh_run2 --geojson-path /home/pulver/projects/vineyard_pf/Outdoor_SLPF_iros_revision_plan/data/riseholme_poles_trunk.geojson --output-folder results/localization_improvement_row_identity/full/rh_run2/row_mixture_delayed_gnss_gating/seed_33 --no-visualization --pose-backend alpha --gnss-robust-mode huber --gnss-outlier-threshold 3.0 --semantic-penalty-cap 50 --row-likelihood-mode mixture --row-mixture-top-k 3 --delayed-row-correction --gnss-row-gating --require-cuda"
+  ],
+  "max_frames": null,
+  "require_cuda": true,
+  "seeds": [
+    11,
+    22,
+    33
+  ],
+  "stage": "full",
+  "traversals": [
+    "rh_run1",
+    "rh_run2"
+  ]
+}

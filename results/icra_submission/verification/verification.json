@@ -1,0 +1,43 @@
+{
+  "release_bundle": "results/icra_submission/evidence",
+  "branch": "codex/evidence-first-icra",
+  "worktree": "/home/pulver/projects/vineyard_pf/Outdoor_SLPF_icra_evidence",
+  "packaging_head": "fb76bafc82399bb5b10e6a60a1d4ad16659b2676",
+  "worktree_dirty": true,
+  "status": "passed",
+  "checks": {
+    "manifest": "canonical, fresh_rerun=true, 48 per-seed rows, 16 aggregate rows, 12 hashed input sources",
+    "seeds": "passed: exact registered seeds 11, 22, 33",
+    "main_matrix": "passed: 6 regenerated SLPF rows plus 42 baseline rows",
+    "dedicated_baselines": "passed: plain AMCL and RTAB-Map rh_run1 dedicated three-run groups have distinct output hashes; rh_run2 baseline rows are historical three-seed references",
+    "gnss_stress": "passed: 240 rows, 8 profiles x 2 traversals x 3 seeds x 5 methods; shared degraded-input hashes",
+    "ablation": "passed: 48 rows, 8 variants x 2 traversals x 3 seeds",
+    "robustness": "passed: 42 rows, 7 conditions x 2 traversals x 3 seeds; recovery aggregate included",
+    "cuda": "passed: all six fresh protocol records require CUDA and report RTX 4060 Ti allocation_ok=true",
+    "statistics": "passed: descriptive n=3 handling, exact paired sign tests/bootstrap intervals, fixed-reference deltas",
+    "py_compile": "passed",
+    "pytest": "56 passed",
+    "claim_checker": "passed",
+    "latex_build": "passed",
+    "pdf": "8 pages, US letter (612 x 792 pts)",
+    "sha256": "refreshed for paper/paper.pdf, evidence/manifest.json, and report/report_data.json"
+  },
+  "evidence_policy": {
+    "paper_facing_configuration": "configs/icra/alpha_huber3_cap50.yaml",
+    "traversals": [
+      "rh_run1",
+      "rh_run2"
+    ],
+    "seeds": [
+      11,
+      22,
+      33
+    ],
+    "cpu_fallback": false,
+    "unsupported_detector_accuracy_claim": false,
+    "embedded_jetson_claim": false,
+    "scope": "descriptive field evaluation on one surveyed vineyard; no universal deployment guarantee"
+  },
+  "hash_file": "results/icra_submission/submission_manifest.sha256",
+  "manifest_sha256": "3dacfbd6ca9944da78f280fc9d023ce48b5e1ad97fc2a17e7049acdfb9df5ec6"
+}

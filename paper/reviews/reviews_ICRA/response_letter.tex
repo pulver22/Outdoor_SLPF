@@ -1,0 +1,241 @@
+\documentclass[a4paper]{article}
+\usepackage{fullpage}
+\usepackage[margin=63pt]{geometry}
+\usepackage{graphics}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{amssymb}
+\usepackage{pdfpages}
+\usepackage{booktabs}
+
+\input{../stachnisslab-math.tex}
+\input{../stachnisslab-latex.tex}
+
+\def\etalcite#1{\etal~\cite{#1}}
+\newcommand\circledmark[1][red]{%
+  \ooalign{%
+    \hidewidth
+    \kern0.65ex\raisebox{-0.9ex}{\scalebox{3}{\textcolor{#1}{\textbullet}}}
+    \hidewidth\cr
+    $\checkmark$\cr
+  }%
+}
+
+\definecolor{brewerGreen0}{HTML}{E5F5F9}
+\definecolor{brewerGreen1}{HTML}{99D8C9}
+\definecolor{brewerGreen2}{HTML}{2CA25F}
+\definecolor{brewerCyan0}{HTML}{ECE2F0}
+\definecolor{brewerCyan1}{HTML}{A6BDDB}
+\definecolor{brewerCyan2}{HTML}{1C9099}
+\definecolor{brewerCyan9}{HTML}{023858}
+\definecolor{brewerGrey0}{HTML}{F0F0F0}
+\definecolor{brewerGrey1}{HTML}{BDBDBD}
+\definecolor{brewerGrey2}{HTML}{636363}
+
+\definecolor{commentColor}{HTML}{000000}
+\definecolor{revisionColor}{HTML}{0238A8}
+\definecolor{answerBoxColor}{HTML}{006D2C}
+
+\usepackage[colorlinks=true,linkcolor=answerBoxColor,citecolor=answerBoxColor,urlcolor=answerBoxColor,pagebackref]{hyperref}
+
+\usepackage{tcolorbox}
+\def\answer#1#2{\begin{tcolorbox}[width=\textwidth,colback={white},title={\textbf{Answer
+ #1}},colbacktitle=answerBoxColor,coltitle=white] #2 \end{tcolorbox} }
+
+\newcounter{todonum}
+\newcommand\resettodonum{\setcounter{todonum}{0}}
+\newcommand\mytodo{%
+  \stepcounter{todonum}%
+  \textcolor{red}{\;TODO \thetodonum}
+}
+
+\newcommand\boldblue[1]{\textcolor{blue}{\textbf{#1}}}
+\newcommand\boldred[1]{\textcolor{red}{\textbf{#1}}}
+\newcommand{\reviewed}[1]{\textcolor{blue}{#1}}
+
+\title{
+  \textbf{Anonymous Manuscript Revision}
+  \\[\baselineskip] Authors' Response to AE and Reviewers
+}
+\author{Anonymous Authors}
+
+\usepackage{titling}
+\setlength{\droptitle}{-0.5in}
+
+\begin{document}
+\maketitle
+\resettodonum
+
+We thank the Associate Editor and both reviewers for their careful and constructive feedback.
+In the revised manuscript, we addressed all requested points and added new experiments for fairness,
+robustness, and runtime reporting.
+For readability, modifications in the revised manuscript are highlighted in \reviewed{blue}.
+
+\paragraph{Summary of major revisions}
+\begin{itemize}
+  \item \textbf{Fairer benchmarking:} added \textbf{AMCL+NoisyGPS} (Kalman fusion) baseline in both traverses and reported multiseed results (seeds 11, 22, 33).
+  \item \textbf{Clearer metrics:} report raw APE and \textbf{RPE at 2 m / 5 m / 10 m} explicitly, plus cross-track error, row-correct fraction, and row-switch events.
+  \item \textbf{Semantic-wall clarity:} expanded the methodology and equations for ray casting and semantic-wall likelihood terms, and added a point-only non-wall formulation for comparison.
+  \item \textbf{Robustness to semantic/map degradation:} added two studies: (A) random semantic detection drop (20\%, 40\%) and (B) section landmark removal (30\%, 50\%) with recovery metrics.
+  \item \textbf{Runtime evaluation:} added repeated runtime profiling with full-pipeline throughput and component-level timings.
+  \item \textbf{Experimental reproducibility details:} expanded hardware/sensor/setup details (Thorvald platform, Intel RealSense D435i, SICK Tim7 2D LiDAR, RTK-GNSS), map usage, and fixed parameters.
+  \item \textbf{Figure readability:} regenerated trajectory figures with larger labels/legends, clearer line rendering, landmark/semantic-wall overlays, and start/end markers.
+  \item \textbf{Text fixes:} corrected all minor typographical/grammar issues raised by the reviewers.
+\end{itemize}
+
+\section*{Associate Editor}
+\paragraph{Report}
+{\color{commentColor}
+(1) Experimental evaluation is difficult to interpret; fairness concern because the proposed method uses GPS while some baselines do not; clarify RPE as RPE@X meters.\\
+(2) The advantages of semantics (especially semantic walls) are not sufficiently clear methodologically and quantitatively.\\
+(3) Plot readability needs improvement (labels/lines difficult to see in key figures).
+}
+
+\vspace{8pt}
+\answer{to Associate Editor}{
+Thank you for the detailed guidance. We revised the paper along exactly these three axes:
+\begin{itemize}
+  \item \textbf{Interpretability and fairness:} we added a fused \emph{AMCL+NoisyGPS} baseline and reran experiments on both traverses with three seeds. We now report raw APE and \emph{RPE@2m/@5m/@10m}. For example, on run2, SLPF obtains raw APE $=1.24\pm0.04$ m, versus $3.38\pm0.91$ m for AMCL+NoisyGPS and $3.50\pm0.94$ m for AMCL.
+  \item \textbf{Semantic contribution clarity:} we expanded the semantic-wall formulation and added explicit ablations. In the main ablation, removing semantic information degrades row consistency and geometry (row-correct from $0.732$ to $0.673$, cross-track mean from $1.263$ m to $1.499$ m).
+  \item \textbf{Plot clarity:} we regenerated the affected figures with larger fonts/legends, thicker trajectories, consistent scales, and overlays of landmarks/semantic walls to make row-switch behaviour easier to interpret.
+\end{itemize}
+}
+
+\newpage
+\section*{Reviewer 1}
+
+\paragraph{Comment 1.1}
+{\color{commentColor}
+The introduction/related work underplays prior fusion methods (LiDAR+vision/semantics). Please expand prior work discussion, clarify novelty and assumptions, and justify the 2D LiDAR choice versus 3D LiDAR.
+}
+\answer{1.1}{
+We expanded the introduction and related-work discussion to better position prior fusion/localization methods and to state our novelty more explicitly.
+We now clarify that our main technical contribution is not generic fusion, but a semantic-particle-filter design that uses semantic wall constraints plus adaptive GNSS weighting to handle row aliasing in repetitive vineyards.
+We also added a dedicated discussion on the 2D-vs-3D LiDAR design tradeoff: expected gains with 3D sensing, what would change in our pipeline, and why the current 2D setup was chosen for this platform and deployment context.
+}
+
+\paragraph{Comment 1.2}
+{\color{commentColor}
+Abstract/Introduction clarity: explicitly mention camera-based semantics (RGB-D), define AMCL at first use, provide quantitative effect sizes, state LiDAR type, and specify required navigation accuracy for vineyard autonomy.
+}
+\answer{1.2}{
+We revised the abstract and introduction accordingly:
+\begin{itemize}
+  \item semantics are explicitly described as camera/RGB-D driven;
+  \item AMCL is expanded on first use;
+  \item quantitative headline results are included;
+  \item LiDAR modality is stated in the abstract;
+  \item the introduction now states the operational row-following requirements and links them to the reported metrics (raw APE/RPE/cross-track/row-correct).
+\end{itemize}
+}
+
+\paragraph{Comment 1.3}
+{\color{commentColor}
+Method reproducibility: clarify data flow/parameters, calibration and time synchronization, and map construction assumptions (cost, maintenance, partial/missing landmarks).
+}
+\answer{1.3}{
+We expanded the methodology and setup descriptions for reproducibility:
+\begin{itemize}
+  \item clearer end-to-end data flow from RGB-D instance masks to BEV semantic labels and PF likelihood updates;
+  \item explicit fixed parameterization (including GNSS/semantic/corridor/background terms and particle settings);
+  \item explicit statement that synchronized RGB-D/LiDAR/RTK streams are used, with known camera--robot extrinsics in projection;
+  \item added map construction discussion, including behaviour under partial/perturbed maps and maintenance implications.
+\end{itemize}
+We also added dedicated robustness experiments under map degradation (see Comment 1.5/2.1 responses).
+}
+
+\paragraph{Comment 1.4}
+{\color{commentColor}
+Experimental setup and baselines: report vineyard size/path length and LiDAR details; clarify RTAB-Map settings; consider a modern visual(-inertial) SLAM baseline; improve qualitative trajectory interpretation with landmark/wall overlays and row-switch focus.
+}
+\answer{1.4}{
+We revised the experimental setup section with explicit site and sensor details (10 rows, mean row length, area/footprint, platform and sensor list including SICK Tim7 2D LiDAR).
+We also clarified baseline protocol/settings:
+\begin{itemize}
+  \item RTAB-Map RGB/RGBD run with default configuration files;
+  \item AMCL configured with the same 5 m sensing range used by SLPF for comparability;
+  \item added AMCL+NoisyGPS fusion baseline for fairness;
+  \item multiseed evaluation on two traverses with aggregate statistics.
+\end{itemize}
+For qualitative clarity, we regenerated trajectory figures with semantic-wall/landmark overlays, clearer labels and line styles, and start/end markers.
+In addition, we executed ORB-SLAM3 runs in our evaluation pipeline and report them as an additional reference baseline in the revision package.
+}
+
+\paragraph{Comment 1.5}
+{\color{commentColor}
+Failure modes should be quantified, e.g., degrade detections or mask map portions and report performance deltas.
+}
+\answer{1.5}{
+We added two new robustness studies on run1 (3 seeds):
+\begin{itemize}
+  \item \textbf{Detection Dropout}: random semantic detection removal at 20\% and 40\%.
+  \item \textbf{Section Landmark Removal}: remove 30\% and 50\% landmarks in one contiguous map band and evaluate recovery after leaving that region.
+\end{itemize}
+Results show graceful degradation and recovery. For example, baseline raw APE is $1.02\pm0.03$ m; with 40\% detection dropout it is $1.08\pm0.11$ m. Under 50\% section removal, post-section recovery remains successful in all runs (recovery rate $=100\%$) with mean recovery distance $11.79\pm4.46$ m.
+These additions directly quantify failure sensitivity and recovery behaviour.
+}
+
+\newpage
+\section*{Reviewer 2}
+
+\paragraph{Comment 2.1}
+{\color{commentColor}
+The semantic-wall contribution is not sufficiently clear in text/equations; clarify how virtual walls are fused with real observations and compare to using only real landmarks.
+}
+\answer{2.1}{
+We substantially revised the method section to clarify this point.
+The revised manuscript now details:
+\begin{itemize}
+  \item semantic-wall map construction from adjacent landmarks;
+  \item ray-casting against wall segments to obtain class/range predictions;
+  \item class-aware semantic/background likelihood terms and their fusion with GNSS/corridor terms.
+\end{itemize}
+To address the quantitative part, we added an explicit non-wall point-based formulation and ablation.
+Compared with the full model, removing semantics worsens row-level robustness (row-correct $0.732\rightarrow0.673$ and cross-track $1.263\rightarrow1.499$ m in the main ablation).
+This clarifies both \emph{how} walls are fused and \emph{what} they contribute empirically.
+}
+
+\paragraph{Comment 2.2}
+{\color{commentColor}
+For fairness, baselines such as AMCL/RTAB-Map should also include GPS observations since the proposed method uses GPS.
+}
+\answer{2.2}{
+Agreed. We added a fused \textbf{AMCL+NoisyGPS} baseline (constant-velocity Kalman fusion of AMCL and noisy GNSS positions) and evaluated it in the same multiseed protocol.
+This directly addresses the fairness concern.
+Representative results:
+\begin{itemize}
+  \item run1: SLPF raw APE $=1.14\pm0.07$ m vs AMCL+NoisyGPS $1.89\pm0.04$ m;
+  \item run2: SLPF raw APE $=1.24\pm0.04$ m vs AMCL+NoisyGPS $3.38\pm0.91$ m.
+\end{itemize}
+We now report all methods with raw APE, RPE@2/5/10m, cross-track, row-correct fraction, and row-switch events.
+}
+
+\paragraph{Comment 2.3}
+{\color{commentColor}
+Please include runtime evaluation to show real-time capability.
+}
+\answer{2.3}{
+We added a dedicated runtime profiling experiment (3 trials, warmup excluded).
+On the reported hardware (Threadripper 2950X + RTX 4060 Ti/3070), we obtain:
+\begin{itemize}
+  \item processed-frame throughput: $13.04\pm0.21$ Hz,
+  \item effective input-rate throughput with stride 4: $52.18\pm0.84$ Hz.
+\end{itemize}
+We also report component-level timing breakdown (semantic inference, measurement update, LiDAR association, motion update, resampling), enabling reproducibility and deployment-oriented interpretation.
+}
+
+\paragraph{Comment 2.4}
+{\color{commentColor}
+Minor points: increase axis/legend readability; fix Figure 3 caption punctuation; correct grammar/typographical issues in Sections III.C, III.D.2, and IV.B.
+}
+\answer{2.4}{
+All minor issues were corrected in the revision:
+\begin{itemize}
+  \item increased font sizes and improved readability in the affected figures;
+  \item corrected the Figure 3 caption punctuation;
+  \item fixed the grammatical/typographical errors identified in Sections III.C, III.D.2, and IV.B.
+\end{itemize}
+}
+
+\end{document}

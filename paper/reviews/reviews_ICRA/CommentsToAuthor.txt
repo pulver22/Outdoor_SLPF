@@ -1,0 +1,59 @@
+Comments to author (Associate Editor)
+=====================================
+
+The reviewers have mixed comments about the work. While
+they acknowledge that the manuscript is easy to follow,
+they also highlighted different sources of concerns about
+its current version. Most importantly:
+
+(1) Experimental evaluation (R1, R2) - Both reviewers
+raised concerns about the interpretation of the results. R1
+mentioned that the plots are not clear and look noisier
+than other baseline methods, which raises doubts about the
+performance of the system; R2 on the other hand raised
+concerns about the comparison being unfair, since the
+proposed method uses GPS while the other baselines do not
+(e.g., AMCL). In my opinion, after reading these comments
+and inspecting the plots, I agree that the results are
+difficult to interpret and the advantages of the method do
+not seem clear. As suggested by R2, one might wonder why an
+AMCL solution with GPS measurements wouldnt outperform all
+the other methods. Furthermore, reporting RPE without
+specifying the distance traveled (RPE@X meters) is not
+informative, because it cannot be interpreted as a drift
+rate.
+
+(2) Advantages of the semantics (R1, R2) - Both reviewers
+raised concerns to understand how the semantic walls
+contribute, both methodologically and quantitatively. This
+is a crucial point since this is the main contribution
+claimed by the paper, so  it needs to be clear in the
+method section, and demonstrated empirically through
+experiments that highlight the advantages of this feature.
+
+(3) Clarity of the plots (R2) - Both the labels and the
+lines are difficult to see in some plots, especially in Fig
+1 and 4. This impedes readers from understanding the
+results.
+
+I recommend the authors to carefully review the comments
+provided by the reviewers, in order to improve the clarity
+of the manuscript and ensure that the claimed technical
+contributions are clearly demonstrated by the experiments.
+
+
+
+----------------------------------------
+Comments on Video Attachment:
+
+[None found]
+Comments to author (Editor)
+================================
+
+See AE report
+
+
+----------------------------------------
+Comments on Video Attachment:
+
+[None found]

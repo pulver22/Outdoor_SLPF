@@ -1,0 +1,8 @@
+pose_backend: alpha
+gnss_robust_mode: huber
+gnss_outlier_threshold: 3.0
+semantic_penalty_cap: 50
+row_likelihood_mode: single
+delayed_row_correction: false
+gnss_row_gating: false
+diagnostics_level: full

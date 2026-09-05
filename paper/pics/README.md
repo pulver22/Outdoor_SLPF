@@ -1,0 +1,1 @@
+This is the directory for all image material, gnuplot scripts, and similar.

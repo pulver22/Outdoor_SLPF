@@ -1,0 +1,115 @@
+Reviewer 1 of ICRA 2026 submission 3047
+
+Comments to the author
+======================
+
+## General Overview
+
+- The introduction underplays prior sensor-fusion
+approaches (LiDAR + vision). Please expand the related work
+to cover fusion methods that confront row aliasing and
+appearance change, and state clearly how this paper differs
+(design choices, inputs, assumptions, and capabilities).
+The current motivation leans mostly on LiDAR failures in
+repetitive scenes without showing how your fusion
+formulation advances beyond earlier fusion pipelines.
+
+- The contributions are not fully supported by the
+literature framing. Map out which prior works addressed
+similar challenges (semantic landmarks, BEV projection, GPS
+priors) and which gaps remain for your method to fill.
+
+- Justify the choice of a 2D LiDAR versus a 3D LiDAR. What
+would change in your pipeline and in failure modes if a 3D
+scanner were available? Discuss expected benefits and
+limitations.
+
+---
+
+## Abstract
+
+- Make explicit that the semantic information comes from a
+camera (RGB-D) rather than from LiDAR alone; the abstract
+currently describes stable object-level detections and
+BEV fusion but does not name the camera explicitly.  
+
+- Define AMCL on first use in the abstract (the expansion
+only appears later in the paper).  
+
+- Add quantitative results (e.g., APE/RPE improvements vs.
+AMCL/RTAB-Map) to give readers a quick sense of effect
+size. Values are only in the Results section.  
+
+- State the LiDAR type used in experiments (you note 2D
+LiDAR later; include that here so the link to
+repetitive-row ambiguity is clear).  
+
+---
+
+## Introduction
+
+- Specify the required navigation accuracy for the target
+application (vineyard autonomy). Provide quantitative
+thresholds (e.g., row-keeping tolerance in meters/degrees)
+so readers can judge whether reported APE/RPE meets
+operational needs.  
+
+---
+
+## Related Works
+
+- Add works that fuse LiDAR and vision (and/or semantics)
+specifically for agricultural rows or repetitive outdoor
+structure; then state how your semantic walls + GPS
+weighting differ in assumptions, inputs, or robustness. A
+brief comparison table (sensors, priors, map type, runtime)
+would help.  
+
+---
+
+## Methodology
+
+- Implementation clarity: ensure the method can be
+reproduced from the paper alone (data flow, parameters, and
+all priors).
+
+- Calibration/time sync: clarify if the camera and LiDAR
+are extrinsically calibrated and whether streams are
+time-synchronized (hardware or software). The paper
+describes projecting RGB-D landmarks to LiDAR/BEV but does
+not specify calibration/sync requirements.
+
+- Map construction: you rely on a surveyed semantic
+landmark map and then create semantic walls. Discuss
+acquisition cost, maintenance, and robustness to
+missing/shifted landmarks; provide guidance for
+lower-accuracy mapping or partial maps.  
+
+---
+
+## Experimental Evaluation
+
+- Study area: report the vineyard area and total path
+length. You mention 10 rows but not size/distance, which
+limits external validity.  
+
+- Sensors: list the exact 2D LiDAR model, specs (angular
+resolution, range, accuracy), and mounting; you already
+list the RealSense D435i and RTK-GPS, but not the LiDAR
+brand/specs.  
+
+- Baselines: briefly explain RTAB-Map inputs and settings
+so differences are interpretable; consider adding a modern
+visual(-inertial) SLAM baseline such as ORB-SLAM3.  
+
+- Qualitative clarity: several trajectories show noisy
+estimates; help readers interpret by overlaying landmarks
+and semantic walls on the trajectory plots and by adding
+zoom-ins at row switches. Also, clearly mark where the
+pseudo-structural walls appear in the figures.	
+
+- Failure modes: the approach appears sensitive to
+misclassified/missing landmarks (which you note in
+Limitations). Please quantify the effect by degrading
+trunk/pole AP or masking portions of the map and reporting
+performance deltas.  

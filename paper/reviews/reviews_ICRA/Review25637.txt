@@ -1,0 +1,75 @@
+Reviewer 2 of ICRA 2026 submission 3047
+
+Comments to the author
+======================
+
+The authors present an approach for reliable localization
+of mobile robots in Vineyards whose repetitive features
+cause aliasing and degrade previous methods. They propose a
+semantic-aware particle filter where semantic landmarks
+(poles and trunks) are detected from images and projected
+into 2D LiDAR data to create semantic scans used in the
+particle filtering model. They also introduce semantic
+walls, which are virtual solid obstacles to constrain the
+observations in this map-based localization. Lastly, GPS
+measurements are fused into the particle filtering for
+improved efficiency and higher robustness in areas with
+fewer detected landmarks.     
+
+The text is easy to follow in general with minor mistakes. 
+
+Although the authors presented a localization system that
+showed improvements when compared to the baselines, some of
+the claims regarding the semantic walls contribution need
+more details and/or evaluation.   
+
+Here are the major points to be addressed in the
+manuscript:  
+
+1) The authors state that the introduced semantic walls,
+which are virtual obstacles (lines) between landmarks,
+improve localization and reduce ambiguity. However, it is
+unclear from the text and equations how these virtual
+landmarks are fused with the local (real) observations and
+actually enhance the localization. For instance, if a
+particle is very close to the wall, is the real landmark
+observation compared with the virtual line landmark in the
+likelihood function? How does that improve/compare with the
+case where only real landmarks are used on the map? These
+questions should be clarified in the manuscript to support
+the authors claims.  
+
+2) In the experimental section, Table I shows that despite
+localizing more often in the wrong row, the AMCL baseline
+has comparable errors to the proposed method. However, the
+authors method uses GPS, which constrains pose errors with
+absolute observations and therefore contributes to avoiding
+row switching. For a fair comparison, some of the baselines
+(AMCL or RTAB-Map) should also include GPS observations.  
+
+3) A runtime evaluation should be included in the
+manuscript to inform readers about the realtime
+capabilities of the method. 
+
+ 
+Some minor but important points to be addressed in the
+manuscript:  
+
+4) In Figures 1 and 4, the axes labels and legends are very
+small. Please increase the font size for better
+visualization.	
+
+5) In Figure 3, the caption text has a repeated period mark
+at the end.	
+
+6) In Section III.D.2, the sentence The total
+log-likelihood log Lx for particle x is a weighted sum of
+normalised the semantic and GPS likelihood components
+seems to have a misplaced the.  
+
+7) In Section IV.B, sentence ...all the baselines in both
+APE metric computed..., the word metric should be
+plural.  
+
+8) Section III.C, the first quotation mark is reversed in
+semantic walls. 

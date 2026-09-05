@@ -1,0 +1,177 @@
+{
+  "commit": "fb574fdeee9b401e54c16deeb8a0b57dfa59c6b9",
+  "traversals": [
+    "rh1",
+    "rh2"
+  ],
+  "methods": [
+    "slpf",
+    "ngps",
+    "amcl_ngps",
+    "rtab_rgb_ngps",
+    "rtab_rgbd_ngps"
+  ],
+  "python_exec": "/home/pulver/projects/vineyard_pf/Outdoor_SLPF/.venv/bin/python",
+  "require_cuda": false,
+  "cuda_probe": {
+    "status": "skipped",
+    "device_count": 0
+  },
+  "dropout_mode": "nan",
+  "headland_fraction": 0.15,
+  "profiles": [
+    {
+      "name": "nominal",
+      "region": "whole",
+      "outage_seconds": null,
+      "noise": {
+        "sigma_w_xy": 0.6,
+        "sigma_w_z": 0.0,
+        "sigma_b_xy": 0.6,
+        "sigma_b_z": 0.0,
+        "tau": 30.0,
+        "outlier_prob": 0.002,
+        "outlier_scale_xy": 3.0,
+        "outlier_scale_z": 0.0,
+        "outlier_dof": 3.0,
+        "dropout_rate": 0.0,
+        "dropout_mean_dur": 2.0,
+        "dropout_mode": "nan"
+      }
+    },
+    {
+      "name": "gaussian_high",
+      "region": "whole",
+      "outage_seconds": null,
+      "noise": {
+        "sigma_w_xy": 2.0,
+        "sigma_w_z": 0.0,
+        "sigma_b_xy": 1.0,
+        "sigma_b_z": 0.0,
+        "tau": 30.0,
+        "outlier_prob": 0.0,
+        "outlier_scale_xy": 4.0,
+        "outlier_scale_z": 6.0,
+        "outlier_dof": 3.0,
+        "dropout_rate": 0.0,
+        "dropout_mean_dur": 2.0,
+        "dropout_mode": "nan"
+      }
+    },
+    {
+      "name": "drift_bias",
+      "region": "whole",
+      "outage_seconds": null,
+      "noise": {
+        "sigma_w_xy": 0.4,
+        "sigma_w_z": 0.0,
+        "sigma_b_xy": 3.0,
+        "sigma_b_z": 0.0,
+        "tau": 90.0,
+        "outlier_prob": 0.0,
+        "outlier_scale_xy": 4.0,
+        "outlier_scale_z": 6.0,
+        "outlier_dof": 3.0,
+        "dropout_rate": 0.0,
+        "dropout_mean_dur": 2.0,
+        "dropout_mode": "nan"
+      }
+    },
+    {
+      "name": "multipath_bursts",
+      "region": "whole",
+      "outage_seconds": null,
+      "noise": {
+        "sigma_w_xy": 0.8,
+        "sigma_w_z": 0.0,
+        "sigma_b_xy": 1.0,
+        "sigma_b_z": 0.0,
+        "tau": 30.0,
+        "outlier_prob": 0.03,
+        "outlier_scale_xy": 8.0,
+        "outlier_scale_z": 0.0,
+        "outlier_dof": 3.0,
+        "dropout_rate": 0.0,
+        "dropout_mean_dur": 2.0,
+        "dropout_mode": "nan"
+      }
+    },
+    {
+      "name": "outage_5s",
+      "region": "whole",
+      "outage_seconds": 5.0,
+      "noise": {
+        "sigma_w_xy": 0.6,
+        "sigma_w_z": 0.0,
+        "sigma_b_xy": 0.6,
+        "sigma_b_z": 0.0,
+        "tau": 30.0,
+        "outlier_prob": 0.005,
+        "outlier_scale_xy": 4.0,
+        "outlier_scale_z": 6.0,
+        "outlier_dof": 3.0,
+        "dropout_rate": 0.0,
+        "dropout_mean_dur": 2.0,
+        "dropout_mode": "nan"
+      }
+    },
+    {
+      "name": "outage_10s",
+      "region": "whole",
+      "outage_seconds": 10.0,
+      "noise": {
+        "sigma_w_xy": 0.6,
+        "sigma_w_z": 0.0,
+        "sigma_b_xy": 0.6,
+        "sigma_b_z": 0.0,
+        "tau": 30.0,
+        "outlier_prob": 0.005,
+        "outlier_scale_xy": 4.0,
+        "outlier_scale_z": 6.0,
+        "outlier_dof": 3.0,
+        "dropout_rate": 0.0,
+        "dropout_mean_dur": 2.0,
+        "dropout_mode": "nan"
+      }
+    },
+    {
+      "name": "outage_20s",
+      "region": "whole",
+      "outage_seconds": 20.0,
+      "noise": {
+        "sigma_w_xy": 0.6,
+        "sigma_w_z": 0.0,
+        "sigma_b_xy": 0.6,
+        "sigma_b_z": 0.0,
+        "tau": 30.0,
+        "outlier_prob": 0.005,
+        "outlier_scale_xy": 4.0,
+        "outlier_scale_z": 6.0,
+        "outlier_dof": 3.0,
+        "dropout_rate": 0.0,
+        "dropout_mean_dur": 2.0,
+        "dropout_mode": "nan"
+      }
+    },
+    {
+      "name": "headland_only_degradation",
+      "region": "headland",
+      "outage_seconds": null,
+      "noise": {
+        "sigma_w_xy": 2.0,
+        "sigma_w_z": 0.0,
+        "sigma_b_xy": 2.0,
+        "sigma_b_z": 0.0,
+        "tau": 60.0,
+        "outlier_prob": 0.02,
+        "outlier_scale_xy": 6.0,
+        "outlier_scale_z": 0.0,
+        "outlier_dof": 3.0,
+        "dropout_rate": 0.0,
+        "dropout_mean_dur": 2.0,
+        "dropout_mode": "nan"
+      }
+    }
+  ],
+  "commands": []
+}

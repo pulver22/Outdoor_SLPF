@@ -252,4 +252,18 @@ results/plots/fig4_zoom_headland_transition_experiment2_candidate.pdf
 
 # Out-of-scope local scripts
 scripts/run_jojo_multiseed.py
-scripts/tune_spfpp_optuna.py
+
+# Temporary and unused artifacts
+temporary_unused_artifacts/
+._*
+**/.DS_Store
+
+# LaTeX build artifacts
+paper/*.aux
+paper/*.blg
+paper/*.fdb_latexmk
+paper/*.fls
+paper/*.log
+paper/*.out
+paper/*.synctex.gz
+

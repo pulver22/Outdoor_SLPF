@@ -36,7 +36,12 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import Normalize
 
-from geojson_rows import iter_projected_points
+try:
+    from geojson_rows import iter_projected_points
+    from experiment_runtime import build_experiment_env, cuda_preflight, requested_device, require_cuda_preflight
+except ModuleNotFoundError:
+    from scripts.geojson_rows import iter_projected_points
+    from scripts.experiment_runtime import build_experiment_env, cuda_preflight, requested_device, require_cuda_preflight
 
 
 BASE_DIR = Path(__file__).parent.parent
@@ -46,19 +51,42 @@ DEFAULT_OUTPUT_ROOT = BASE_DIR / "results" / "ab_runs"
 DEFAULT_GEOJSON = BASE_DIR / "data" / "riseholme_poles_trunk.geojson"
 
 
-KEY_METRICS = [
-    "ape_align_rmse",
-    "rpe_2m_align_rmse",
-    "rpe_5m_align_rmse",
-    "rpe_10m_align_rmse",
+ROW_BASE_METRICS = [
     "cross_track_mean",
+    "cross_track_median",
+    "cross_track_max",
     "row_correct_fraction",
     "row_switch_events",
+    "wrong_row_duration_sec",
+    "wrong_row_distance_m",
+    "max_wrong_row_duration_sec",
+    "max_wrong_row_distance_m",
+    "mean_recovery_distance_m",
+    "failure_rate",
+    "xt_below_0p25_fraction",
+    "xt_below_0p5_fraction",
+    "xt_below_1p0_fraction",
+]
+
+ROW_SECTION_METRICS = ROW_BASE_METRICS
+
+SMOOTHNESS_METRICS = [
     "speed_mean",
     "accel_rms",
     "jerk_rms",
     "heading_rate_rms",
     "heading_accel_rms",
+]
+
+KEY_METRICS = [
+    "ape_align_rmse",
+    "rpe_2m_align_rmse",
+    "rpe_5m_align_rmse",
+    "rpe_10m_align_rmse",
+    *ROW_BASE_METRICS,
+    *[f"headland_{metric}" for metric in ROW_SECTION_METRICS],
+    *[f"inrow_{metric}" for metric in ROW_SECTION_METRICS],
+    *SMOOTHNESS_METRICS,
 ]
 
 
@@ -92,21 +120,8 @@ def run_cmd(cmd: List[str], log_path: Path, cwd: Path, env: Dict[str, str] | Non
 
 
 def check_cuda_available(python_exec: Path) -> bool:
-    probe = [
-        str(python_exec),
-        "-c",
-        "import torch; print('1' if torch.cuda.is_available() else '0')",
-    ]
-    proc = subprocess.run(
-        probe,
-        cwd=str(BASE_DIR),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        check=False,
-    )
-    out = (proc.stdout or "").strip().splitlines()
-    return proc.returncode == 0 and len(out) > 0 and out[-1].strip() == "1"
+    env = build_experiment_env(BASE_DIR)
+    return bool(cuda_preflight(python_exec, env=env, cwd=BASE_DIR).get("allocation_ok"))
 
 
 def read_tum_file(path: Path) -> Trajectory:
@@ -167,6 +182,99 @@ def apply_transform(points: np.ndarray, scale: float, rot: np.ndarray, trans: np
     return (scale * (rot @ points.T)).T + trans
 
 
+def quaternion_to_yaw_xyzw(q: np.ndarray) -> float:
+    x, y, z, w = [float(v) for v in q]
+    return float(np.arctan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (y * y + z * z)))
+
+
+def yaw_to_quaternion_xyzw(yaw: float) -> np.ndarray:
+    return np.asarray([0.0, 0.0, np.sin(yaw * 0.5), np.cos(yaw * 0.5)], dtype=np.float64)
+
+
+def start_pose_anchor_positions(
+    est_pos: np.ndarray,
+    est_quat: np.ndarray,
+    gt_pos: np.ndarray,
+    gt_quat: np.ndarray | None = None,
+) -> np.ndarray:
+    """Translate and yaw-rotate an estimate so its first pose matches ground truth."""
+    est_pos = np.asarray(est_pos, dtype=np.float64)
+    gt_pos = np.asarray(gt_pos, dtype=np.float64)
+    if est_pos.size == 0 or gt_pos.size == 0:
+        return np.array(est_pos, copy=True)
+
+    anchored = np.array(est_pos, copy=True)
+    est_xy = est_pos[:, :2] - est_pos[0, :2]
+
+    if gt_quat is not None and len(est_quat) > 0 and len(gt_quat) > 0:
+        yaw_est = quaternion_to_yaw_xyzw(np.asarray(est_quat)[0])
+        yaw_gt = quaternion_to_yaw_xyzw(np.asarray(gt_quat)[0])
+        delta_yaw = yaw_gt - yaw_est
+        c = float(np.cos(delta_yaw))
+        s = float(np.sin(delta_yaw))
+        rot2 = np.array([[c, -s], [s, c]], dtype=np.float64)
+        est_xy = est_xy @ rot2.T
+
+    anchored[:, :2] = est_xy + gt_pos[0, :2]
+    anchored[:, 2] = est_pos[:, 2] - est_pos[0, 2] + gt_pos[0, 2]
+    return anchored
+
+
+def start_pose_anchor_quaternions(est_quat: np.ndarray, gt_quat: np.ndarray | None) -> np.ndarray:
+    """Yaw-rotate quaternions by the same initial-frame offset as the position anchor."""
+    est_quat = np.asarray(est_quat, dtype=np.float64)
+    if est_quat.size == 0:
+        return np.array(est_quat, copy=True)
+    if gt_quat is None or len(gt_quat) == 0:
+        return np.array(est_quat, copy=True)
+
+    yaw_est0 = quaternion_to_yaw_xyzw(est_quat[0])
+    yaw_gt0 = quaternion_to_yaw_xyzw(np.asarray(gt_quat)[0])
+    delta_yaw = yaw_gt0 - yaw_est0
+    anchored = np.array(est_quat, copy=True)
+    for idx, quat in enumerate(est_quat):
+        anchored[idx] = yaw_to_quaternion_xyzw(quaternion_to_yaw_xyzw(quat) + delta_yaw)
+    return anchored
+
+
+def write_tum_file(path: Path, trajectory: Trajectory) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as f:
+        f.write("# timestamp tx ty tz qx qy qz qw\n")
+        for t, p, q in zip(trajectory.timestamps, trajectory.positions, trajectory.quaternions):
+            f.write(
+                f"{float(t)} {float(p[0])} {float(p[1])} {float(p[2])} "
+                f"{float(q[0])} {float(q[1])} {float(q[2])} {float(q[3])}\n"
+            )
+
+
+def start_pose_anchored_trajectory(est_tum: Path, gt_tum: Path) -> Trajectory:
+    est = read_tum_file(est_tum)
+    gt = read_tum_file(gt_tum)
+    gt_interp = interpolate_positions(gt.timestamps, gt.positions, est.timestamps)
+    gt_quat_interp = np.empty((len(est.timestamps), 4), dtype=np.float64)
+    for idx in range(4):
+        gt_quat_interp[:, idx] = np.interp(est.timestamps, gt.timestamps, gt.quaternions[:, idx])
+    anchored_pos = start_pose_anchor_positions(est.positions, est.quaternions, gt_interp, gt_quat_interp)
+    anchored_quat = start_pose_anchor_quaternions(est.quaternions, gt_quat_interp)
+    return Trajectory(est.timestamps, anchored_pos, anchored_quat)
+
+
+def prepare_eval_trajectory(
+    est_tum: Path,
+    gt_tum: Path,
+    out_dir: Path,
+    *,
+    start_pose_anchor: bool = False,
+) -> Path:
+    if not start_pose_anchor:
+        return est_tum
+    anchored = start_pose_anchored_trajectory(est_tum, gt_tum)
+    anchored_path = out_dir / "start_pose_anchored_estimate.tum"
+    write_tum_file(anchored_path, anchored)
+    return anchored_path
+
+
 def parse_evo_stats(archive_path: Path) -> Dict[str, float | None]:
     if not archive_path.exists():
         return {"rmse": None, "mean": None, "median": None, "max": None, "std": None}
@@ -206,6 +314,34 @@ def nearest_row_and_distance(pt: np.ndarray, rows: Dict[str, np.ndarray]) -> Tup
     return best_row, best_dist
 
 
+def nearest_row_endpoint_distance(pt: np.ndarray, rows: Dict[str, np.ndarray]) -> float:
+    best_dist = float("inf")
+    for pts in rows.values():
+        if len(pts) == 0:
+            continue
+        best_dist = min(
+            best_dist,
+            float(np.linalg.norm(pt - pts[0])),
+            float(np.linalg.norm(pt - pts[-1])),
+        )
+    return best_dist
+
+
+def classify_headland_mask(
+    gt_interp: np.ndarray,
+    rows: Dict[str, np.ndarray],
+    *,
+    endpoint_radius_m: float = 3.0,
+    row_distance_threshold_m: float = 2.5,
+) -> np.ndarray:
+    mask = np.zeros(len(gt_interp), dtype=bool)
+    for idx, point in enumerate(gt_interp[:, :2]):
+        _, row_distance = nearest_row_and_distance(point, rows)
+        endpoint_distance = nearest_row_endpoint_distance(point, rows)
+        mask[idx] = endpoint_distance <= endpoint_radius_m or row_distance >= row_distance_threshold_m
+    return mask
+
+
 def load_rows_from_geojson(path: Path, target_crs: str = "epsg:32630") -> Dict[str, np.ndarray]:
     if not path.exists():
         raise FileNotFoundError(path)
@@ -234,7 +370,119 @@ def load_rows_from_geojson(path: Path, target_crs: str = "epsg:32630") -> Dict[s
     return rows_sorted
 
 
-def compute_row_metrics(est_aligned: np.ndarray, gt_interp: np.ndarray, rows: Dict[str, np.ndarray]) -> Dict[str, float]:
+def _sample_intervals(timestamps: np.ndarray | None, n: int) -> np.ndarray:
+    if n <= 0:
+        return np.zeros(0, dtype=np.float64)
+    if timestamps is None:
+        intervals = np.ones(n, dtype=np.float64)
+        intervals[-1] = 0.0
+        return intervals
+
+    ts = np.asarray(timestamps, dtype=np.float64)
+    if ts.shape[0] != n:
+        raise ValueError(f"timestamps length {ts.shape[0]} does not match trajectory length {n}")
+    intervals = np.zeros(n, dtype=np.float64)
+    if n > 1:
+        intervals[:-1] = np.maximum(0.0, np.diff(ts))
+    return intervals
+
+
+def _path_intervals(points: np.ndarray) -> np.ndarray:
+    n = len(points)
+    intervals = np.zeros(n, dtype=np.float64)
+    if n > 1:
+        intervals[:-1] = np.linalg.norm(np.diff(points[:, :2], axis=0), axis=1)
+    return intervals
+
+
+def _fraction_below(values: np.ndarray, threshold: float) -> float:
+    finite = values[np.isfinite(values)]
+    if finite.size == 0:
+        return float("nan")
+    return float(np.mean(finite <= threshold))
+
+
+def _wrong_run_metrics(
+    wrong: np.ndarray,
+    time_intervals: np.ndarray,
+    distance_intervals: np.ndarray,
+) -> Dict[str, float]:
+    if wrong.size == 0:
+        return {
+            "row_switch_events": float("nan"),
+            "wrong_row_duration_sec": float("nan"),
+            "wrong_row_distance_m": float("nan"),
+            "max_wrong_row_duration_sec": float("nan"),
+            "max_wrong_row_distance_m": float("nan"),
+            "mean_recovery_distance_m": float("nan"),
+        }
+
+    starts = np.flatnonzero(wrong & np.r_[True, ~wrong[:-1]])
+    durations = []
+    distances = []
+    recovery_distances = []
+
+    for start in starts:
+        end = int(start)
+        while end + 1 < wrong.size and wrong[end + 1]:
+            end += 1
+        durations.append(float(np.sum(time_intervals[start : end + 1])))
+        distances.append(float(np.sum(distance_intervals[start : end + 1])))
+        if end + 1 < wrong.size and not wrong[end + 1]:
+            recovery_distances.append(float(np.sum(distance_intervals[start : end + 1])))
+
+    return {
+        "row_switch_events": float(len(starts)),
+        "wrong_row_duration_sec": float(np.sum(durations)) if durations else 0.0,
+        "wrong_row_distance_m": float(np.sum(distances)) if distances else 0.0,
+        "max_wrong_row_duration_sec": float(np.max(durations)) if durations else 0.0,
+        "max_wrong_row_distance_m": float(np.max(distances)) if distances else 0.0,
+        "mean_recovery_distance_m": float(np.mean(recovery_distances)) if recovery_distances else float("nan"),
+    }
+
+
+def _row_metric_block(
+    cross_track: np.ndarray,
+    matches: np.ndarray,
+    wrong: np.ndarray,
+    time_intervals: np.ndarray,
+    distance_intervals: np.ndarray,
+) -> Dict[str, float]:
+    if cross_track.size == 0:
+        return {metric: float("nan") for metric in ROW_BASE_METRICS}
+
+    finite_ct = cross_track[np.isfinite(cross_track)]
+    run_metrics = _wrong_run_metrics(wrong, time_intervals, distance_intervals)
+    block = {
+        "cross_track_mean": float(np.mean(finite_ct)) if finite_ct.size else float("nan"),
+        "cross_track_median": float(np.median(finite_ct)) if finite_ct.size else float("nan"),
+        "cross_track_max": float(np.max(finite_ct)) if finite_ct.size else float("nan"),
+        "row_correct_fraction": float(np.mean(matches)) if matches.size else float("nan"),
+        **run_metrics,
+        "failure_rate": float(np.mean(wrong)) if wrong.size else float("nan"),
+        "xt_below_0p25_fraction": _fraction_below(cross_track, 0.25),
+        "xt_below_0p5_fraction": _fraction_below(cross_track, 0.5),
+        "xt_below_1p0_fraction": _fraction_below(cross_track, 1.0),
+    }
+    return block
+
+
+def _prefixed_block(prefix: str, block: Dict[str, float]) -> Dict[str, float]:
+    return {f"{prefix}_{key}": value for key, value in block.items()}
+
+
+def _empty_prefixed_block(prefix: str) -> Dict[str, float]:
+    return {f"{prefix}_{key}": float("nan") for key in ROW_SECTION_METRICS}
+
+
+def compute_row_metrics(
+    est_aligned: np.ndarray,
+    gt_interp: np.ndarray,
+    rows: Dict[str, np.ndarray],
+    *,
+    timestamps: np.ndarray | None = None,
+    headland_mask: np.ndarray | None = None,
+) -> Dict[str, float]:
     cross_track_errs = []
     est_rows = []
     gt_rows = []
@@ -258,21 +506,42 @@ def compute_row_metrics(est_aligned: np.ndarray, gt_interp: np.ndarray, rows: Di
         else:
             cross_track_errs.append(est_row_dist)
 
-    ct_arr = np.asarray([c for c in cross_track_errs if c is not None], dtype=np.float64)
-    matches = [1 if (e == g and e is not None) else 0 for e, g in zip(est_rows, gt_rows)]
-    wrong = [1 if (e != g and e is not None and g is not None) else 0 for e, g in zip(est_rows, gt_rows)]
-    switches = 0
-    for i, val in enumerate(wrong):
-        if val and (i == 0 or not wrong[i - 1]):
-            switches += 1
+    n = len(gt_interp)
+    ct_arr = np.asarray(cross_track_errs, dtype=np.float64)
+    matches = np.asarray([e == g and e is not None and g is not None for e, g in zip(est_rows, gt_rows)], dtype=bool)
+    wrong = ~matches
+    time_intervals = _sample_intervals(timestamps, n)
+    distance_intervals = _path_intervals(gt_interp)
 
-    return {
-        "cross_track_mean": float(np.mean(ct_arr)) if ct_arr.size else float("nan"),
-        "cross_track_median": float(np.median(ct_arr)) if ct_arr.size else float("nan"),
-        "cross_track_max": float(np.max(ct_arr)) if ct_arr.size else float("nan"),
-        "row_correct_fraction": float(np.mean(matches)) if matches else float("nan"),
-        "row_switch_events": float(switches),
-    }
+    base_block = _row_metric_block(ct_arr, matches, wrong, time_intervals, distance_intervals)
+    out = dict(base_block)
+
+    if headland_mask is None:
+        out.update(_empty_prefixed_block("headland"))
+        out.update(_prefixed_block("inrow", base_block))
+        return out
+
+    headland = np.asarray(headland_mask, dtype=bool)
+    if headland.shape[0] != n:
+        raise ValueError(f"headland_mask length {headland.shape[0]} does not match trajectory length {n}")
+
+    for prefix, mask in (("headland", headland), ("inrow", ~headland)):
+        if not np.any(mask):
+            out.update(_empty_prefixed_block(prefix))
+            continue
+        out.update(
+            _prefixed_block(
+                prefix,
+                _row_metric_block(
+                    ct_arr[mask],
+                    matches[mask],
+                    wrong[mask],
+                    time_intervals[mask],
+                    distance_intervals[mask],
+                ),
+            )
+        )
+    return out
 
 
 def _rms(arr: np.ndarray) -> float:
@@ -431,16 +700,26 @@ def evaluate_run(
     evo_ape_bin: Path,
     evo_rpe_bin: Path,
     env: Dict[str, str],
+    start_pose_anchor: bool = False,
 ) -> Dict[str, float | str]:
-    evo = run_evo_bundle(est_tum, gt_tum, name, out_dir, evo_ape_bin, evo_rpe_bin, env)
-    aligned = aligned_estimate(est_tum, gt_tum)
-    row_metrics = compute_row_metrics(aligned["est_aligned"], aligned["gt_interp"], rows)
+    eval_est_tum = prepare_eval_trajectory(est_tum, gt_tum, out_dir, start_pose_anchor=start_pose_anchor)
+    evo = run_evo_bundle(eval_est_tum, gt_tum, name, out_dir, evo_ape_bin, evo_rpe_bin, env)
+    aligned = aligned_estimate(eval_est_tum, gt_tum)
+    row_metrics = compute_row_metrics(
+        aligned["est_aligned"],
+        aligned["gt_interp"],
+        rows,
+        timestamps=aligned["timestamps"],
+        headland_mask=classify_headland_mask(aligned["gt_interp"], rows),
+    )
     smooth = compute_smoothness_metrics(aligned["timestamps"], aligned["est_aligned"])
 
     return {
         "run_name": name,
         "est_tum": str(est_tum),
+        "eval_est_tum": str(eval_est_tum),
         "gt_tum": str(gt_tum),
+        "start_pose_anchor": int(start_pose_anchor),
         **evo,
         **row_metrics,
         **smooth,
@@ -670,7 +949,8 @@ def main():
     parser.add_argument("--gps-weight", type=float, default=0.5)
     parser.add_argument("--miss-penalty", type=float, default=4.0)
     parser.add_argument("--wrong-hit-penalty", type=float, default=4.0)
-    parser.add_argument("--cuda-visible-devices", type=str, default="0")
+    parser.add_argument("--device", choices=["auto", "cuda", "cpu"], default="auto")
+    parser.add_argument("--cuda-visible-devices", type=str, default=None)
     parser.add_argument("--require-cuda", dest="require_cuda", action="store_true", default=True)
     parser.add_argument("--allow-cpu", dest="require_cuda", action="store_false")
     args = parser.parse_args()
@@ -704,8 +984,9 @@ def main():
         raise ValueError(f"Need at least {args.run_count} seeds, got {len(seeds)}")
     seeds = seeds[: args.run_count]
 
-    if args.require_cuda and not check_cuda_available(python_exec):
-        raise RuntimeError("CUDA is required but not visible in this Python runtime.")
+    env = build_experiment_env(BASE_DIR, cuda_visible_devices=args.cuda_visible_devices)
+    if args.require_cuda:
+        require_cuda_preflight(python_exec, env=env, cwd=BASE_DIR)
 
     evo_ape_bin = python_exec.parent / "evo_ape"
     evo_rpe_bin = python_exec.parent / "evo_rpe"
@@ -717,10 +998,6 @@ def main():
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     run_dir = output_root / f"{ts}_option12_validation"
     run_dir.mkdir(parents=True, exist_ok=True)
-
-    env = os.environ.copy()
-    env["CUDA_VISIBLE_DEVICES"] = args.cuda_visible_devices
-    env["MPLBACKEND"] = "Agg"
 
     # Baseline evaluation (existing files only).
     baseline_eval_dir = run_dir / "baseline_eval"
@@ -758,6 +1035,8 @@ def main():
             str(seed),
             "--output-folder",
             str(out_dir),
+            "--device",
+            requested_device(args.device, args.require_cuda),
         ]
         if args.require_cuda:
             cmd.append("--require-cuda")
